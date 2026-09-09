@@ -4,6 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>KCM Focus Family Prestudy Pamphlet Guide</title>
+<script>
+// Pre-paint theme script, copied from blueberry_game/apps/web/index.html.
+// Light first: dark only when the reader explicitly chose it. It runs inline
+// and before first paint, so there is never a flash of the wrong theme. An
+// onload handler would run after paint and flash.
+(function () {
+  try {
+    if (localStorage.getItem("theme") === "dark") {
+      document.documentElement.classList.add("dark");
+    }
+  } catch (e) {
+    /* storage blocked: stay light */
+  }
+})();
+</script>
 <style>
 
 
@@ -25,6 +40,16 @@
   --red:#B3261E; --red-bg:#FDF0EF; --red-rule:#D9534A;
   --lav-bg:#F4F0FB; --lav-rule:#9334E6;
   --hl:#FFF0A6; --line:#DAD7E4; --link:#1155CC;
+
+  /* Screen only. The sheet is the page, the ground is what it sits on, and the
+     grid draws on the ground. Print never sees any of this. */
+  --sheet:#FFFFFF; --ground:#EDEBF2; --grid:#DEDBE8; --frame:#D5D1E2;
+  --shadow:rgba(0,0,0,.07); --sheet-fade:rgba(255,255,255,.9);
+  /* Named so the dark block has something to flip. Every one of these was a
+     literal in the rule that used it. */
+  --soft:#F7F7F9; --code-bg:#F2F1F6; --tip-bg:#F0F7F4; --note-bd:#BFBBCC;
+  --msg-bd:#D6C9EE; --nav-bd:#F0DCDA; --sub:#4A4756; --mut:#8B8798;
+  --btn-bg:#FFFFFF; --btn-hover:#F4F2F8; --chip-bg:#FFFFFF;
 }
 @page{
   size:Letter; margin:0.8in 0.85in 0.86in 0.85in;
@@ -46,14 +71,14 @@ p{margin:0 0 8pt 0;}
   text-transform:uppercase;color:var(--acc);margin-bottom:24pt;}
 .cv-rule{width:52pt;height:2.4pt;background:var(--amber-rule);margin-bottom:24pt;}
 .cv-title{font-family:'Libre';font-size:21pt;line-height:1.3;font-weight:700;color:var(--deep);margin:0 0 14pt 0;}
-.cv-sub{font-family:'Libre';font-size:10.4pt;font-style:italic;color:#4A4756;line-height:1.55;margin:0 0 34pt 0;}
+.cv-sub{font-family:'Libre';font-size:10.4pt;font-style:italic;color:var(--sub);line-height:1.55;margin:0 0 34pt 0;}
 .cv-chip{display:inline-block;font-family:'Instr';font-size:7.4pt;font-weight:700;letter-spacing:.09em;
   text-transform:uppercase;color:var(--acc);border:.7pt solid var(--acc);border-radius:2pt;padding:3.5pt 7pt;margin:0 5pt 6pt 0;}
 .cv-meta{border-top:.6pt solid var(--line);padding-top:14pt;margin-top:48pt;font-family:'Instr';
   font-size:8.8pt;line-height:1.95;color:#3D3A4A;}
 .cv-meta b{font-weight:700;color:var(--deep);}
 .cv-foot{position:absolute;left:1.35in;right:2.05in;bottom:.95in;font-family:'Instr';font-size:7.8pt;
-  color:#8B8798;letter-spacing:.05em;border-top:.6pt solid var(--line);padding-top:9pt;}
+  color:var(--mut);letter-spacing:.05em;border-top:.6pt solid var(--line);padding-top:9pt;}
 
 .partpage{break-before:page;}
 .part-label{font-family:'Instr';font-size:7.8pt;font-weight:700;letter-spacing:.17em;
@@ -102,10 +127,10 @@ ul.check>li::before{content:"";position:absolute;left:0;top:2.6pt;width:8.5pt;he
 .warn.red .warn-mark span{border-bottom-color:var(--red-rule);}
 .warn.red b.lead{color:var(--red);}
 
-.note{background:#F7F7F9;border-left:2.4pt solid #BFBBCC;padding:7pt 11pt;margin:9pt 0;
-  font-size:9pt;font-style:italic;color:#4A4756;break-inside:avoid;}
+.note{background:var(--soft);border-left:2.4pt solid var(--note-bd);padding:7pt 11pt;margin:9pt 0;
+  font-size:9pt;font-style:italic;color:var(--sub);break-inside:avoid;}
 .note b{font-style:normal;}
-.tip{background:#F0F7F4;border-left:2.4pt solid var(--green);padding:7pt 11pt;margin:9pt 0;
+.tip{background:var(--tip-bg);border-left:2.4pt solid var(--green);padding:7pt 11pt;margin:9pt 0;
   font-size:9pt;color:#33443B;break-inside:avoid;}
 .tip .tl{font-family:'Instr';font-size:7.4pt;font-weight:700;letter-spacing:.13em;
   text-transform:uppercase;color:var(--green-dk);display:block;margin-bottom:3pt;}
@@ -116,11 +141,11 @@ ul.check>li::before{content:"";position:absolute;left:0;top:2.6pt;width:8.5pt;he
 .verse .ref{font-family:'Instr';font-size:7.4pt;font-style:normal;font-weight:700;letter-spacing:.1em;
   text-transform:uppercase;color:var(--lav-rule);display:block;margin-bottom:4pt;}
 
-.msgbox{background:var(--lav-bg);border:.8pt solid #D6C9EE;border-radius:4pt;padding:10pt 40pt 10pt 13pt;
+.msgbox{background:var(--lav-bg);border:.8pt solid var(--msg-bd);border-radius:4pt;padding:10pt 40pt 10pt 13pt;
   margin:9pt 0;position:relative;break-inside:avoid;font-size:9.4pt;color:#332F42;}
 .msgbox .ci{position:absolute;right:11pt;top:10pt;width:13pt;height:15pt;}
 .msgbox .ci i{position:absolute;display:block;border:1pt solid var(--acc);border-radius:1.5pt;}
-.msgbox .ci i.b{left:0;top:3pt;width:9pt;height:11pt;background:#fff;}
+.msgbox .ci i.b{left:0;top:3pt;width:9pt;height:11pt;background:var(--sheet);}
 .msgbox .ci i.f{left:3.5pt;top:0;width:9pt;height:11pt;background:var(--lav-bg);}
 
 mark{background:var(--hl);padding:0 1.5pt;border-radius:1pt;}
@@ -136,7 +161,7 @@ th{font-family:'Instr';font-size:7.4pt;font-weight:700;letter-spacing:.1em;text-
   color:var(--acc);text-align:left;border-bottom:1pt solid var(--acc);padding:0 8pt 4.5pt 0;vertical-align:bottom;}
 td{padding:6pt 8pt 6pt 0;border-bottom:.5pt solid var(--line);vertical-align:top;line-height:1.5;}
 td:last-child,th:last-child{padding-right:0;}
-tr.grp td{background:#F7F7F9;font-family:'Instr';font-size:7.4pt;font-weight:700;letter-spacing:.12em;
+tr.grp td{background:var(--soft);font-family:'Instr';font-size:7.4pt;font-weight:700;letter-spacing:.12em;
   text-transform:uppercase;color:var(--green-dk);padding:4.5pt 8pt 4.5pt 6pt;}
 td.k{font-family:'Instr';font-weight:700;font-size:8.9pt;color:var(--deep);width:31%;}
 table.vals td.k{width:24%;}
@@ -146,9 +171,9 @@ figure img{max-width:100%;border:.6pt solid var(--line);border-radius:2pt;}
 figcaption{font-family:'Instr';font-size:7.9pt;color:#5F5B6E;margin-top:6pt;line-height:1.45;}
 figcaption b{color:var(--acc);font-weight:700;}
 
-pre{font-family:'Mono';font-size:8pt;line-height:1.5;background:#F7F7F9;border-left:2.4pt solid var(--green);
+pre{font-family:'Mono';font-size:8pt;line-height:1.5;background:var(--soft);border-left:2.4pt solid var(--green);
   padding:9pt 11pt;margin:8pt 0 10pt 0;white-space:pre-wrap;break-inside:avoid;color:#2B2A33;}
-code{font-family:'Mono';font-size:8.4pt;background:#F2F1F6;padding:.5pt 2.5pt;border-radius:2pt;}
+code{font-family:'Mono';font-size:8.4pt;background:var(--code-bg);padding:.5pt 2.5pt;border-radius:2pt;}
 a,.url{color:var(--link);text-decoration:underline;}
 .ref-list{font-size:9pt;line-height:1.5;}
 .ref-list p{padding-left:20pt;text-indent:-20pt;margin-bottom:8pt;word-wrap:break-word;}
@@ -169,12 +194,12 @@ a,.url{color:var(--link);text-decoration:underline;}
   letter-spacing:.14em;text-transform:uppercase;padding:5pt 11pt;}
 .navcard .nb{padding:9pt 11pt 7pt 11pt;}
 .navcard table{margin:0;font-size:9pt;}
-.navcard td{border-bottom:.5pt solid #F0DCDA;padding:5pt 8pt 5pt 0;}
+.navcard td{border-bottom:.5pt solid var(--nav-bd);padding:5pt 8pt 5pt 0;}
 .navcard tr:last-child td{border-bottom:none;}
 .navcard td.q{width:56%;}
 .navcard td.a{font-family:'Instr';font-weight:700;color:var(--red);}
 .inline-warn{margin:11pt 0 11pt 0;}
-.copybtn{position:absolute;right:8pt;top:7pt;background:#fff;border:.9pt solid var(--acc);
+.copybtn{position:absolute;right:8pt;top:7pt;background:var(--chip-bg);border:.9pt solid var(--acc);
   border-radius:3pt;padding:4pt 5pt 2pt 5pt;cursor:pointer;}
 .copybtn.copied{background:var(--acc);}
 .reslist td.k{width:30%;}
@@ -184,7 +209,21 @@ body{background:#ffffff;}
 .page-wrap{position:relative;}
 
 @media screen{
-  body{max-width:830px;margin:0 auto;padding:44px 40px 110px 40px;font-size:10.6pt;line-height:1.72;}
+  /* The ground. The grid is two repeating gradients rather than an image so it
+     costs nothing and recolours with the theme. */
+  body{background:var(--ground);min-height:100vh;
+    background-image:
+      repeating-linear-gradient(to right,var(--grid) 0 1px,transparent 1px 26px),
+      repeating-linear-gradient(to bottom,var(--grid) 0 1px,transparent 1px 26px);}
+  /* The sheet. This carries the width and padding that used to sit on body, so
+     that body is free to be the ground behind it. */
+  .page-wrap{max-width:830px;margin:0 auto;padding:44px 40px 110px 40px;
+    background:var(--sheet);border-left:1px solid var(--frame);
+    border-right:1px solid var(--frame);box-shadow:0 0 34px var(--shadow);}
+}
+
+@media screen{
+  body{font-size:10.6pt;line-height:1.72;}
   h1{font-size:20pt;}
   h2{font-size:13pt;margin-top:30pt;}
   h3{font-size:10pt;margin-top:22pt;}
@@ -199,7 +238,13 @@ body{background:#ffffff;}
   .note,.tip,.verse,.msgbox{padding:12pt 15pt;margin:14pt 0;}
   ol.sub>li,ul.tick>li,ul.check>li{margin-bottom:7pt;}
   .cover{height:auto;padding:0 0 34px 0;margin-bottom:26px;border-bottom:1.6pt solid var(--deep);position:relative;}
-  .cover-bar,.cover-accent{display:none;}
+  /* The PDF cover bar, brought back on screen. It is pulled out by the sheet's
+     own 40px padding so it sits flush to the sheet edge the way it sits flush
+     to the paper edge in print. Proportions follow the print rule: a wide bar,
+     a thin accent, then a gap before the text. */
+  .cover-bar{display:block;left:-40px;top:0;width:26px;height:100%;}
+  .cover-accent{display:block;left:-14px;top:0;width:3px;height:100%;}
+  .cover{padding-left:24px;}
   .cover-inner{position:static;}
   .cv-foot{position:static;margin-top:22px;right:auto;}
   .cover-logo{position:absolute;right:0;bottom:34px;width:78px;}
@@ -207,7 +252,7 @@ body{background:#ffffff;}
 }
 
 .docbar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:8px;align-items:center;
-  justify-content:space-between;background:rgba(255,255,255,.9);backdrop-filter:blur(8px);
+  justify-content:space-between;background:var(--sheet-fade);backdrop-filter:blur(8px);
   border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:22px;}
 .docbar .t{font-family:'Instr';font-size:12px;font-weight:700;letter-spacing:.09em;
   text-transform:uppercase;color:var(--acc);}
@@ -215,9 +260,9 @@ body{background:#ffffff;}
 
 .btn{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;border-radius:8px;
   font-family:'Instr';font-size:13px;font-weight:500;transition:background-color .15s,color .15s;
-  outline-offset:2px;height:36px;padding:0 16px;border:1px solid var(--line);background:#fff;
+  outline-offset:2px;height:36px;padding:0 16px;border:1px solid var(--line);background:var(--btn-bg);
   color:var(--deep);box-shadow:0 1px 2px rgba(0,0,0,.05);cursor:pointer;text-decoration:none;gap:7px;}
-.btn:hover{background:#F4F2F8;}
+.btn:hover{background:var(--btn-hover);}
 .btn:focus-visible{outline:2px solid var(--acc);}
 .btn-primary{background:var(--acc);color:#fff;border-color:var(--acc);}
 .btn-primary:hover{background:#5E4396;}
@@ -232,15 +277,60 @@ body{background:#ffffff;}
 
 .tip{position:relative;}
 .tip-bubble{position:absolute;top:calc(100% + 6px);right:0;z-index:50;white-space:nowrap;
-  border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--deep);
+  border-radius:8px;border:1px solid var(--line);background:var(--sheet);color:var(--deep);
   padding:5px 9px;font-family:'Instr';font-size:11px;box-shadow:0 4px 14px rgba(0,0,0,.08);
   opacity:0;transform:scale(.95);transition:opacity .12s,transform .12s;pointer-events:none;}
 .tip:hover .tip-bubble,.tip:focus-within .tip-bubble{opacity:1;transform:scale(1);}
 
 .pdfsection{margin-top:64px;padding-top:40px;border-top:.6pt solid var(--line);}
 .pdfframe{width:100%;height:78vh;min-height:520px;border:1px solid var(--line);border-radius:8px;
-  background:#F7F7F9;}
+  background:var(--soft);}
 
+/* Theme toggle, the control copied from blueberry_game MeTab: a two button
+   segmented pair, sun and moon, aria-pressed marking the live one. */
+.themetog{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+.tbtn{display:inline-flex;align-items:center;gap:5px;height:36px;padding:0 12px;border:0;
+  background:var(--btn-bg);color:var(--mut);font-family:'Instr';font-size:12px;font-weight:600;
+  cursor:pointer;line-height:1;}
+.tbtn+.tbtn{border-left:1px solid var(--line);}
+.tbtn:hover{background:var(--btn-hover);}
+.tbtn[aria-pressed="true"]{background:var(--acc-soft);color:var(--acc);}
+
+@media screen{
+  /* Dark lives inside @media screen on purpose: print then cannot inherit it,
+     so a reader who prints while in dark mode still gets the light document
+     and does not empty a toner cartridge on the background. */
+  .dark{
+    --ink:#E8E6F2; --deep:#CFCCE6; --acc:#B3B6F2; --acc-soft:#262B4A;
+    --green:#6FCFAE; --green-dk:#8FE0C4;
+    --amber:#E8B76B; --amber-bg:#332A16; --amber-rule:#C89448;
+    --red:#FB7185; --red-bg:#3A1F22; --red-rule:#E0656F;
+    --lav-bg:#2A2547; --lav-rule:#C08CF5;
+    --hl:#5A4A12; --line:#3A3F63; --link:#8FB4F5;
+
+    --sheet:#1B1E33; --ground:#101227; --grid:#1B1E38; --frame:#3A3F63;
+    --shadow:rgba(0,0,0,.5); --sheet-fade:rgba(27,30,51,.9);
+    --soft:#232741; --code-bg:#2C3151; --tip-bg:#1E3830; --note-bd:#6F74A3;
+    --msg-bd:#4A4270; --nav-bd:#4A3038; --sub:#BAB7CC; --mut:#9C98B4;
+    --btn-bg:#232741; --btn-hover:#2C3151; --chip-bg:#232741;
+  }
+  /* The figures are drawn light: screenshots of light UI, and diagrams whose
+     fills are baked into the SVG. Inverting them would misrepresent what the
+     reader sees in Acrobat, so at night they keep their own paper instead. */
+  .dark figure img,.dark figure svg{background:#F4F3F8;border-radius:6px;}
+
+  /* Inks that were literals chosen against light tinted panels. At night the
+     panel underneath them is dark, so they take the light inks instead of
+     keeping a value that only worked on paper. */
+  .dark .cv-meta,.dark .phase .pd{color:var(--sub);}
+  .dark .tip,.dark .verse,.dark .msgbox,.dark pre{color:var(--ink);}
+  .dark .warn b.lead{color:var(--amber);}
+  .dark figcaption,.dark .signoff .sname{color:var(--mut);}
+  /* These four put white on an accent fill. At night the accent is the pale
+     half of the pair, so the ink and the surface swap roles. */
+  .dark .btn-primary,.dark .step-n,.dark .navcard .nh,.dark .msgbox .ci i.b{color:#1B1E33;}
+  .dark .btn-primary:hover{background:#C9CBF7;}
+}
 </style>
 </head>
 <body>
@@ -248,6 +338,10 @@ body{background:#ffffff;}
 <div class="docbar">
   <span class="t">KCM Prestudy Pamphlet Guide</span>
   <span class="acts">
+    <span class="themetog" role="group" aria-label="Colour theme">
+      <button type="button" class="tbtn" data-theme-set="light" aria-pressed="true"><span aria-hidden="true">&#9728;</span> Light</button>
+      <button type="button" class="tbtn" data-theme-set="dark" aria-pressed="false"><span aria-hidden="true">&#9790;</span> Dark</button>
+    </span>
     <a class="btn" href="#pdf">Read as PDF</a>
     <a class="btn btn-primary" href="guide.pdf" download>Download PDF</a>
   </span>
@@ -868,7 +962,36 @@ function fallbackCopy(text, done) {
   document.body.removeChild(area);
 }
 
+// Theme wiring, the setter copied from blueberry_game/apps/web/src/app/hooks.ts.
+// The class goes on <html> so the pre-paint script and this agree on one place.
+function setTheme(theme) {
+  document.documentElement.classList.toggle("dark", theme === "dark");
+  try {
+    localStorage.setItem("theme", theme);
+  } catch (e) {
+    /* storage blocked: the choice lasts for the session */
+  }
+  syncThemeButtons();
+}
+
+function syncThemeButtons() {
+  var current = document.documentElement.classList.contains("dark") ? "dark" : "light";
+  document.querySelectorAll("[data-theme-set]").forEach(function (btn) {
+    btn.setAttribute("aria-pressed", btn.getAttribute("data-theme-set") === current ? "true" : "false");
+  });
+}
+
+function initThemeToggle() {
+  document.querySelectorAll("[data-theme-set]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      setTheme(btn.getAttribute("data-theme-set"));
+    });
+  });
+  syncThemeButtons();
+}
+
 initCopyButtons();
+initThemeToggle();
 
 </script>
 </body>

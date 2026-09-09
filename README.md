@@ -35,13 +35,13 @@ Then visit `http://localhost:8000`. A server is needed because the browser block
 
 ## Files
 
-    index.html        the guide
-    guide.pdf         printable version
-    css/style.css     styles
-    js/hexfloat.js    background effect
-    js/app.js         copy button and background setup
-    fonts/            Libre Baskerville, Instrument Sans, JetBrains Mono, Allura
-    img/              annotated screenshots
+    index.html            the guide
+    guide.pdf             printable version
+    example-pamphlet.pdf  a finished pamphlet, Spring FF #06, as a reference
+
+The styles, the background effect, the copy buttons, the fonts (Libre Baskerville,
+Instrument Sans, JetBrains Mono, Allura) and the annotated screenshots are all
+inlined into `index.html`, so it is one self-contained file with no dependencies.
 
 ## Credits
 

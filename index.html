@@ -51,7 +51,7 @@ document.documentElement.classList.add("paged");
   /* Named so the dark block has something to flip. Every one of these was a
      literal in the rule that used it. */
   --soft:#F7F7F9; --code-bg:#F2F1F6; --tip-bg:#F0F7F4; --note-bd:#BFBBCC;
-  --msg-bd:#D6C9EE; --nav-bd:#F0DCDA; --sub:#4A4756; --mut:#8B8798;
+  --msg-bd:#D6C9EE; --sub:#4A4756; --mut:#8B8798;
   --btn-bg:#FFFFFF; --btn-hover:#F4F2F8; --chip-bg:#FFFFFF;
   --band:#F3F2F7;
 }
@@ -193,15 +193,6 @@ a,.url{color:var(--link);text-decoration:underline;}
 .signoff .sname{font-family:'Instr';font-weight:700;font-size:8.4pt;letter-spacing:.09em;
   text-transform:uppercase;color:#6E6B7B;}
 .signoff .kcmlogo{width:0.6in;height:auto;display:inline-block;margin-top:13pt;}
-.navcard{border:1.4pt solid var(--red-rule);border-radius:4pt;margin:14pt 0 16pt 0;break-inside:avoid;}
-.navcard .nh{background:var(--red-rule);color:#fff;font-family:'Instr';font-size:8pt;font-weight:700;
-  letter-spacing:.14em;text-transform:uppercase;padding:5pt 11pt;}
-.navcard .nb{padding:9pt 11pt 7pt 11pt;}
-.navcard table{margin:0;font-size:9pt;}
-.navcard td{border-bottom:.5pt solid var(--nav-bd);padding:5pt 8pt 5pt 0;}
-.navcard tr:last-child td{border-bottom:none;}
-.navcard td.q{width:56%;}
-.navcard td.a{font-family:'Instr';font-weight:700;color:var(--red);}
 .inline-warn{margin:11pt 0 11pt 0;}
 .copybtn{position:absolute;right:8pt;top:7pt;background:var(--chip-bg);border:.9pt solid var(--acc);
   border-radius:3pt;padding:4pt 5pt 2pt 5pt;cursor:pointer;}
@@ -428,11 +419,12 @@ body{background:#ffffff;}
 .theme-transition .themebtn *{transition-property:transform,opacity !important;transition-duration:.5s !important;
   transition-timing-function:cubic-bezier(.34,1.56,.64,1) !important;}
 
-/* Download: an icon that widens into a labelled pill on hover. */
-.dlbtn{padding:0 9px;gap:0;}
-.dl-lbl{max-width:0;opacity:0;overflow:hidden;transition:max-width .35s ease,opacity .2s ease,margin-left .35s ease;}
-@media (hover:hover){.dlbtn:hover .dl-lbl{max-width:9rem;opacity:1;margin-left:7px;}}
-.dlbtn:focus-visible .dl-lbl{max-width:9rem;opacity:1;margin-left:7px;}
+/* Icon buttons that widen into a labelled pill on hover: Download PDF in the
+   header, GitHub in the footer. */
+.xbtn{padding:0 9px;gap:0;}
+.xlbl{max-width:0;opacity:0;overflow:hidden;transition:max-width .35s ease,opacity .2s ease,margin-left .35s ease;}
+@media (hover:hover){.xbtn:hover .xlbl{max-width:9rem;opacity:1;margin-left:7px;}}
+.xbtn:focus-visible .xlbl{max-width:9rem;opacity:1;margin-left:7px;}
 
 /* Header: the flower mark, the guide's name, and who it is for. */
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--deep);min-width:0;}
@@ -442,7 +434,7 @@ body{background:#ffffff;}
 .brand-s{font-family:'Instr';font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--acc);}
 /* On a phone the header keeps to one row: the mark and subtitle go. */
 @media (max-width:480px){.docbar{flex-wrap:nowrap;}.docbar-l{min-width:0;}.docbar .acts{flex-shrink:0;}
-  .brand-mark,.brand-s{display:none;}.brand-t{font-size:13px;overflow:hidden;text-overflow:ellipsis;}}
+  .docbar .brand-mark,.brand-s{display:none;}.brand-t{font-size:13px;overflow:hidden;text-overflow:ellipsis;}}
 
 /* KCM logo card. It leans toward the pointer, lifts, and grows, the Blueberry
    bento tile (grignard-app-source/src/components/ui/bento-tile.tsx). The JS
@@ -531,7 +523,36 @@ body{background:#ffffff;}
 .tool-ico svg.full{width:100%;height:100%;}
 .sprite{position:absolute;width:0;height:0;overflow:hidden;}
 @media print{.page-head{display:none;}}
-.navcard td.a a{color:inherit;}
+
+/* Footer, after Blueberry's (grignard-app-source/src/components/ui/site-footer.tsx):
+   a quiet rule with a lit seam in the middle, a small brand column, and a link
+   column under a mono label. The columns blur up into place the first time
+   they scroll into view, once. The links are the old "In a hurry?" card. */
+.foot{display:none;}
+@media screen{
+  .foot{display:grid;grid-template-columns:1fr 1.8fr;gap:32px;position:relative;margin-top:56px;padding-top:36px;
+    border-top:1px solid var(--line);}
+  .foot::before{content:"";position:absolute;top:-1px;left:50%;width:33%;height:1px;transform:translateX(-50%);
+    background:linear-gradient(to right,transparent,rgba(155,122,214,.7),transparent);filter:blur(1px);}
+}
+@media screen and (max-width:640px){.foot{grid-template-columns:1fr;}}
+.foot-brand{display:flex;flex-direction:column;align-items:flex-start;gap:12px;}
+.foot-brand .brand-mark{width:36px;height:36px;}
+.foot-blurb{margin:0;max-width:18rem;font-family:'Instr';font-size:13px;line-height:1.55;color:var(--sub);}
+.foot-meta{margin:0;font-family:'Mono';font-size:11px;color:var(--mut);}
+.foot-h{margin:0 0 6px 0;font-family:'Mono';font-size:10.5px;font-weight:400;letter-spacing:.18em;text-transform:uppercase;color:var(--sub);}
+.foot-note{margin:0 0 12px 0;font-family:'Instr';font-size:12.5px;color:var(--mut);}
+.foot-links{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:2px 16px;}
+@media (max-width:560px){.foot-links{grid-template-columns:1fr;}}
+.foot-links a{display:flex;align-items:center;gap:10px;padding:6px 8px;margin:0 -8px;border-radius:8px;
+  color:var(--deep);text-decoration:none;transition:background-color .15s ease,transform .15s ease;}
+.foot-links a:hover,.foot-links a:focus-visible{background:var(--btn-hover);transform:translateX(2px);}
+.foot-links a:focus-visible{outline:2px solid var(--acc);outline-offset:1px;}
+.foot-links a:hover .toc-ico,.foot-links a:focus-visible .toc-ico{background:var(--acc);color:var(--sheet);}
+.foot-q{display:block;font-family:'Instr';font-size:13px;line-height:1.35;}
+.foot-a{display:block;font-family:'Instr';font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--acc);}
+.rise{transition:opacity .7s ease,filter .7s ease,transform .7s ease;transition-delay:var(--d,0s);}
+.js-rise .rise:not(.in){opacity:0;filter:blur(4px);transform:translateY(-8px);}
 
 
 @media screen{
@@ -549,7 +570,7 @@ body{background:#ffffff;}
     --sheet:#1E1238; --ground:#140B28; --grid:#22163F; --frame:#43316E;
     --shadow:rgba(0,0,0,.5); --sheet-fade:rgba(30,18,56,.9);
     --soft:#291A4A; --code-bg:#35225E; --tip-bg:#1E3830; --note-bd:#A1A1AA;
-    --msg-bd:#4B3679; --nav-bd:#4A3038; --sub:#E4E4E7; --mut:#A1A1AA;
+    --msg-bd:#4B3679; --sub:#E4E4E7; --mut:#A1A1AA;
     --btn-bg:#291A4A; --btn-hover:#35225E; --chip-bg:#291A4A;
     --band:#2A1A4D;
   }
@@ -565,9 +586,9 @@ body{background:#ffffff;}
   .dark .tip,.dark .verse,.dark .msgbox,.dark pre{color:var(--ink);}
   .dark .warn b.lead{color:var(--amber);}
   .dark figcaption,.dark .signoff .sname{color:var(--mut);}
-  /* These four put white on an accent fill. At night the accent is the pale
+  /* These three put white on an accent fill. At night the accent is the pale
      half of the pair, so the ink and the surface swap roles. */
-  .dark .btn-primary,.dark .step-n,.dark .navcard .nh,.dark .msgbox .ci i.b{color:#1E1238;}
+  .dark .btn-primary,.dark .step-n,.dark .msgbox .ci i.b{color:#1E1238;}
   .dark .btn-primary:hover{background:#E4E4E7;}
   /* The cover stripe is the ink colour, white at night, which would merge
      with the white accent line beside it. */
@@ -594,7 +615,7 @@ body{background:#ffffff;}
   </span>
   <span class="acts">
     <button type="button" class="themebtn" aria-label="Switch to dark theme" aria-pressed="false" title="Switch to dark theme"><svg class="tt" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><mask id="tt-mask"><rect x="-8" y="-8" width="40" height="40" fill="white"/><circle class="tt-bite" cx="33" cy="0" r="9" fill="black"/></mask><g mask="url(#tt-mask)"><circle class="tt-body" cx="12" cy="12" r="9" fill="currentColor" stroke="none"/></g><g class="tt-rays"><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="5.64" y1="5.64" x2="4.22" y2="4.22"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/><line x1="5.64" y1="18.36" x2="4.22" y2="19.78"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/></g></svg></button>
-    <a class="btn btn-primary dlbtn" href="guide.pdf" download><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg><span class="dl-lbl">Download PDF</span></a>
+    <a class="btn btn-primary xbtn" href="guide.pdf" download><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg><span class="xlbl">Download PDF</span></a>
   </span>
 </div>
 
@@ -745,21 +766,6 @@ body{background:#ffffff;}
 <section class="partpage" id="who" data-page="who" data-title="Who This Guide Is For">
   <div class="part-label">Before you start</div>
   <h1>Who This Guide Is For</h1><div class="h1rule"></div>
-
-  <div class="navcard">
-    <div class="nh">In a hurry? Skip ahead.</div>
-    <div class="nb">
-      <p style="margin:0 0 7pt 0;font-size:9pt;">You do not have to read this front to back. Most people only need one part of it at a time.</p>
-      <table>
-        <tr><td class="q">I just need to make the document.</td><td class="a"><a href="#step-1">Phase 1, Step 1</a></td></tr>
-        <tr><td class="q">I have the file and just need to print it.</td><td class="a"><a href="#step-10">Phase 4, Step 10</a></td></tr>
-        <tr><td class="q">I need help researching the passage.</td><td class="a"><a href="#step-4">Phase 2, Step 4</a></td></tr>
-        <tr><td class="q">I need to get it approved.</td><td class="a"><a href="#step-8">Phase 3, Step 8</a></td></tr>
-        <tr><td class="q">My test copy folded wrong.</td><td class="a"><a href="#troubleshooting">Troubleshooting</a></td></tr>
-        <tr><td class="q">I have never opened Adobe Acrobat.</td><td class="a"><a href="#step-10">Before Step 10</a></td></tr>
-      </table>
-    </div>
-  </div>
 
   <h3>Who you are</h3>
   <p>You are a new Focus Family Leader. You were probably appointed within the last few weeks, and your first pamphlet is due sooner than feels comfortable. You already use Google Docs and Discord without thinking about it. You have most likely never opened Adobe Acrobat's print settings, used Bible Hub's research tools, or run a campus print kiosk, and you are not a developer. None of that is a problem. Everything in this guide was written assuming exactly that starting point.</p>
@@ -1289,6 +1295,28 @@ body{background:#ffffff;}
   <a class="pager-prev" href="#home"><span class="pager-k">Previous</span><span class="pager-t"></span></a>
   <a class="pager-next" href="#home"><span class="pager-k">Next</span><span class="pager-t"></span></a>
 </nav>
+
+<!-- FOOTER. After Blueberry's site footer; the links are the old "In a hurry?" card. -->
+<footer class="foot">
+  <div class="foot-brand rise">
+    <a class="brand" href="#home" aria-label="Prestudy Pamphlet Guide, overview"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect x=".5" y=".5" width="31" height="31" rx="8" fill="#F6EEDC" stroke="#E2D3AE"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(0 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(60 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(120 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(180 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(240 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(300 16 16)"/><circle cx="16" cy="16" r="3" fill="#E6AE4A" stroke="#B98322" stroke-width=".6"/></svg></a>
+    <p class="foot-blurb">How Kharis Campus Ministry's Focus Family leaders make the bi-weekly Prestudy Pamphlet, written down by one of them.</p>
+    <p class="foot-meta">&copy; 2026 Andrew Liu</p>
+    <a class="btn xbtn" href="https://github.com/andliu7/ff_technical_instructions" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.37.5 0 5.87 0 12.5c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58 0-.28-.01-1.03-.02-2.02-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.33-1.76-1.33-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.11-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6.01 0c2.29-1.55 3.3-1.23 3.3-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.62-5.48 5.92.43.37.81 1.1.81 2.22 0 1.6-.01 2.89-.01 3.28 0 .32.21.7.83.58A12.01 12.01 0 0 0 24 12.5C24 5.87 18.63.5 12 .5Z"/></svg><span class="xlbl">GitHub</span></a>
+  </div>
+  <div class="rise" style="--d:.08s">
+    <h2 class="foot-h">In a hurry? Skip ahead.</h2>
+    <p class="foot-note">You do not have to read this front to back. Most people only need one part of it at a time.</p>
+    <ul class="foot-links">
+      <li><a href="#step-1"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg></span><span><span class="foot-q">I just need to make the document.</span><span class="foot-a">Phase 1, Step 1</span></span></a></li>
+      <li><a href="#step-10"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/></svg></span><span><span class="foot-q">I have the file and just need to print it.</span><span class="foot-a">Phase 4, Step 10</span></span></a></li>
+      <li><a href="#step-4"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span><span class="foot-q">I need help researching the passage.</span><span class="foot-a">Phase 2, Step 4</span></span></a></li>
+      <li><a href="#step-8"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></svg></span><span><span class="foot-q">I need to get it approved.</span><span class="foot-a">Phase 3, Step 8</span></span></a></li>
+      <li><a href="#troubleshooting"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span><span><span class="foot-q">My test copy folded wrong.</span><span class="foot-a">Troubleshooting</span></span></a></li>
+      <li><a href="#step-10"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg></span><span><span class="foot-q">I have never opened Adobe Acrobat.</span><span class="foot-a">Before Step 10</span></span></a></li>
+    </ul>
+  </div>
+</footer>
 </div>
 <!-- FLOATING NAV -->
 <div class="fab" role="group" aria-label="Page navigation">
@@ -1546,11 +1574,31 @@ function initPages() {
   showPage();
 }
 
+// The footer columns blur up into place the first time they come into view,
+// Blueberry's Rise. Only armed when it can finish, so without an observer or
+// with reduced motion the footer simply shows.
+function initFooter() {
+  var foot = document.querySelector(".foot");
+  if (!("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  foot.classList.add("js-rise");
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("in");
+      io.unobserve(entry.target);
+    });
+  });
+  foot.querySelectorAll(".rise").forEach(function (el) {
+    io.observe(el);
+  });
+}
+
 initCopyButtons();
 initThemeToggle();
 initFab();
 initSidebar();
 initLogoCards();
+initFooter();
 initPages();
 
 </script>

@@ -524,8 +524,58 @@ body{background:#ffffff;}
 .sprite{position:absolute;width:0;height:0;overflow:hidden;}
 @media print{.page-head{display:none;}}
 
+/* Laser seam. Canvas UI's Laser, rebuilt in CSS for the one place its idea
+   fits this page: the edge the page lifts off the footer, so the footer is
+   uncovered from behind the beam. A white-hot core and a coloured glow taper to
+   points across 55% of the content column, flicker and drift, and brighten
+   while you scroll (see initLaser); a heat band spills onto the footer.
+   Canvas UI's version also shimmers and heats the content itself, which needs
+   an experimental Chrome API, so it is left out. Numbers follow its props:
+   thickness 6, radius 20, width .55, flicker .2, color [.051,.349,1]. */
+.laser{display:none;}
+@media screen{
+  .laser{--laser:13 89 255;--act:0;display:block;position:absolute;left:50%;bottom:0;z-index:2;height:0;
+    width:calc(min(830px,100vw) * .55);transform:translateX(-50%);pointer-events:none;}
+  .laser-core,.laser-glow,.laser-heat{position:absolute;left:0;right:0;}
+  .laser-core{top:-3px;height:6px;
+    background:radial-gradient(closest-side,#FFFFFF 55%,rgb(var(--laser) / .9) 80%,transparent);
+    animation:laser-flicker 7s steps(1,end) infinite,laser-drift 11s ease-in-out infinite alternate;}
+  .laser-glow{top:-20px;height:40px;filter:blur(4px);opacity:calc(.6 + .4 * var(--act));
+    background:radial-gradient(closest-side,rgb(var(--laser) / .85),rgb(var(--laser) / .35) 45%,transparent);
+    animation:laser-drift 11s ease-in-out infinite alternate;}
+  .laser-heat{top:0;left:-10%;right:-10%;height:160px;opacity:calc(.3 + .7 * var(--act));
+    background:radial-gradient(ellipse 50% 100% at 50% 0,rgb(var(--laser) / .45),rgb(var(--laser) / .12) 45%,transparent 75%);}
+}
+@keyframes laser-flicker{0%{opacity:1;}13%{opacity:.86;}17%{opacity:1;}46%{opacity:.92;}49%{opacity:1;}71%{opacity:.82;}74%{opacity:1;}}
+@keyframes laser-drift{from{transform:translateY(-2px) rotate(-.25deg);}to{transform:translateY(2px) rotate(.25deg);}}
+@media (prefers-reduced-motion:reduce){.laser-core,.laser-glow{animation:none;}}
+
+/* Figure lens. Canvas UI's Magnify, rebuilt for the screenshots (see initLens).
+   Colour and HUD strength live here; size, zoom, follow and ripple timing live
+   in LENS in the script. Every layer is fixed and never takes the pointer. */
+.lens,.lens-readout,.lens-ripples{--hud:121 43 208;--hud-a:.7;}
+.lens{position:fixed;left:0;top:0;z-index:25;pointer-events:none;width:calc(var(--lens-r) * 2);height:calc(var(--lens-r) * 2);}
+.lens-view{position:absolute;inset:0;border-radius:50%;background-color:#F4F3F8;background-repeat:no-repeat;
+  border:1.3px solid rgb(var(--hud) / var(--hud-a));box-shadow:0 10px 28px rgba(0,0,0,.22);
+  transform:scale(0);transition:transform .25s cubic-bezier(.16,1,.3,1);}
+.lens.on .lens-view{transform:scale(1);}
+.lens-dot{position:absolute;left:50%;top:50%;width:3px;height:3px;margin:-1.5px 0 0 -1.5px;border-radius:50%;
+  background:rgb(var(--hud) / var(--hud-a));opacity:0;transition:opacity .2s;}
+.lens-dot::after{content:"";position:absolute;left:50%;top:50%;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;
+  border:.9px solid rgb(var(--hud) / .42);border-radius:50%;}
+.lens.on .lens-dot{opacity:1;}
+.lens-readout{position:fixed;left:0;top:0;z-index:25;pointer-events:none;white-space:pre;opacity:0;
+  font-family:'Mono',ui-monospace,monospace;font-size:10px;line-height:1.8;letter-spacing:.14em;
+  color:rgb(var(--hud));transition:opacity .2s;}
+.lens-readout.on{opacity:var(--hud-a);}
+.dark .lens-readout{color:#FFFFFF;}
+.lens-ripples{position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:24;pointer-events:none;overflow:visible;}
+.lens-ripples circle{fill:none;stroke:rgb(var(--hud));stroke-width:2;}
+@media screen and (hover:hover) and (pointer:fine){figure img{cursor:crosshair;}}
+@media print{.lens,.lens-readout,.lens-ripples{display:none;}}
+
 /* Footer, after Blueberry's (grignard-app-source/src/components/ui/site-footer.tsx):
-   a lit seam on the rule, a brand column, and a link column under a mono label.
+   a brand column and a link column under a mono label, with the laser for a seam.
    Always black, in either theme, with Blueberry's stone greys for type.
 
    It is revealed rather than reached. .shell carries the page and its ground
@@ -536,8 +586,6 @@ body{background:#ffffff;}
 @media screen{
   .shell{position:relative;z-index:1;min-height:100vh;background:inherit;box-shadow:0 12px 32px rgba(0,0,0,.28);}
   .foot{display:block;position:relative;z-index:0;background:#0C0A09;border-top:1px solid #292524;}
-  .foot::before{content:"";position:absolute;top:-1px;left:50%;width:33%;height:1px;transform:translateX(-50%);
-    background:linear-gradient(to right,transparent,rgba(155,122,214,.8),transparent);filter:blur(1px);}
   .foot-in{max-width:830px;margin:0 auto;padding:44px 40px 56px 40px;display:grid;grid-template-columns:1.8fr 1fr;gap:32px;}
 }
 /* Stuck only where the whole footer fits in the window. Taller than the
@@ -1310,6 +1358,9 @@ body{background:#ffffff;}
 </nav>
 
 </div>
+<!-- LASER SEAM. On the bottom edge of the shell, where the page lifts off the
+     footer. Decoration only. -->
+<div class="laser" aria-hidden="true"><span class="laser-heat"></span><span class="laser-glow"></span><span class="laser-core"></span></div>
 </div>
 <!-- FOOTER. Outside the shell, so the page slides up to uncover it. The links
      are the old "In a hurry?" card. -->
@@ -1589,11 +1640,179 @@ function initPages() {
   showPage();
 }
 
+// Laser seam. Scrolling feeds `activity`, which brightens the beam and the heat
+// band through --act and then decays, the way Laser's reactivity works. The
+// loop runs only while there is energy left to spend.
+function initLaser() {
+  var laser = document.querySelector(".laser");
+  if (!laser || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var REACTIVITY = 1;
+  var activity = 0;
+  var lastY = window.scrollY;
+  var last = 0;
+  var raf = 0;
+  function frame(now) {
+    var dt = Math.min((now - last) / 1000, 1 / 30);
+    last = now;
+    activity *= Math.exp(-dt * 2.4);
+    if (activity < 0.01) {
+      activity = 0;
+      raf = 0;
+    } else {
+      raf = requestAnimationFrame(frame);
+    }
+    laser.style.setProperty("--act", Math.min(activity * REACTIVITY, 1).toFixed(3));
+  }
+  window.addEventListener("scroll", function () {
+    var y = window.scrollY;
+    activity = Math.min(1, activity + Math.abs(y - lastY) / 600);
+    lastY = y;
+    if (!raf) {
+      last = performance.now();
+      raf = requestAnimationFrame(frame);
+    }
+  }, { passive: true });
+}
+
+// Figure lens. Canvas UI's Magnify, rebuilt for the screenshots, where
+// magnifying earns its keep: the Acrobat and kiosk callouts are small. The real
+// component magnifies live HTML through an experimental Chrome API; an image
+// needs no WebGL, so the lens is a circle whose background is the screenshot at
+// LENS.zoom, positioned under the pointer. Ring, dot, readout and click ripple
+// follow Magnify's settings. Mouse and trackpad only, and it never takes the
+// pointer: every listener is passive and nothing is prevented.
+var LENS = { size: 140, zoom: 1.5, follow: 0.25, rippleSpeed: 900, rippleGlow: 0.35, rippleLife: 1.4, maxRipples: 6 };
+
+function initLens() {
+  if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+  var imgs = document.querySelectorAll("figure img");
+  if (!imgs.length) return;
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var R = LENS.size;
+
+  var lens = document.createElement("div");
+  lens.className = "lens";
+  lens.setAttribute("aria-hidden", "true");
+  lens.style.setProperty("--lens-r", R + "px");
+  lens.innerHTML = '<div class="lens-view"></div><span class="lens-dot"></span>';
+  var view = lens.firstChild;
+  var readout = document.createElement("div");
+  readout.className = "lens-readout";
+  readout.setAttribute("aria-hidden", "true");
+  var SVG = "http://www.w3.org/2000/svg";
+  var rippleLayer = document.createElementNS(SVG, "svg");
+  rippleLayer.setAttribute("class", "lens-ripples");
+  rippleLayer.setAttribute("aria-hidden", "true");
+  document.body.appendChild(lens);
+  document.body.appendChild(readout);
+  document.body.appendChild(rippleLayer);
+
+  var img = null;
+  var x = 0, y = 0, tx = 0, ty = 0;
+  var ripples = [];
+  var lastRipple = 0;
+  var raf = 0;
+  var last = 0;
+
+  function hide() {
+    img = null;
+    lens.classList.remove("on");
+    readout.classList.remove("on");
+  }
+
+  function draw(now) {
+    var rect = img.getBoundingClientRect();
+    lens.style.transform = "translate(" + (x - R) + "px," + (y - R) + "px)";
+    view.style.backgroundSize = rect.width * LENS.zoom + "px " + rect.height * LENS.zoom + "px";
+    view.style.backgroundPosition = (R - (x - rect.left) * LENS.zoom) + "px " + (R - (y - rect.top) * LENS.zoom) + "px";
+    // The readout reports where the lens is on the screenshot itself, in its
+    // own pixels, which is the number worth having when pointing someone at it.
+    var sx = Math.round((x - rect.left) / rect.width * img.naturalWidth);
+    var sy = Math.round((y - rect.top) / rect.height * img.naturalHeight);
+    var blink = Math.floor(now / 600) % 2 === 0 ? "\u25CF" : "\u25CB";
+    readout.textContent = "X " + String(sx).padStart(4, " ") + "\nY " + String(sy).padStart(4, " ") +
+      "\n" + LENS.zoom.toFixed(1) + "X MAG\nR " + R + "PX " + blink;
+    var rx = x + R + 18;
+    if (rx + 120 > window.innerWidth - 8) rx = x - R - 18 - 120;
+    var ry = Math.min(Math.max(y - 34, 8), window.innerHeight - 90);
+    readout.style.transform = "translate(" + Math.round(rx) + "px," + Math.round(ry) + "px)";
+  }
+
+  function drawRipples(dt) {
+    for (var i = ripples.length - 1; i >= 0; i--) {
+      var r = ripples[i];
+      r.age += dt;
+      var t = r.age / LENS.rippleLife;
+      if (t >= 1) {
+        r.el.remove();
+        ripples.splice(i, 1);
+        continue;
+      }
+      r.el.setAttribute("r", R + LENS.rippleSpeed * r.age);
+      r.el.style.opacity = Math.min(1, LENS.rippleGlow * 2) * Math.pow(1 - t, 2);
+    }
+  }
+
+  function frame(now) {
+    var dt = Math.min((now - last) / 1000, 1 / 30);
+    last = now;
+    // A page turn can take the figure away without a pointerleave.
+    if (img && !img.offsetParent) hide();
+    if (img) {
+      var k = reduce ? 1 : 1 - Math.exp(-dt * (4 + LENS.follow * 26));
+      x += (tx - x) * k;
+      y += (ty - y) * k;
+      draw(now);
+    }
+    drawRipples(dt);
+    raf = img || ripples.length ? requestAnimationFrame(frame) : 0;
+  }
+
+  function wake() {
+    if (raf) return;
+    last = performance.now();
+    raf = requestAnimationFrame(frame);
+  }
+
+  imgs.forEach(function (el) {
+    el.addEventListener("pointermove", function (e) {
+      tx = e.clientX;
+      ty = e.clientY;
+      if (img !== el) {
+        img = el;
+        x = tx;
+        y = ty;
+        view.style.backgroundImage = 'url("' + el.currentSrc + '")';
+        lens.classList.add("on");
+        readout.classList.add("on");
+      }
+      wake();
+    }, { passive: true });
+    el.addEventListener("pointerleave", hide, { passive: true });
+    // One ring out from the lens per click, with a quiet period so a jittery
+    // press does not spray them, and a cap on how many are alive at once.
+    el.addEventListener("pointerdown", function (e) {
+      if (e.button > 0 || reduce || e.timeStamp - lastRipple < 250) return;
+      lastRipple = e.timeStamp;
+      if (ripples.length >= LENS.maxRipples) ripples.shift().el.remove();
+      var c = document.createElementNS(SVG, "circle");
+      c.setAttribute("cx", x);
+      c.setAttribute("cy", y);
+      c.setAttribute("r", R);
+      rippleLayer.appendChild(c);
+      ripples.push({ el: c, age: 0 });
+      wake();
+    }, { passive: true });
+  });
+}
+
 initCopyButtons();
 initThemeToggle();
 initFab();
 initSidebar();
 initLogoCards();
+initLaser();
+initLens();
 initPages();
 
 </script>

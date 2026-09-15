@@ -498,18 +498,54 @@ body{background:#ffffff;}
   .paged [data-page]:not(.is-current){display:none;}
   /* A page stands alone, so the rule and gap that separated sections go. */
   .partpage[data-page],.pdfsection[data-page]{margin-top:0;padding-top:6px;border-top:0;}
-  .paged .pager{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:48px;padding-top:24px;
-    border-top:1px solid var(--line);}
-  .pager a{display:flex;flex-direction:column;gap:4px;padding:14px 16px;border:1px solid var(--line);
-    border-radius:10px;background:var(--btn-bg);color:var(--deep);text-decoration:none;
-    transition:border-color .15s,background-color .15s;}
-  .pager a:hover{border-color:var(--acc);background:var(--btn-hover);}
+  .paged .pager{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:40px;
+    padding-top:22px;border-top:1px solid var(--line);}
   .pager a[hidden]{display:none;}
-  .pager-next{grid-column:2;text-align:right;}
-  .pager-k{font-family:'Instr';font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--acc);}
-  .pager-t{font-family:'Libre',serif;font-size:15px;font-weight:700;line-height:1.35;}
+  .pager-next{margin-left:auto;}
 }
-@media screen and (max-width:560px){.paged .pager{grid-template-columns:1fr;}.pager-next{grid-column:1;}}
+
+/* Pager buttons, after the FlowButton pattern: a small pill whose arrow slides
+   through as a filled circle swells from the middle and the corners square off.
+   The label is the page's short name (Step 5, Memo); the rest of its title
+   rises above on hover. Everything that moves moves by transform, so the
+   circle scales up rather than growing its width. */
+.flow{position:relative;display:inline-flex;color:var(--ink);text-decoration:none;}
+.flow-pill{position:relative;display:inline-flex;align-items:center;overflow:hidden;padding:7px 28px;
+  border:1.5px solid var(--line);border:1.5px solid color-mix(in srgb,var(--ink) 40%,transparent);border-radius:100px;
+  font-family:'Instr';font-size:13px;font-weight:600;line-height:1.3;
+  transition:border-color .6s cubic-bezier(.23,1,.32,1),border-radius .6s cubic-bezier(.23,1,.32,1),
+    color .6s cubic-bezier(.23,1,.32,1),transform .15s ease;}
+.flow-fill{position:absolute;left:50%;top:50%;width:220px;height:220px;margin:-110px 0 0 -110px;border-radius:50%;
+  background:var(--ink);opacity:0;transform:scale(.07);
+  transition:transform .8s cubic-bezier(.19,1,.22,1),opacity .8s cubic-bezier(.19,1,.22,1);}
+.flow-t{position:relative;z-index:1;white-space:nowrap;transition:transform .8s ease-out;}
+.flow-arr{position:absolute;top:50%;z-index:2;width:14px;height:14px;margin-top:-7px;
+  transition:transform .8s cubic-bezier(.34,1.56,.64,1);}
+.pager-next .flow-t{transform:translateX(-8px);}
+.pager-next .flow-in{left:10px;transform:translateX(-40px);}
+.pager-next .flow-out{right:10px;}
+.pager-prev .flow-t{transform:translateX(8px);}
+.pager-prev .flow-in{right:10px;transform:translateX(40px);}
+.pager-prev .flow-out{left:10px;}
+.flow:hover .flow-pill,.flow:focus-visible .flow-pill{border-color:transparent;border-radius:12px;color:var(--sheet);}
+.flow:hover .flow-fill,.flow:focus-visible .flow-fill{opacity:1;transform:scale(1);}
+.flow:hover .flow-in,.flow:focus-visible .flow-in{transform:none;}
+.pager-next:hover .flow-t,.pager-next:focus-visible .flow-t{transform:translateX(8px);}
+.pager-next:hover .flow-out,.pager-next:focus-visible .flow-out{transform:translateX(40px);}
+.pager-prev:hover .flow-t,.pager-prev:focus-visible .flow-t{transform:translateX(-8px);}
+.pager-prev:hover .flow-out,.pager-prev:focus-visible .flow-out{transform:translateX(-40px);}
+.flow:active .flow-pill{transform:scale(.95);}
+.flow:focus-visible{outline:none;}
+.flow:focus-visible .flow-pill{outline:2px solid var(--acc);outline-offset:2px;}
+/* The title, anchored to the button's outer edge so a long one never runs off
+   the screen. */
+.flow-tip{position:absolute;bottom:calc(100% + 8px);max-width:min(80vw,420px);overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;padding:4px 9px;border-radius:6px;border:1px solid var(--line);background:var(--sheet);
+  color:var(--deep);font-family:'Instr';font-size:12px;box-shadow:0 4px 12px rgba(0,0,0,.08);
+  opacity:0;transform:translateY(4px);pointer-events:none;transition:opacity .2s ease,transform .2s ease;}
+.pager-prev .flow-tip{left:0;}
+.pager-next .flow-tip{right:0;}
+.flow:hover .flow-tip,.flow:focus-visible .flow-tip{opacity:1;transform:none;}
 /* Step page header: where the page sits, and the tools it uses. Screen only,
    since print has the whole guide and its own running footer. */
 .page-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 16px 0;min-height:34px;}
@@ -573,6 +609,13 @@ body{background:#ffffff;}
 .lens-ripples circle{fill:none;stroke:rgb(var(--hud));stroke-width:2;}
 @media screen and (hover:hover) and (pointer:fine){figure img{cursor:crosshair;}}
 @media print{.lens,.lens-readout,.lens-ripples{display:none;}}
+
+/* Flame wrap (see initFlames). The host is a wrapper put round the burning
+   element so the canvas can hang off it; the canvas never takes the pointer. */
+.flame-host{position:relative;display:inline-block;vertical-align:middle;transition:transform .2s ease;}
+.cover-logo .flame-host{display:block;}
+.flame{position:absolute;z-index:1;pointer-events:none;}
+@media print{.flame{display:none;}}
 
 /* Footer, after Blueberry's (grignard-app-source/src/components/ui/site-footer.tsx):
    a brand column and a link column under a mono label, with the laser for a seam.
@@ -1353,8 +1396,8 @@ body{background:#ffffff;}
 
 <!-- PAGER. initPages() fills in the titles and hides whichever end is missing. -->
 <nav class="pager" aria-label="Previous and next page">
-  <a class="pager-prev" href="#home"><span class="pager-k">Previous</span><span class="pager-t"></span></a>
-  <a class="pager-next" href="#home"><span class="pager-k">Next</span><span class="pager-t"></span></a>
+  <a class="flow pager-prev" href="#home"><span class="flow-pill"><span class="flow-fill"></span><svg class="flow-arr flow-in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg><span class="flow-t"></span><svg class="flow-arr flow-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></span><span class="flow-tip"></span></a>
+  <a class="flow pager-next" href="#home"><span class="flow-pill"><span class="flow-fill"></span><svg class="flow-arr flow-in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg><span class="flow-t"></span><svg class="flow-arr flow-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span><span class="flow-tip"></span></a>
 </nav>
 
 </div>
@@ -1546,7 +1589,9 @@ function initSidebar() {
 function initLogoCards() {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   var MAX_ROTATION = 10;
-  document.querySelectorAll(".kcmlogo").forEach(function (el) {
+  document.querySelectorAll(".kcmlogo").forEach(function (logo) {
+    // A burning logo tilts its flame host, so the fire leans with the card.
+    var el = logo.parentNode.classList.contains("flame-host") ? logo.parentNode : logo;
     el.addEventListener("pointermove", function (e) {
       var rect = el.getBoundingClientRect();
       var px = (e.clientX - rect.left) / rect.width - 0.5;
@@ -1591,8 +1636,12 @@ function setPagerLink(a, page, word) {
   a.hidden = !page;
   if (!page) return;
   a.href = "#/" + page.name;
-  a.querySelector(".pager-k").textContent = page.name.indexOf("step-") === 0 ? word + " step" : word;
-  a.querySelector(".pager-t").textContent = page.title;
+  // The button shows the short name ("Step 5", "Memo"), the rest of the title
+  // rises above it on hover, and the whole title is the accessible name.
+  var split = page.title.indexOf(": ");
+  a.querySelector(".flow-t").textContent = split > 0 ? page.title.slice(0, split) : page.title;
+  a.querySelector(".flow-tip").textContent = split > 0 ? page.title.slice(split + 2) : page.title;
+  a.setAttribute("aria-label", word + ": " + page.title);
 }
 
 function showPage() {
@@ -1806,10 +1855,241 @@ function initLens() {
   });
 }
 
+// Flame wrap. Canvas UI's FlameWrap idea, reimplemented: a WebGL fire on a
+// canvas around a rounded rectangle, licking up from the top edge, glowing
+// round the sides, throwing sparks and a little smoke. The original also burns
+// and warps the content inside, which needs an experimental Chrome API; the
+// fire does not, so the fire is what is kept. The shader is written here rather
+// than copied, since canvas-ui is MIT plus the Commons Clause. One loop draws
+// every flame that is on screen, and nothing runs when none is.
+var FLAME = { color: [0.7725, 0.0039, 1], intensity: 0.7, speed: 0.4, scale: 0.72, turbulence: 0.49,
+  turbulenceScale: 0.8, sparks: 2.3, sparkSize: 0.6, sparkDensity: 0.9, sparkSpeed: 1, rim: 2.55, smoke: 1.75 };
+// Heights are scaled to each element: 170px of flame over a 32px icon would
+// cover everything above it. `page` limits a flame to one page.
+var FLAME_TARGETS = [
+  { sel: ".docbar .brand-mark", height: 40, spread: 8, radius: 8, page: "home" },
+  { sel: ".cover-logo .kcmlogo", height: 90, spread: 14, radius: 8 },
+  { sel: '.toc a[href$="step-10"] .toc-ico', height: 30, spread: 8, radius: 7 }
+];
+
+var FLAME_VERT = "attribute vec2 aPos; void main () { gl_Position = vec4(aPos, 0.0, 1.0); }";
+var FLAME_FRAG = [
+  "precision highp float;",
+  "uniform vec2 uRes; uniform float uTime; uniform vec2 uCenter; uniform vec2 uHalf; uniform float uRadius;",
+  "uniform vec3 uColor; uniform float uIntensity; uniform float uHeight; uniform float uSpread; uniform float uScale;",
+  "uniform float uTurb; uniform float uTurbScale; uniform float uSparks; uniform float uSparkSize;",
+  "uniform float uSparkDensity; uniform float uSparkSpeed; uniform float uRim; uniform float uSmoke;",
+  "float hash (vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }",
+  "float vnoise (vec2 p) {",
+  "  vec2 i = floor(p); vec2 f = fract(p); f = f * f * (3.0 - 2.0 * f);",
+  "  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);",
+  "}",
+  "float fbm (vec2 p) {",
+  "  float v = 0.0; float a = 0.5;",
+  "  for (int i = 0; i < 5; i++) { v += a * vnoise(p); p = p * 2.02 + vec2(17.1, 9.7); a *= 0.5; }",
+  "  return v;",
+  "}",
+  "float sdBox (vec2 p, vec2 b, float r) { vec2 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r; }",
+  "void main () {",
+  "  vec2 p = gl_FragCoord.xy - uCenter;",
+  "  float r = min(uRadius, min(uHalf.x, uHalf.y));",
+  "  float d = sdBox(p, uHalf, r);",
+  "  float t = uTime;",
+  "  float unit = max(uHeight, 16.0);",
+  // Above the top edge the fire may lick up to uHeight; round the sides and
+  // bottom it only glows out to uSpread.
+  "  float over = smoothstep(-uHalf.y, uHalf.y * 0.6, p.y) * (1.0 - smoothstep(uHalf.x - r * 0.3, uHalf.x + uSpread, abs(p.x)));",
+  "  float reach = mix(uSpread, uHeight, over);",
+  // Noise that rises with time, swayed by a few sine warps: the turbulence.
+  "  float detail = mix(0.6, 2.2, clamp(uScale, 0.0, 1.0));",
+  "  vec2 q = vec2(p.x, p.y - t * unit * 1.4) / unit * detail * 3.0;",
+  "  float fq = uTurbScale * 2.0;",
+  "  for (int i = 0; i < 4; i++) {",
+  "    q += uTurb * 0.35 * vec2(sin(q.y * fq + t * 3.0 + float(i) * 1.7), cos(q.x * fq * 0.8 - t * 2.1 + float(i) * 2.3)) / fq;",
+  "    fq *= 1.6;",
+  "  }",
+  "  float n = fbm(q);",
+  "  float k = max(d, 0.0) / reach;",
+  // The flames thin out more slowly above the top edge than round the sides,
+  // so the top licks climb most of the way to uHeight and the outline stays thin.
+  "  float slope = mix(1.1, 0.78, over);",
+  "  float dens = clamp((n * 1.25 - k * (slope + 0.45 * n) + 0.1 * (1.0 - k)) * 2.2, 0.0, 1.0) * smoothstep(-1.0, 1.5, d);",
+  "  float body = dens * dens * (3.0 - 2.0 * dens);",
+  "  float e = body * uIntensity * 1.6;",
+  "  float ramp = 1.0 - exp(-e * 2.5);",
+  "  vec3 col = mix(uColor * uColor * 0.8, uColor, smoothstep(0.0, 0.5, ramp));",
+  "  col = mix(col, mix(uColor, vec3(1.0), 0.45), smoothstep(0.65, 1.0, ramp * (1.0 - k * 0.6)));",
+  "  float a = clamp(1.0 - exp(-e * 3.0), 0.0, 1.0);",
+  // A molten rim hugging the outline, and a soft halo past it.
+  "  float rim = exp(-abs(d) / 1.6) * uRim * 0.35 * (0.6 + 0.4 * n);",
+  "  float halo = exp(-max(d, 0.0) / (uSpread * 1.1)) * smoothstep(0.0, 2.0, d) * uRim * 0.12 * uIntensity;",
+  "  col = col * a + mix(uColor, vec3(1.0), 0.35) * rim * uIntensity + uColor * halo;",
+  "  a = clamp(a + rim * uIntensity * 0.8 + halo * 0.6, 0.0, 1.0);",
+  // Sparks: one per lit cell, drifting up and twinkling, only above the top.
+  "  if (uSparks > 0.0) {",
+  "    float cells = 6.0 * uSparkDensity;",
+  "    vec2 sp = vec2(p.x, p.y - t * unit * 0.9 * uSparkSpeed) / unit * cells;",
+  "    vec2 id = floor(sp); vec2 fr = fract(sp);",
+  "    float h = hash(id); float h2 = hash(id + 7.3);",
+  "    vec2 c = vec2(0.2 + 0.6 * h, 0.2 + 0.6 * h2);",
+  "    c.x += 0.15 * sin(t * 2.0 + h * 6.28);",
+  "    float s = length((fr - c) / cells * unit);",
+  "    float size = (0.6 + 1.6 * h2) * uSparkSize;",
+  "    float tw = step(0.55, h) * (0.5 + 0.5 * sin(t * (5.0 + 6.0 * h2) + h * 12.0));",
+  "    float gate = over * smoothstep(0.0, 0.3, k) * (1.0 - smoothstep(0.7, 1.4, k));",
+  "    float spark = exp(-s * s / (size * size)) * tw * gate * uSparks;",
+  "    col += mix(uColor, vec3(1.0), 0.6) * spark;",
+  "    a = clamp(a + spark * 0.8, 0.0, 1.0);",
+  "  }",
+  // Smoke: a faint wisp where the flames give out.
+  "  float wisp = smoothstep(0.5, 0.85, fbm(q * 0.5 + 11.0)) * smoothstep(0.7, 1.0, k) * (1.0 - smoothstep(1.0, 1.6, k)) * over;",
+  "  float sA = wisp * 0.06 * uSmoke;",
+  "  col += mix(vec3(0.5), uColor, 0.5) * sA;",
+  "  a = clamp(a + sA, 0.0, 1.0);",
+  // Fade at the canvas bounds so nothing ends in a straight line.
+  "  vec2 edge = min(gl_FragCoord.xy, uRes - gl_FragCoord.xy);",
+  "  float fade = smoothstep(0.0, 12.0, edge.x) * smoothstep(0.0, 12.0, edge.y);",
+  "  gl_FragColor = vec4(col * fade, a * fade);",
+  "}"
+].join("\n");
+
+function makeFlame(el, opt) {
+  var canvas = document.createElement("canvas");
+  var gl = canvas.getContext("webgl", { premultipliedAlpha: true, antialias: false, depth: false });
+  if (!gl) return null;
+  function shader(type, src) {
+    var s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error("Flame shader:", gl.getShaderInfoLog(s));
+    return s;
+  }
+  var prog = gl.createProgram();
+  gl.attachShader(prog, shader(gl.VERTEX_SHADER, FLAME_VERT));
+  gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, FLAME_FRAG));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  var aPos = gl.getAttribLocation(prog, "aPos");
+  gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+  var u = {};
+  ["uRes", "uTime", "uCenter", "uHalf", "uRadius", "uColor", "uIntensity", "uHeight", "uSpread", "uScale", "uTurb",
+    "uTurbScale", "uSparks", "uSparkSize", "uSparkDensity", "uSparkSpeed", "uRim", "uSmoke"].forEach(function (name) {
+    u[name] = gl.getUniformLocation(prog, name);
+  });
+
+  // Wrap the element so the canvas can hang off it.
+  var host = document.createElement("span");
+  host.className = "flame-host";
+  el.parentNode.insertBefore(host, el);
+  host.appendChild(el);
+  canvas.className = "flame";
+  canvas.setAttribute("aria-hidden", "true");
+  host.appendChild(canvas);
+
+  var top = Math.round(opt.height * 1.3 + 20);
+  var side = Math.round(opt.spread * 3 + 16);
+  var w = 0, h = 0, dpr = 1;
+  function size() {
+    w = host.offsetWidth;
+    h = host.offsetHeight;
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.style.left = -side + "px";
+    canvas.style.top = -top + "px";
+    canvas.style.width = w + side * 2 + "px";
+    canvas.style.height = h + top + side + "px";
+    canvas.width = Math.round((w + side * 2) * dpr);
+    canvas.height = Math.round((h + top + side) * dpr);
+  }
+  size();
+  new ResizeObserver(size).observe(host);
+
+  return {
+    host: host,
+    canvas: canvas,
+    page: opt.page,
+    onScreen: false,
+    live: function () { return this.onScreen && w > 0 && (!this.page || this.page === currentPage); },
+    draw: function (time) {
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.uniform2f(u.uRes, canvas.width, canvas.height);
+      gl.uniform1f(u.uTime, time);
+      // GL counts y from the bottom: the box sits `side` px above the canvas floor.
+      gl.uniform2f(u.uCenter, (side + w / 2) * dpr, (side + h / 2) * dpr);
+      gl.uniform2f(u.uHalf, (w / 2) * dpr, (h / 2) * dpr);
+      gl.uniform1f(u.uRadius, opt.radius * dpr);
+      gl.uniform3f(u.uColor, FLAME.color[0], FLAME.color[1], FLAME.color[2]);
+      gl.uniform1f(u.uIntensity, FLAME.intensity);
+      gl.uniform1f(u.uHeight, opt.height * dpr);
+      gl.uniform1f(u.uSpread, opt.spread * dpr);
+      gl.uniform1f(u.uScale, FLAME.scale);
+      gl.uniform1f(u.uTurb, FLAME.turbulence);
+      gl.uniform1f(u.uTurbScale, FLAME.turbulenceScale);
+      gl.uniform1f(u.uSparks, FLAME.sparks);
+      gl.uniform1f(u.uSparkSize, FLAME.sparkSize * dpr);
+      gl.uniform1f(u.uSparkDensity, FLAME.sparkDensity);
+      gl.uniform1f(u.uSparkSpeed, FLAME.sparkSpeed);
+      gl.uniform1f(u.uRim, FLAME.rim);
+      gl.uniform1f(u.uSmoke, FLAME.smoke);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    }
+  };
+}
+
+function initFlames() {
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var flames = [];
+  FLAME_TARGETS.forEach(function (target) {
+    document.querySelectorAll(target.sel).forEach(function (el) {
+      var flame = makeFlame(el, target);
+      if (flame) flames.push(flame);
+    });
+  });
+  if (!flames.length) return;
+
+  var raf = 0;
+  var time = 0;
+  var last = 0;
+  function frame(now) {
+    var dt = Math.min((now - last) / 1000, 1 / 30);
+    last = now;
+    if (!reduce) time += dt * FLAME.speed;
+    var any = false;
+    flames.forEach(function (flame) {
+      if (!flame.live()) return;
+      flame.draw(time);
+      any = true;
+    });
+    // Reduced motion draws one still frame and stops.
+    raf = any && !reduce ? requestAnimationFrame(frame) : 0;
+  }
+  function wake() {
+    if (raf) return;
+    last = performance.now();
+    raf = requestAnimationFrame(frame);
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      flames.forEach(function (flame) {
+        if (flame.canvas === entry.target) flame.onScreen = entry.isIntersecting;
+      });
+    });
+    wake();
+  });
+  flames.forEach(function (flame) {
+    io.observe(flame.canvas);
+  });
+  // The header mark burns on the first page only, so a page turn can start it.
+  window.addEventListener("hashchange", wake);
+}
+
 initCopyButtons();
 initThemeToggle();
 initFab();
 initSidebar();
+initFlames();
 initLogoCards();
 initLaser();
 initLens();

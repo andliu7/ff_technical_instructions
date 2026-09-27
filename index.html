@@ -719,6 +719,10 @@ body{background:#ffffff;}
 .kcal-views .btn{border:0;box-shadow:none;background:none;height:26px;padding:0 10px;color:var(--sub);}
 .kcal-views .btn[aria-pressed="true"]{background:var(--acc-soft);color:var(--acc);}
 .dark .kcal-views .btn[aria-pressed="true"]{background:var(--acc);color:#fff;}
+.kcal-corner{display:inline-flex;gap:4px;}
+.kcal .btn.busy svg{animation:kcal-spin 1s linear infinite;}
+.kcal-role{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);}
+.kcal-hint{font-size:12px;color:var(--mut);margin:8px 0 0 0;}
 .kcal-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:12px;}
 .kcal-search{position:relative;flex:1 1 200px;min-width:160px;}
 .kcal-search svg{position:absolute;left:10px;top:50%;width:15px;height:15px;transform:translateY(-50%);color:var(--mut);pointer-events:none;}
@@ -815,11 +819,8 @@ body{background:#ffffff;}
 .kcal-foot{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin-top:10px;padding-top:8px;border-top:1px solid var(--line);
   font-size:11.5px;color:var(--mut);}
 .kcal-foot a{color:var(--link);}
-.kcal-foot .btn{height:24px;padding:0 8px;font-size:11.5px;margin-left:auto;}
-.kcal-foot .btn svg{width:13px;height:13px;}
-.kcal-foot .btn.busy svg{animation:kcal-spin 1s linear infinite;}
 @keyframes kcal-spin{to{transform:rotate(360deg);}}
-@media (prefers-reduced-motion:reduce){.kcal-foot .btn.busy svg{animation:none;}.kcal-chip,.kcal-card,.kcal-row{transition:none;}}
+@media (prefers-reduced-motion:reduce){.kcal .btn.busy svg{animation:none;}.kcal-chip,.kcal-card,.kcal-row{transition:none;}}
 
 /* Dialogs: the key and the event details, both native <dialog>. */
 .kcal-dialog{border:1px solid var(--line);border-radius:12px;background:var(--sheet);color:var(--ink);padding:0;width:min(420px,calc(100vw - 32px));
@@ -845,6 +846,7 @@ body{background:#ffffff;}
 .kcal-abbr dd{margin:0;color:var(--sub);}
 .kcal-df{display:flex;justify-content:flex-end;gap:8px;padding:0 18px 16px 18px;}
 .kcal-df .btn{height:32px;font-family:'Instr',sans-serif;font-size:12.5px;}
+.kcal-df .btn svg{width:15px;height:15px;}
 @media print{.kcal{display:none;}}
 </style>
 </head>
@@ -952,7 +954,10 @@ body{background:#ffffff;}
       <button type="button" class="btn" data-view="week" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/><path d="M15 21V9"/></svg>Week</button>
       <button type="button" class="btn" data-view="list" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>List</button>
     </div>
-    <button type="button" class="btn btn-icon" data-cal="key" aria-label="Colour key" title="Colour key" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></button>
+    <div class="kcal-corner">
+    <button type="button" class="btn btn-icon" data-cal="key" aria-label="Key: colours, rows and source" title="Key" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></button>
+    <button type="button" class="btn btn-icon" data-cal="refresh" aria-label="Refresh from the master calendar" title="Refresh from the master calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg></button>
+    </div>
   </div>
   <div class="kcal-tools">
     <label class="kcal-search">
@@ -961,27 +966,23 @@ body{background:#ffffff;}
       <button type="button" class="kcal-clear" data-cal="clear-q" aria-label="Clear search" hidden><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
     </label>
     <div class="kcal-cats" role="group" aria-label="Filter by colour"></div>
-    <select id="kcal-track" aria-label="Filter by row"><option value="">All rows</option></select>
+    <label class="kcal-role"><span>Show for</span><select id="kcal-role" aria-label="Show the calendar for a role"></select></label>
   </div>
   <div class="kcal-active" hidden></div>
   <div class="kcal-body"></div>
-  <div class="kcal-foot">
-    <span class="kcal-status">Snapshot of the master calendar, 27 Sep 2026</span>
-    <a href="https://docs.google.com/spreadsheets/d/1nghaUIhNLTYmfYwly1ZY2fAgsFh4VD6dNNcuquHFQgg/edit?gid=1234033160#gid=1234033160" target="_blank" rel="noopener">Open the sheet</a>
-    <button type="button" class="btn" data-cal="refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>Refresh</button>
-  </div>
+  <div class="kcal-foot"><span class="kcal-status">Snapshot of the master calendar, 27 Sep 2026</span></div>
   <div class="kcal-pop" hidden></div>
 
   <dialog class="kcal-dialog" id="kcal-keydlg" aria-labelledby="kcal-keyttl">
     <div class="kcal-dh">
-      <h3 id="kcal-keyttl">Colour key</h3>
+      <h3 id="kcal-keyttl">Key</h3>
       <button type="button" class="btn btn-icon" data-cal="close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
     </div>
     <div class="kcal-db">
       <p>The five fills from the top row of the master calendar sheet.</p>
       <ul class="kcal-key"></ul>
       <div class="lbl">Rows on the sheet</div>
-      <p class="val">Public &middot; Officers/Leaders &middot; Focus Fam &middot; Media &middot; Praise &middot; Welcome. The Spring tab keeps everything on one Master row.</p>
+      <p class="val">Public &middot; Officers/Leaders &middot; Focus Fam &middot; Media &middot; Praise &middot; Welcome. The Spring tab keeps everything on one Master row. The Show for dropdown picks the rows a role needs: a team leader sees the Public row, their team row and the Leaders Meetings.</p>
       <div class="lbl">Abbreviations</div>
       <dl class="kcal-abbr">
         <dt>LG</dt><dd>Large Group</dd>
@@ -992,6 +993,15 @@ body{background:#ffffff;}
         <dt>MT, WT, PT, FFT</dt><dd>Media, Welcome, Praise and Focus Family teams</dd>
         <dt>Loc TBD</dt><dd>Room not booked yet. Check the sheet before you print the cover.</dd>
       </dl>
+      <div class="lbl">Where this comes from</div>
+      <p class="val"><a href="https://docs.google.com/spreadsheets/d/1nghaUIhNLTYmfYwly1ZY2fAgsFh4VD6dNNcuquHFQgg/edit?gid=1234033160#gid=1234033160" target="_blank" rel="noopener">26-27 KCM Master Calendar</a>, the Fall 2026 and Spring 2027 tabs. This page reads the sheet and never writes to it: to change a room or a time, change the sheet, then refresh here.</p>
+      <div class="lbl">Status</div>
+      <p class="val kcal-status">Snapshot of the master calendar, 27 Sep 2026</p>
+      <p class="kcal-hint">The live read works once the sheet is shared with anyone who has the link (Share, General access, Anyone with the link, Viewer). Until then this page shows its built-in snapshot.</p>
+    </div>
+    <div class="kcal-df">
+      <button type="button" class="btn" data-cal="refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>Refresh now</button>
+      <a class="btn btn-primary" href="https://docs.google.com/spreadsheets/d/1nghaUIhNLTYmfYwly1ZY2fAgsFh4VD6dNNcuquHFQgg/edit?gid=1234033160#gid=1234033160" target="_blank" rel="noopener">Open the sheet</a>
     </div>
   </dialog>
 
@@ -2331,6 +2341,22 @@ var CAL_CATS = [
   { id: "teams", name: "Teams", note: "MT, WT, PT, FFT and small groups" },
   { id: "school", name: "School calendar", note: "UMD breaks, first and last days, finals" }
 ];
+// Who is reading. A role is the set of sheet rows that reader needs: their
+// own team row plus the Public row every member sees, and for a team leader
+// the Leaders Meetings that sit on the officers row (matched by title, since
+// that row also holds officer-only meetings). The Spring tab keeps everything
+// on one Master row, so that row is in every role. The choice sticks in
+// localStorage the way the theme does.
+var CAL_LEADERS = /Leaders? Meeting/i;
+var CAL_ROLES = [
+  { id: "all", name: "Everyone (all rows)", rows: null },
+  { id: "member", name: "Member", rows: ["Public", "Master"] },
+  { id: "ff", name: "Focus Family leader", rows: ["Public", "Focus Fam", "Master"], also: CAL_LEADERS },
+  { id: "media", name: "Media team leader", rows: ["Public", "Media", "Master"], also: CAL_LEADERS },
+  { id: "praise", name: "Praise team leader", rows: ["Public", "Praise", "Master"], also: CAL_LEADERS },
+  { id: "welcome", name: "Welcome team leader", rows: ["Public", "Welcome", "Master"], also: CAL_LEADERS },
+  { id: "officer", name: "Officer", rows: ["Public", "Officers/Leaders", "Master"] }
+];
 var CAL_DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 var CAL_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -2340,7 +2366,7 @@ var cal = {
   view: "month",
   q: "",
   cats: [],
-  track: "",
+  role: "all",
   root: null,
   popTimer: null
 };
@@ -2381,11 +2407,16 @@ function calStartMinute(time) {
   return h * 60 + min;
 }
 
+function calRole() {
+  return CAL_ROLES.filter(function (r) { return r.id === cal.role; })[0] || CAL_ROLES[0];
+}
+
 function calFiltered() {
   var q = cal.q.trim().toLowerCase();
   return cal.events.filter(function (e) {
     if (cal.cats.length && cal.cats.indexOf(e.cat) === -1) return false;
-    if (cal.track && e.track !== cal.track) return false;
+    var role = calRole();
+    if (role.rows && role.rows.indexOf(e.track) === -1 && !(role.also && role.also.test(e.t))) return false;
     if (q && (e.t + " " + e.time + " " + e.loc + " " + e.track).toLowerCase().indexOf(q) === -1) return false;
     return true;
   }).sort(function (a, b) {
@@ -2485,25 +2516,37 @@ function renderCalendar() {
   });
   cal.root.querySelector("[data-cal=clear-q]").hidden = !cal.q;
   var active = cal.root.querySelector(".kcal-active");
-  var on = cal.cats.length || cal.track;
+  var on = cal.cats.length || cal.role !== "all";
   active.hidden = !on;
   if (on) {
     active.innerHTML = "Showing " + list.length + " of " + cal.events.length + " events" +
-      (cal.track ? ' on the <b>' + calEsc(cal.track) + "</b> row" : "") +
-      ' <button type="button" class="btn" data-cal="clear">Clear filters</button>';
+      (cal.role !== "all" ? " for a <b>" + calEsc(calRole().name) + "</b>" : "") +
+      ' <button type="button" class="btn" data-cal="clear">Show everything</button>';
   }
 }
 
-function calTrackOptions() {
-  var sel = cal.root.querySelector("#kcal-track");
-  var seen = {};
-  cal.events.forEach(function (e) { seen[e.track] = true; });
-  var keep = cal.track;
-  sel.innerHTML = '<option value="">All rows</option>' + Object.keys(seen).map(function (t) {
-    return '<option value="' + calEsc(t) + '">' + calEsc(t) + "</option>";
+function calRoleOptions() {
+  var sel = cal.root.querySelector("#kcal-role");
+  sel.innerHTML = CAL_ROLES.map(function (r) {
+    return '<option value="' + r.id + '">' + calEsc(r.name) + "</option>";
   }).join("");
-  sel.value = seen[keep] ? keep : "";
-  cal.track = sel.value;
+  try {
+    var saved = localStorage.getItem("kcal-role");
+    if (CAL_ROLES.some(function (r) { return r.id === saved; })) cal.role = saved;
+  } catch (e) {
+    /* storage blocked: the choice lasts for the session */
+  }
+  sel.value = cal.role;
+}
+
+function calSetRole(id) {
+  cal.role = id;
+  cal.root.querySelector("#kcal-role").value = id;
+  try {
+    localStorage.setItem("kcal-role", id);
+  } catch (e) {
+    /* storage blocked */
+  }
 }
 
 function calSetEvents(list) {
@@ -2511,7 +2554,6 @@ function calSetEvents(list) {
     e.i = i;
     return e;
   });
-  calTrackOptions();
   renderCalendar();
 }
 
@@ -2622,9 +2664,11 @@ function calEventsFromCSV(rows, tab, known) {
   return out;
 }
 function refreshCalendar(manual) {
-  var btn = cal.root.querySelector("[data-cal=refresh]");
-  var status = cal.root.querySelector(".kcal-status");
-  btn.classList.add("busy");
+  var btns = cal.root.querySelectorAll("[data-cal=refresh]");
+  var setStatus = function (text) {
+    cal.root.querySelectorAll(".kcal-status").forEach(function (el) { el.textContent = text; });
+  };
+  btns.forEach(function (b) { b.classList.add("busy"); });
   var known = {};
   cal.events.forEach(function (e) { known[e.t] = e.cat; });
   Promise.all(CAL_TABS.map(function (tab) {
@@ -2641,15 +2685,15 @@ function refreshCalendar(manual) {
     if (!all.length) throw new Error("empty");
     calSetEvents(all);
     var now = new Date();
-    status.textContent = "Live from the master calendar, read " +
-      now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }) + " today";
+    setStatus("Live from the master calendar, read " +
+      now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }) + " today");
   }).catch(function (err) {
     // Not shared publicly, offline, or the tab was renamed: keep the snapshot
     // and say so. Only a manual refresh gets the reason.
-    if (manual) status.textContent = "Could not read the sheet (" + err.message + "). Showing the snapshot from 27 Sep 2026. " +
-      "The sheet has to be shared with anyone who has the link for the live read to work.";
+    if (manual) setStatus("Could not read the sheet (" + err.message + "). Showing the snapshot from 27 Sep 2026. " +
+      "The sheet has to be shared with anyone who has the link for the live read to work.");
   }).then(function () {
-    btn.classList.remove("busy");
+    btns.forEach(function (b) { b.classList.remove("busy"); });
   });
 }
 
@@ -2668,6 +2712,7 @@ function initCalendar() {
       "</b><span>" + c.note + "</span></div></li>";
   }).join("");
 
+  calRoleOptions();
   calSetEvents(snapshot);
 
   cal.root.addEventListener("click", function (ev) {
@@ -2692,15 +2737,15 @@ function initCalendar() {
     else if (act === "key") cal.root.querySelector("#kcal-keydlg").showModal();
     else if (act === "close") t.closest("dialog").close();
     else if (act === "clear-q") { cal.q = ""; cal.root.querySelector("#kcal-q").value = ""; renderCalendar(); }
-    else if (act === "clear") { cal.cats = []; cal.track = ""; cal.root.querySelector("#kcal-track").value = ""; renderCalendar(); }
+    else if (act === "clear") { cal.cats = []; calSetRole("all"); renderCalendar(); }
     else if (act === "refresh") refreshCalendar(true);
   });
   cal.root.querySelector("#kcal-q").addEventListener("input", function (e) {
     cal.q = e.target.value;
     renderCalendar();
   });
-  cal.root.querySelector("#kcal-track").addEventListener("change", function (e) {
-    cal.track = e.target.value;
+  cal.root.querySelector("#kcal-role").addEventListener("change", function (e) {
+    calSetRole(e.target.value);
     renderCalendar();
   });
   // Clicking the dim backdrop closes a dialog; Escape already does.

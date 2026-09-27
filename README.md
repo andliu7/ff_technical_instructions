@@ -43,6 +43,17 @@ The styles, the background effect, the copy buttons, the fonts (Libre Baskervill
 Instrument Sans, JetBrains Mono, Allura) and the annotated screenshots are all
 inlined into `index.html`, so it is one self-contained file with no dependencies.
 
+## The calendar
+
+The first page carries the 26-27 KCM Master Calendar (Fall 2026 and Spring 2027
+tabs) as a month, week and list view with the sheet's own colour code behind the
+key icon. The events are a snapshot taken 2026-09-27, baked into `index.html`.
+On load the page tries to read the sheet again so room numbers and times follow
+the sheet; that works once the sheet is shared with anyone who has the link
+(Share, General access, Anyone with the link, Viewer). Until then the snapshot
+shows and the Refresh button says why. To move the snapshot forward, re-export
+the sheet and rebuild the JSON in the `kcal-data` block.
+
 ## Credits
 
 Background effect from Canvas UI HexFloat. Fonts under the SIL Open Font License.

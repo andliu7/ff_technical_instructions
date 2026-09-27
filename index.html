@@ -697,6 +697,155 @@ body{background:#ffffff;}
      with the white accent line beside it. */
   .dark .cover-bar{background:#4A2A8C;}
 }
+
+/* Master calendar. Screen only, on the first page between the cover and the
+   contents. It is a port of the event-manager component (month, week and list
+   views, search and filters, a key popup and an event dialog) to the plain
+   JavaScript and CSS this file already uses, so it has no build step. The five
+   chip colours are the sheet's own fills, which is why the key matches what
+   leaders see in Google Sheets. */
+.kcal{position:relative;border:1px solid var(--line);border-radius:8px;padding:16px 20px 12px 20px;margin:0 0 26px 0;
+  font-family:'Instr',sans-serif;font-size:13px;line-height:1.45;color:var(--ink);
+  --kc-regular:#D9D2E9;--kc-special:#D9EAD3;--kc-officers:#FCE5CD;--kc-teams:#FF9ADA;--kc-school:#EA9999;
+  --kd-regular:#6B4EA8;--kd-special:#2E7A61;--kd-officers:#9C6420;--kd-teams:#B0287A;--kd-school:#B3261E;}
+.kcal-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-bottom:12px;}
+.kcal-title{font-family:'Libre',serif;font-size:19px;font-weight:700;color:var(--deep);margin:0;line-height:1.2;}
+.kcal-nav,.kcal-views{display:inline-flex;align-items:center;gap:4px;}
+.kcal-nav{margin-right:auto;}
+.kcal-views{border:1px solid var(--line);border-radius:8px;padding:3px;background:var(--btn-bg);}
+.kcal .btn{height:32px;padding:0 12px;font-family:'Instr',sans-serif;font-size:12.5px;}
+.kcal .btn-icon{width:32px;height:32px;padding:0;}
+.kcal .btn svg{width:16px;height:16px;}
+.kcal-views .btn{border:0;box-shadow:none;background:none;height:26px;padding:0 10px;color:var(--sub);}
+.kcal-views .btn[aria-pressed="true"]{background:var(--acc-soft);color:var(--acc);}
+.dark .kcal-views .btn[aria-pressed="true"]{background:var(--acc);color:#fff;}
+.kcal-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:12px;}
+.kcal-search{position:relative;flex:1 1 200px;min-width:160px;}
+.kcal-search svg{position:absolute;left:10px;top:50%;width:15px;height:15px;transform:translateY(-50%);color:var(--mut);pointer-events:none;}
+.kcal-search input{width:100%;height:32px;border:1px solid var(--line);border-radius:8px;background:var(--btn-bg);color:var(--ink);
+  font:inherit;padding:0 30px 0 32px;}
+.kcal-search input:focus-visible{outline:2px solid var(--acc);outline-offset:1px;}
+.kcal-clear{position:absolute;right:3px;top:3px;width:26px;height:26px;border:0;background:none;color:var(--mut);cursor:pointer;border-radius:6px;}
+.kcal-clear:hover{background:var(--btn-hover);color:var(--ink);}
+.kcal-clear[hidden]{display:none;}
+.kcal-cats{display:flex;flex-wrap:wrap;gap:5px;}
+.kcal-cat{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px 0 7px;border-radius:999px;border:1px solid var(--line);
+  background:var(--btn-bg);color:var(--sub);font:inherit;font-size:11.5px;font-weight:700;cursor:pointer;transition:background-color .15s,color .15s;}
+.kcal-cat .dot{width:11px;height:11px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 1.5px var(--d);}
+.kcal-cat:hover{background:var(--btn-hover);}
+.kcal-cat[aria-pressed="true"]{background:var(--c);border-color:var(--d);color:#1A1B22;}
+.kcal-cat:focus-visible{outline:2px solid var(--acc);outline-offset:1px;}
+.kcal select{height:32px;border:1px solid var(--line);border-radius:8px;background:var(--btn-bg);color:var(--ink);font:inherit;font-size:12.5px;padding:0 8px;}
+.kcal-active{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:-4px 0 10px 0;font-size:12px;color:var(--mut);}
+.kcal-active[hidden]{display:none;}
+.kcal-active .btn{height:24px;padding:0 8px;font-size:11.5px;}
+
+/* Month grid. Chips are the sheet's cells shrunk to one line; the full text
+   comes back in a hover card and in the dialog. */
+.kcal-grid{border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+.kcal-dow,.kcal-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));}
+.kcal-dow div{padding:6px 4px;text-align:center;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);
+  border-bottom:1px solid var(--line);border-right:1px solid var(--line);background:var(--soft);}
+.kcal-dow div:last-child,.kcal-day:nth-child(7n){border-right:0;}
+.kcal-day{min-height:92px;padding:4px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);}
+.kcal-day:nth-last-child(-n+7){border-bottom:0;}
+.kcal-day.out{background:var(--soft);}
+.kcal-day.out .kcal-dn{color:var(--mut);}
+.kcal-dn{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;color:var(--sub);margin-bottom:2px;}
+.kcal-day.today .kcal-dn{background:var(--acc);color:#fff;}
+.kcal-chip{display:block;width:100%;text-align:left;border:0;border-left:3px solid var(--d);border-radius:4px;background:var(--c);color:#1A1B22;
+  font:inherit;font-size:11px;font-weight:700;line-height:1.25;padding:3px 5px;margin-bottom:3px;cursor:pointer;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:transform .15s,box-shadow .15s;}
+.kcal-chip:hover,.kcal-chip:focus-visible{transform:scale(1.03);box-shadow:0 2px 8px rgba(0,0,0,.18);position:relative;z-index:2;outline:none;}
+.kcal-chip:focus-visible{box-shadow:0 0 0 2px var(--acc);}
+.kcal-chip .rm{font-weight:400;opacity:.8;}
+.kcal-more{display:block;border:0;background:none;color:var(--mut);font:inherit;font-size:11px;padding:2px 4px;cursor:pointer;text-decoration:underline;}
+.kcal-more:hover{color:var(--acc);}
+.kcal-dow abbr{text-decoration:none;}
+@media (max-width:640px){
+  .kcal{padding:12px 12px 8px 12px;}
+  .kcal-day{min-height:64px;padding:3px 2px;}
+  .kcal-chip{font-size:0;padding:0;height:6px;border-left:0;border-radius:3px;margin-bottom:2px;}
+  .kcal-dow span{display:none;}
+}
+@media (min-width:641px){.kcal-dow abbr{display:none;}}
+
+/* Week view. Seven columns of full cards rather than a 24 hour grid: nearly
+   every event on the sheet is an evening, so an hour grid would be mostly
+   empty rows. */
+.kcal-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;}
+.kcal-wcol{min-width:0;}
+.kcal-wh{text-align:center;padding:4px 0 6px 0;border-bottom:1px solid var(--line);margin-bottom:6px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);}
+.kcal-wh b{display:block;font-family:'Libre',serif;font-size:16px;letter-spacing:0;text-transform:none;color:var(--deep);}
+.kcal-wcol.today .kcal-wh b{color:var(--acc);}
+.kcal-card{display:block;width:100%;text-align:left;border:0;border-left:3px solid var(--d);border-radius:6px;background:var(--c);color:#1A1B22;
+  font:inherit;font-size:11.5px;line-height:1.3;padding:6px 7px;margin-bottom:6px;cursor:pointer;transition:transform .15s,box-shadow .15s;}
+.kcal-card:hover,.kcal-card:focus-visible{transform:scale(1.02);box-shadow:0 3px 10px rgba(0,0,0,.18);outline:none;}
+.kcal-card:focus-visible{box-shadow:0 0 0 2px var(--acc);}
+.kcal-card b{display:block;font-weight:700;}
+.kcal-card span{display:block;opacity:.85;overflow-wrap:anywhere;}
+@media (max-width:640px){.kcal-week{grid-template-columns:1fr;}.kcal-wh{text-align:left;display:flex;gap:8px;align-items:baseline;}.kcal-wh b{display:inline;}}
+
+/* List view. Grouped by day, the way the sheet reads top to bottom. */
+.kcal-list{max-height:560px;overflow-y:auto;padding-right:4px;}
+.kcal-lday{margin-bottom:14px;}
+.kcal-lday h4{font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin:0 0 6px 0;position:sticky;top:0;background:var(--sheet);padding:4px 0;}
+.kcal-lday.today h4{color:var(--acc);}
+.kcal-row{display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;border:1px solid var(--line);border-radius:8px;background:var(--btn-bg);
+  color:var(--ink);font:inherit;padding:8px 10px;margin-bottom:6px;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;}
+.kcal-row:hover,.kcal-row:focus-visible{transform:scale(1.01);box-shadow:0 3px 10px rgba(0,0,0,.12);border-color:var(--acc);outline:none;}
+.kcal-row .dot{flex:0 0 auto;width:11px;height:11px;border-radius:50%;margin-top:4px;background:var(--c);box-shadow:inset 0 0 0 1.5px var(--d);}
+.kcal-row .body{flex:1 1 auto;min-width:0;}
+.kcal-row b{display:block;font-size:13px;color:var(--deep);}
+.kcal-row .meta{font-size:11.5px;color:var(--sub);}
+.kcal-row .meta span+span::before{content:"\00a0\00b7\00a0";color:var(--mut);}
+.kcal-tag{display:inline-block;flex:0 0 auto;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:1px 8px;}
+.kcal-empty{padding:36px 0;text-align:center;color:var(--mut);}
+
+/* Hover card, one element moved under whichever chip the pointer is on. */
+.kcal-pop{position:absolute;z-index:30;width:250px;background:var(--sheet);border:1px solid var(--line);border-radius:8px;
+  box-shadow:0 8px 24px rgba(0,0,0,.18);padding:10px 12px;font-size:12px;pointer-events:none;}
+.kcal-pop[hidden]{display:none;}
+.kcal-pop b{display:block;font-size:13px;color:var(--deep);margin-bottom:2px;}
+.kcal-pop .dot{float:right;width:12px;height:12px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 1.5px var(--d);margin:2px 0 0 8px;}
+.kcal-pop span{display:block;color:var(--sub);}
+
+/* Footer: where the data came from and how fresh it is. */
+.kcal-foot{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin-top:10px;padding-top:8px;border-top:1px solid var(--line);
+  font-size:11.5px;color:var(--mut);}
+.kcal-foot a{color:var(--link);}
+.kcal-foot .btn{height:24px;padding:0 8px;font-size:11.5px;margin-left:auto;}
+.kcal-foot .btn svg{width:13px;height:13px;}
+.kcal-foot .btn.busy svg{animation:kcal-spin 1s linear infinite;}
+@keyframes kcal-spin{to{transform:rotate(360deg);}}
+@media (prefers-reduced-motion:reduce){.kcal-foot .btn.busy svg{animation:none;}.kcal-chip,.kcal-card,.kcal-row{transition:none;}}
+
+/* Dialogs: the key and the event details, both native <dialog>. */
+.kcal-dialog{border:1px solid var(--line);border-radius:12px;background:var(--sheet);color:var(--ink);padding:0;width:min(420px,calc(100vw - 32px));
+  box-shadow:0 20px 60px rgba(0,0,0,.3);font-family:'Instr',sans-serif;font-size:13px;line-height:1.5;}
+.kcal-dialog::backdrop{background:rgba(15,17,30,.45);}
+.kcal-dh{display:flex;align-items:flex-start;gap:10px;padding:16px 18px 6px 18px;}
+.kcal-dh h3{font-family:'Libre',serif;font-size:16px;font-weight:700;color:var(--deep);margin:0;letter-spacing:0;text-transform:none;flex:1;}
+.kcal-dh .btn-icon{width:30px;height:30px;margin:-4px -6px 0 0;}
+.kcal-dh .btn-icon svg{width:16px;height:16px;}
+.kcal-db{padding:4px 18px 16px 18px;}
+.kcal-db p{margin:0 0 6px 0;}
+.kcal-db .lbl{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin:10px 0 2px 0;}
+.kcal-db .val{font-size:13.5px;color:var(--ink);}
+.kcal-db .val.big{font-family:'Libre',serif;font-size:15px;color:var(--deep);}
+.kcal-key{list-style:none;margin:6px 0 0 0;padding:0;}
+.kcal-key li{display:flex;align-items:flex-start;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);}
+.kcal-key li:last-child{border-bottom:0;}
+.kcal-key .sw{flex:0 0 auto;width:28px;height:18px;border-radius:4px;background:var(--c);border-left:3px solid var(--d);margin-top:2px;}
+.kcal-key b{display:block;}
+.kcal-key span{color:var(--sub);font-size:12px;}
+.kcal-abbr{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;margin:6px 0 0 0;font-size:12px;}
+.kcal-abbr dt{font-weight:700;color:var(--deep);}
+.kcal-abbr dd{margin:0;color:var(--sub);}
+.kcal-df{display:flex;justify-content:flex-end;gap:8px;padding:0 18px 16px 18px;}
+.kcal-df .btn{height:32px;font-family:'Instr',sans-serif;font-size:12.5px;}
+@media print{.kcal{display:none;}}
 </style>
 </head>
 <body>
@@ -783,6 +932,82 @@ body{background:#ffffff;}
   </g>
 </svg></div>
   <div class="cv-foot">Contains: Memo &nbsp;&middot;&nbsp; Who This Is For &nbsp;&middot;&nbsp; Instructions &nbsp;&middot;&nbsp; Appendix A &nbsp;&middot;&nbsp; Further Reading &nbsp;&middot;&nbsp; Example Pamphlet</div>
+</section>
+
+<!-- MASTER CALENDAR. Screen only, home page only. The events inside the JSON
+     block are a snapshot of the 26-27 KCM Master Calendar sheet (Fall 2026 and
+     Spring 2027 tabs) taken on 2026-09-27. On load the page tries to refetch
+     the sheet, so room numbers and times follow the sheet once it is shared
+     with "anyone with the link"; until then the snapshot shows. -->
+<section class="kcal" id="calendar" data-page="home" aria-label="KCM master calendar">
+  <div class="kcal-head">
+    <h2 class="kcal-title" id="kcal-title" aria-live="polite">September 2026</h2>
+    <div class="kcal-nav">
+      <button type="button" class="btn btn-icon" data-cal="prev" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+      <button type="button" class="btn" data-cal="today">Today</button>
+      <button type="button" class="btn btn-icon" data-cal="next" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+    </div>
+    <div class="kcal-views" role="group" aria-label="View">
+      <button type="button" class="btn" data-view="month" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>Month</button>
+      <button type="button" class="btn" data-view="week" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/><path d="M15 21V9"/></svg>Week</button>
+      <button type="button" class="btn" data-view="list" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>List</button>
+    </div>
+    <button type="button" class="btn btn-icon" data-cal="key" aria-label="Colour key" title="Colour key" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></button>
+  </div>
+  <div class="kcal-tools">
+    <label class="kcal-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="search" id="kcal-q" placeholder="Search events, rooms, times" autocomplete="off" aria-label="Search events">
+      <button type="button" class="kcal-clear" data-cal="clear-q" aria-label="Clear search" hidden><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+    </label>
+    <div class="kcal-cats" role="group" aria-label="Filter by colour"></div>
+    <select id="kcal-track" aria-label="Filter by row"><option value="">All rows</option></select>
+  </div>
+  <div class="kcal-active" hidden></div>
+  <div class="kcal-body"></div>
+  <div class="kcal-foot">
+    <span class="kcal-status">Snapshot of the master calendar, 27 Sep 2026</span>
+    <a href="https://docs.google.com/spreadsheets/d/1nghaUIhNLTYmfYwly1ZY2fAgsFh4VD6dNNcuquHFQgg/edit?gid=1234033160#gid=1234033160" target="_blank" rel="noopener">Open the sheet</a>
+    <button type="button" class="btn" data-cal="refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>Refresh</button>
+  </div>
+  <div class="kcal-pop" hidden></div>
+
+  <dialog class="kcal-dialog" id="kcal-keydlg" aria-labelledby="kcal-keyttl">
+    <div class="kcal-dh">
+      <h3 id="kcal-keyttl">Colour key</h3>
+      <button type="button" class="btn btn-icon" data-cal="close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+    </div>
+    <div class="kcal-db">
+      <p>The five fills from the top row of the master calendar sheet.</p>
+      <ul class="kcal-key"></ul>
+      <div class="lbl">Rows on the sheet</div>
+      <p class="val">Public &middot; Officers/Leaders &middot; Focus Fam &middot; Media &middot; Praise &middot; Welcome. The Spring tab keeps everything on one Master row.</p>
+      <div class="lbl">Abbreviations</div>
+      <dl class="kcal-abbr">
+        <dt>LG</dt><dd>Large Group</dd>
+        <dt>FF</dt><dd>Focus Family</dd>
+        <dt>PM</dt><dd>Prayer Meeting</dd>
+        <dt>SG</dt><dd>Small Group</dd>
+        <dt>WW</dt><dd>Welcome Week</dd>
+        <dt>MT, WT, PT, FFT</dt><dd>Media, Welcome, Praise and Focus Family teams</dd>
+        <dt>Loc TBD</dt><dd>Room not booked yet. Check the sheet before you print the cover.</dd>
+      </dl>
+    </div>
+  </dialog>
+
+  <dialog class="kcal-dialog" id="kcal-evdlg" aria-labelledby="kcal-evttl">
+    <div class="kcal-dh">
+      <h3 id="kcal-evttl">Event</h3>
+      <button type="button" class="btn btn-icon" data-cal="close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+    </div>
+    <div class="kcal-db"></div>
+    <div class="kcal-df">
+      <a class="btn" id="kcal-evsheet" href="https://docs.google.com/spreadsheets/d/1nghaUIhNLTYmfYwly1ZY2fAgsFh4VD6dNNcuquHFQgg/edit" target="_blank" rel="noopener">Open in the sheet</a>
+      <button type="button" class="btn btn-primary" data-cal="close">Done</button>
+    </div>
+  </dialog>
+
+  <script id="kcal-data" type="application/json">[{"d":"2026-08-31","t":"WW: Tabling","time":"10:00 - 2:00 PM","loc":"The Y","cat":"special","track":"Public","term":"fall"},{"d":"2026-09-01","t":"WW: Picnic","time":"5:00 - 8:00 PM","loc":"Prince Frederick Lawn","cat":"special","track":"Public","term":"fall"},{"d":"2026-09-02","t":"WW: Game Night","time":"5:00 - 7:00 PM","loc":"Tawes 1310","cat":"special","track":"Public","term":"fall"},{"d":"2026-09-04","t":"WW: Praise & Prayer","time":"7:00 - 9:00 PM","loc":"Tawes 0130","cat":"special","track":"Public","term":"fall"},{"d":"2026-08-31","t":"First Day of Classes","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-09-02","t":"KCM Prayer Meeting #1","time":"7:30 - 8:30 AM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-09-07","t":"Labor Day","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-09-10","t":"First Look Fair","time":"10:00 - 3:00 PM","loc":"McKeldin Mall","cat":"special","track":"Public","term":"fall"},{"d":"2026-09-10","t":"LG #1","time":"7:00-10:00PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-09-09","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-09-08","t":"FF Team Pre-Study #1","time":"7:00-9:00 PM","loc":"Loc TBD","cat":"teams","track":"Focus Fam","term":"fall"},{"d":"2026-09-10","t":"MT Meeting #2","time":"4:30-5:30 PM","loc":"Loc TBD","cat":"teams","track":"Media","term":"fall"},{"d":"2026-09-15","t":"FF #1","time":"7:00 - 9:00 PM","loc":"JMZ 3120","cat":"regular","track":"Public","term":"fall"},{"d":"2026-09-16","t":"FF #1","time":"7:00 - 9:00 PM","loc":"JMZ 2120","cat":"regular","track":"Public","term":"fall"},{"d":"2026-09-17","t":"FF #1","time":"7:00 - 9:00 PM","loc":"JMZ 3120","cat":"regular","track":"Public","term":"fall"},{"d":"2026-09-16","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-09-24","t":"LG #2","time":"7:00-10:00PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-09-26","t":"Apple Picking","time":"10:00-4:00 PM","loc":"Tawes ?","cat":"special","track":"Public","term":"fall"},{"d":"2026-09-23","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-09-22","t":"FF Team Pre-Study #2","time":"7:00-9:00 PM","loc":"Loc TBD","cat":"teams","track":"Focus Fam","term":"fall"},{"d":"2026-09-27","t":"SG Interest Forms due","time":"","loc":"","cat":"teams","track":"Public","term":"fall"},{"d":"2026-09-29","t":"FF #2","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-09-30","t":"FF #2","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-10-01","t":"FF #2","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-10-02","t":"SG Assignments made","time":"","loc":"","cat":"teams","track":"Public","term":"fall"},{"d":"2026-10-03","t":"SG Assignments sent to Group Members","time":"","loc":"","cat":"teams","track":"Public","term":"fall"},{"d":"2026-09-30","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-10-04","t":"SGs Start Meeting","time":"","loc":"","cat":"teams","track":"Public","term":"fall"},{"d":"2026-10-05","t":"KCM Prayer Meeting #2","time":"8:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-10-09","t":"Lock-In","time":"Start Time TBD","loc":"Loc TBD","cat":"special","track":"Public","term":"fall"},{"d":"2026-10-10","t":"Lock-In","time":"End Time TBD","loc":"Loc TBD","cat":"special","track":"Public","term":"fall"},{"d":"2026-10-07","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-10-12","t":"Fall Break","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-10-13","t":"Fall Break","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-10-15","t":"LG #3","time":"7:00-10:00PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-10-14","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-10-13","t":"FF Team Pre-Study #3","time":"7:00-9:00 PM","loc":"Loc TBD","cat":"teams","track":"Focus Fam","term":"fall"},{"d":"2026-10-19","t":"Outreach Training #1","time":"8:15 - 10:00 PM","loc":"Loc TBD","cat":"special","track":"Public","term":"fall"},{"d":"2026-10-20","t":"FF #3","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-10-21","t":"FF #3","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-10-22","t":"FF #3","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-10-24","t":"DC Outreach #1","time":"10:00 AM - 2:00 PM","loc":"","cat":"special","track":"Public","term":"fall"},{"d":"2026-10-21","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-10-26","t":"Seminar \"What to Learn..\"","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"special","track":"Public","term":"fall"},{"d":"2026-10-29","t":"LG #4","time":"7:00-10:00PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-10-28","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-10-27","t":"FF Team Pre-Study #4","time":"7:00-9:00 PM","loc":"Loc TBD","cat":"teams","track":"Focus Fam","term":"fall"},{"d":"2026-11-02","t":"KCM Prayer Meeting #3","time":"7:30 - 8:30 AM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-11-03","t":"FF #4","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-11-04","t":"FF #4","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-11-05","t":"FF #4","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-11-06","t":"Outreach Training #2","time":"8:15 - 10:00 PM","loc":"Loc TBD","cat":"special","track":"Public","term":"fall"},{"d":"2026-11-04","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-11-09","t":"On Campus Outreach #1","time":"TBD","loc":"","cat":"special","track":"Public","term":"fall"},{"d":"2026-11-12","t":"LG #5","time":"7:00-10:00PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-11-11","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-11-10","t":"FF Team Pre-Study #5","time":"7:00-9:00 PM","loc":"Loc TBD","cat":"teams","track":"Focus Fam","term":"fall"},{"d":"2026-11-17","t":"FF #5","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-11-18","t":"FF #5","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-11-19","t":"FF #5","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-11-18","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-11-23","t":"KCM Thanksgiving Banquet","time":"6:00-9:30","loc":"CBCM","cat":"special","track":"Public","term":"fall"},{"d":"2026-11-25","t":"Thanksgiving Break","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-11-26","t":"Thanksgiving Break","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-11-27","t":"Thanksgiving Break","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-11-28","t":"Thanksgiving Break","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-11-24","t":"FF Team Pre-Study #6","time":"7:00-9:00 PM","loc":"Loc TBD","cat":"teams","track":"Focus Fam","term":"fall"},{"d":"2026-11-29","t":"Thanksgiving Break","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-11-30","t":"TBD: Bible Overview Seminar","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"special","track":"Public","term":"fall"},{"d":"2026-12-01","t":"FF #6","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-12-02","t":"FF #6","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-12-03","t":"FF #6","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-12-05","t":"Praise & Prayer","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"special","track":"Public","term":"fall"},{"d":"2026-12-02","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-12-07","t":"KCM Prayer Meeting #4","time":"8:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-12-11","t":"Last Day of Classes","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-12-12","t":"Reading Day","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-12-09","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-12-14","t":"Finals","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-12-15","t":"Finals","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-12-16","t":"Finals","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-12-17","t":"Finals","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-12-18","t":"Finals","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-12-19","t":"Finals","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-12-20","t":"Finals","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-12-21","t":"Finals","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2027-01-27","t":"UMD First Day of Classes","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-01-30","t":"Ice Skating","time":"12:00 - 4:00 PM","loc":"Herbert Wells Ice Rink","cat":"special","track":"Master","term":"spring"},{"d":"2027-02-01","t":"KCM Prayer Meeting #1","time":"7:30 - 8:30 AM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-02-04","t":"Second Look Fair","time":"10 AM - 3 PM","loc":"Stamp","cat":"special","track":"Master","term":"spring"},{"d":"2027-02-04","t":"LG #1","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-02-09","t":"FF #1","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-02-10","t":"FF #1","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-02-11","t":"FF #1","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-02-18","t":"LG #2","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-02-23","t":"FF #2","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-02-24","t":"FF #2","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-02-25","t":"FF #2","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-03-01","t":"KCM Prayer Meeting #2","time":"7:30 - 8:30 AM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-03-04","t":"LG #3","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-03-12","t":"Retreat","time":"","loc":"Black Rock Retreat Center","cat":"special","track":"Master","term":"spring"},{"d":"2027-03-13","t":"Retreat","time":"","loc":"Black Rock Retreat Center","cat":"special","track":"Master","term":"spring"},{"d":"2027-03-14","t":"Retreat","time":"","loc":"Black Rock Retreat Center","cat":"special","track":"Master","term":"spring"},{"d":"2027-03-15","t":"Spring Break","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-03-16","t":"Spring Break","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-03-17","t":"Spring Break","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-03-18","t":"Spring Break","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-03-19","t":"Spring Break","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-03-20","t":"Spring Break","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-03-21","t":"Spring Break","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-03-23","t":"FF #3","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-03-24","t":"FF #3","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-03-25","t":"FF #3","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-03-27","t":"Praise & Prayer","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"special","track":"Master","term":"spring"},{"d":"2027-03-30","t":"Seminar","time":"7:00 PM - 9:00 PM","loc":"Loc TBD","cat":"special","track":"Master","term":"spring"},{"d":"2027-04-01","t":"LG #4 (Nominations)","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-04-05","t":"KCM Prayer Meeting #3","time":"7:30 - 8:30 AM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-04-06","t":"FF #4","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-04-07","t":"FF #4","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-04-08","t":"FF #4","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-04-10","t":"Coffeehouse","time":"12:00 PM - 3:00 PM","loc":"TBD","cat":"special","track":"Master","term":"spring"},{"d":"2027-04-15","t":"LG #5 (Elections)","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-04-20","t":"FF #5","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-04-21","t":"FF #5","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-04-22","t":"FF #5","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-04-29","t":"LG #6","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-05-01","t":"Praise & Prayer","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"special","track":"Master","term":"spring"},{"d":"2027-05-03","t":"KCM Prayer Meeting #4","time":"7:30 - 8:30 AM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-05-04","t":"FF #6","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-05-05","t":"FF #6","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-05-06","t":"FF #6","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-05-08","t":"Senior Banquet","time":"6:00 PM - 10:00 PM","loc":"CBCCP","cat":"special","track":"Master","term":"spring"},{"d":"2027-05-11","t":"Last Day of Classes","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-05-12","t":"Reading Day","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-05-13","t":"Finals","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-05-14","t":"Finals","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-05-15","t":"Finals","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-05-16","t":"Finals","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-05-17","t":"Finals","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-05-18","t":"Finals","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-05-19","t":"Finals","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-05-20","t":"Finals","time":"","loc":"","cat":"school","track":"Master","term":"spring"}]</script>
 </section>
 
 <!-- CONTENTS -->
@@ -2085,6 +2310,417 @@ function initFlames() {
   window.addEventListener("hashchange", wake);
 }
 
+// Master calendar. A port of the event-manager component to plain JavaScript:
+// month, week and list views, search and filters, a colour key and an event
+// dialog. Read only, because the sheet is the source of truth and an edit here
+// would be a lie the next reader acts on. The events start from the JSON
+// snapshot in the section and are replaced by a live read of the sheet when
+// Google lets the browser have it (see refreshCalendar).
+var CAL_SHEET_ID = "1nghaUIhNLTYmfYwly1ZY2fAgsFh4VD6dNNcuquHFQgg";
+var CAL_TABS = [
+  // gid for the tab this guide links to; sheet name for the other, since the
+  // gviz endpoint takes either and the name is what the export gave us.
+  { term: "fall", year: 2026, query: "gid=1234033160" },
+  { term: "spring", year: 2027, query: "sheet=" + encodeURIComponent("2027 Spring Master Calendar") }
+];
+// The key. Names are the sheet's own top-row labels; fills are its fills.
+var CAL_CATS = [
+  { id: "regular", name: "Regular events", note: "LG, FF, PM" },
+  { id: "special", name: "Special events", note: "Welcome Week, outreach, banquets, retreat" },
+  { id: "officers", name: "Officers and leaders", note: "Officer and leaders meetings" },
+  { id: "teams", name: "Teams", note: "MT, WT, PT, FFT and small groups" },
+  { id: "school", name: "School calendar", note: "UMD breaks, first and last days, finals" }
+];
+var CAL_DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+var CAL_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+var cal = {
+  events: [],
+  cursor: new Date(),
+  view: "month",
+  q: "",
+  cats: [],
+  track: "",
+  root: null,
+  popTimer: null
+};
+
+function calKey(d) {
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+function calParse(key) {
+  var p = key.split("-");
+  return new Date(+p[0], +p[1] - 1, +p[2]);
+}
+function calToday() {
+  return calKey(new Date());
+}
+function calEsc(s) {
+  return String(s).replace(/[&<>"]/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+  });
+}
+function calLongDate(key) {
+  var d = calParse(key);
+  return CAL_DOW[d.getDay()] + ", " + CAL_MONTHS[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
+}
+
+// Start minute of the event, for sorting within a day. The sheet writes times
+// several ways ("7:00 - 9:00 PM", "7:00-10:00PM", "10 AM - 3 PM", "7:30 - 8:30
+// AM"), so a start with no AM/PM of its own borrows the end's, and flips to
+// morning when that would put the start after the end. Anything unparseable
+// sorts last.
+function calStartMinute(time) {
+  var m = /(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\s*-\s*(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/i.exec(time || "");
+  if (!m) return 24 * 60;
+  var h = +m[1], min = +(m[2] || 0), mer = (m[3] || m[6] || "").toLowerCase();
+  var endH = +m[4];
+  if (!m[3] && m[6] && mer === "pm" && h > endH && h !== 12) mer = "am";
+  if (mer === "pm" && h < 12) h += 12;
+  if (mer === "am" && h === 12) h = 0;
+  return h * 60 + min;
+}
+
+function calFiltered() {
+  var q = cal.q.trim().toLowerCase();
+  return cal.events.filter(function (e) {
+    if (cal.cats.length && cal.cats.indexOf(e.cat) === -1) return false;
+    if (cal.track && e.track !== cal.track) return false;
+    if (q && (e.t + " " + e.time + " " + e.loc + " " + e.track).toLowerCase().indexOf(q) === -1) return false;
+    return true;
+  }).sort(function (a, b) {
+    return a.d < b.d ? -1 : a.d > b.d ? 1 : calStartMinute(a.time) - calStartMinute(b.time);
+  });
+}
+function calByDay(list) {
+  var map = {};
+  list.forEach(function (e) {
+    (map[e.d] = map[e.d] || []).push(e);
+  });
+  return map;
+}
+function calStyle(e) {
+  return 'style="--c:var(--kc-' + e.cat + ');--d:var(--kd-' + e.cat + ')"';
+}
+
+// Views. Each returns markup for .kcal-body; event buttons carry data-ev with
+// the event's index into cal.events so one click handler serves all three.
+function calMonthHTML(list) {
+  var y = cal.cursor.getFullYear(), mo = cal.cursor.getMonth();
+  var first = new Date(y, mo, 1);
+  var start = new Date(first);
+  start.setDate(1 - first.getDay());
+  var byDay = calByDay(list), today = calToday();
+  var h = '<div class="kcal-grid"><div class="kcal-dow">' + CAL_DOW.map(function (d) {
+    return "<div><span>" + d + "</span><abbr title=\"" + d + "\">" + d.charAt(0) + "</abbr></div>";
+  }).join("") + '</div><div class="kcal-days">';
+  for (var i = 0; i < 42; i++) {
+    var d = new Date(start);
+    d.setDate(start.getDate() + i);
+    var key = calKey(d), evs = byDay[key] || [];
+    h += '<div class="kcal-day' + (d.getMonth() !== mo ? " out" : "") + (key === today ? " today" : "") + '">';
+    h += '<div class="kcal-dn">' + d.getDate() + "</div>";
+    evs.slice(0, 3).forEach(function (e) {
+      h += '<button type="button" class="kcal-chip" data-ev="' + e.i + '" ' + calStyle(e) + ">" + calEsc(e.t) +
+        (e.loc ? ' <span class="rm">' + calEsc(e.loc) + "</span>" : "") + "</button>";
+    });
+    if (evs.length > 3) h += '<button type="button" class="kcal-more" data-day="' + key + '">+' + (evs.length - 3) + " more</button>";
+    h += "</div>";
+  }
+  return h + "</div></div>";
+}
+function calWeekHTML(list) {
+  var start = new Date(cal.cursor);
+  start.setDate(cal.cursor.getDate() - cal.cursor.getDay());
+  var byDay = calByDay(list), today = calToday();
+  var h = '<div class="kcal-week">';
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(start);
+    d.setDate(start.getDate() + i);
+    var key = calKey(d), evs = byDay[key] || [];
+    h += '<div class="kcal-wcol' + (key === today ? " today" : "") + '"><div class="kcal-wh">' + CAL_DOW[i] +
+      " <b>" + (d.getMonth() + 1) + "/" + d.getDate() + "</b></div>";
+    evs.forEach(function (e) {
+      h += '<button type="button" class="kcal-card" data-ev="' + e.i + '" ' + calStyle(e) + "><b>" + calEsc(e.t) + "</b>" +
+        (e.time ? "<span>" + calEsc(e.time) + "</span>" : "") + (e.loc ? "<span>" + calEsc(e.loc) + "</span>" : "") + "</button>";
+    });
+    h += "</div>";
+  }
+  return h + "</div>";
+}
+function calListHTML(list) {
+  if (!list.length) return '<div class="kcal-empty">No events match.</div>';
+  var byDay = calByDay(list), today = calToday();
+  return '<div class="kcal-list">' + Object.keys(byDay).sort().map(function (key) {
+    return '<div class="kcal-lday' + (key === today ? " today" : "") + '"><h4>' + calLongDate(key) + "</h4>" + byDay[key].map(function (e) {
+      return '<button type="button" class="kcal-row" data-ev="' + e.i + '" ' + calStyle(e) + '><span class="dot"></span><span class="body"><b>' +
+        calEsc(e.t) + '</b><span class="meta">' + (e.time ? "<span>" + calEsc(e.time) + "</span>" : "") +
+        (e.loc ? "<span>" + calEsc(e.loc) + "</span>" : "") + "</span></span><span class=\"kcal-tag\">" + calEsc(e.track) + "</span></button>";
+    }).join("") + "</div>";
+  }).join("") + "</div>";
+}
+
+function renderCalendar() {
+  var list = calFiltered();
+  var title = cal.root.querySelector("#kcal-title");
+  if (cal.view === "month") {
+    title.textContent = CAL_MONTHS[cal.cursor.getMonth()] + " " + cal.cursor.getFullYear();
+  } else if (cal.view === "week") {
+    var s = new Date(cal.cursor);
+    s.setDate(cal.cursor.getDate() - cal.cursor.getDay());
+    title.textContent = "Week of " + CAL_MONTHS[s.getMonth()].slice(0, 3) + " " + s.getDate() + ", " + s.getFullYear();
+  } else {
+    title.textContent = "All events";
+  }
+  cal.root.querySelector(".kcal-body").innerHTML =
+    cal.view === "month" ? calMonthHTML(list) : cal.view === "week" ? calWeekHTML(list) : calListHTML(list);
+  cal.root.querySelectorAll("[data-view]").forEach(function (b) {
+    b.setAttribute("aria-pressed", b.getAttribute("data-view") === cal.view ? "true" : "false");
+  });
+  cal.root.querySelectorAll("[data-cal=prev],[data-cal=next]").forEach(function (b) {
+    b.hidden = cal.view === "list";
+  });
+  cal.root.querySelectorAll(".kcal-cat").forEach(function (b) {
+    b.setAttribute("aria-pressed", cal.cats.indexOf(b.getAttribute("data-cat")) !== -1 ? "true" : "false");
+  });
+  cal.root.querySelector("[data-cal=clear-q]").hidden = !cal.q;
+  var active = cal.root.querySelector(".kcal-active");
+  var on = cal.cats.length || cal.track;
+  active.hidden = !on;
+  if (on) {
+    active.innerHTML = "Showing " + list.length + " of " + cal.events.length + " events" +
+      (cal.track ? ' on the <b>' + calEsc(cal.track) + "</b> row" : "") +
+      ' <button type="button" class="btn" data-cal="clear">Clear filters</button>';
+  }
+}
+
+function calTrackOptions() {
+  var sel = cal.root.querySelector("#kcal-track");
+  var seen = {};
+  cal.events.forEach(function (e) { seen[e.track] = true; });
+  var keep = cal.track;
+  sel.innerHTML = '<option value="">All rows</option>' + Object.keys(seen).map(function (t) {
+    return '<option value="' + calEsc(t) + '">' + calEsc(t) + "</option>";
+  }).join("");
+  sel.value = seen[keep] ? keep : "";
+  cal.track = sel.value;
+}
+
+function calSetEvents(list) {
+  cal.events = list.map(function (e, i) {
+    e.i = i;
+    return e;
+  });
+  calTrackOptions();
+  renderCalendar();
+}
+
+// Hover card, the compact chip's preview from the component. One element,
+// repositioned; hidden on leave, scroll and any re-render.
+function calShowPop(btn) {
+  var e = cal.events[+btn.getAttribute("data-ev")];
+  var pop = cal.root.querySelector(".kcal-pop");
+  pop.innerHTML = '<span class="dot" ' + calStyle(e) + "></span><b>" + calEsc(e.t) + "</b><span>" + calLongDate(e.d) + "</span>" +
+    (e.time ? "<span>" + calEsc(e.time) + "</span>" : "") + (e.loc ? "<span>" + calEsc(e.loc) + "</span>" : "") +
+    "<span>" + calEsc(e.track) + "</span>";
+  pop.hidden = false;
+  var r = btn.getBoundingClientRect(), host = cal.root.getBoundingClientRect();
+  var left = r.left - host.left;
+  if (left + 250 > host.width) left = host.width - 250;
+  pop.style.left = Math.max(0, left) + "px";
+  pop.style.top = (r.bottom - host.top + 4) + "px";
+}
+function calHidePop() {
+  cal.root.querySelector(".kcal-pop").hidden = true;
+}
+
+function calOpenEvent(i) {
+  var e = cal.events[i];
+  var dlg = cal.root.querySelector("#kcal-evdlg");
+  var cat = CAL_CATS.filter(function (c) { return c.id === e.cat; })[0];
+  dlg.querySelector("#kcal-evttl").textContent = e.t;
+  dlg.querySelector(".kcal-db").innerHTML =
+    '<div class="lbl">When</div><div class="val big">' + calLongDate(e.d) + "</div>" +
+    (e.time ? '<div class="val">' + calEsc(e.time) + "</div>" : "") +
+    '<div class="lbl">Where</div><div class="val">' + (e.loc ? calEsc(e.loc) : "Not on the sheet yet") + "</div>" +
+    '<div class="lbl">Colour</div><div class="val"><span class="kcal-cat" ' + calStyle(e) + ' aria-pressed="true"><span class="dot"></span>' +
+    calEsc(cat ? cat.name : e.cat) + "</span></div>" +
+    '<div class="lbl">Row</div><div class="val">' + calEsc(e.track) + " &middot; " + (e.term === "fall" ? "Fall 2026" : "Spring 2027") + " tab</div>";
+  var tab = CAL_TABS.filter(function (t) { return t.term === e.term; })[0];
+  dlg.querySelector("#kcal-evsheet").href = "https://docs.google.com/spreadsheets/d/" + CAL_SHEET_ID + "/edit" +
+    (tab && tab.query.indexOf("gid=") === 0 ? "?" + tab.query + "#" + tab.query : "");
+  dlg.showModal();
+}
+
+// Live read. Google serves a tab as CSV once the sheet is shared with anyone
+// who has the link. The CSV has no fills, so a colour comes from the snapshot
+// when the title is known there and from the title's wording otherwise.
+function calGuessCat(title, known) {
+  if (known[title]) return known[title];
+  if (/^(LG|FF|PM)\b|Prayer Meeting/i.test(title)) return "regular";
+  if (/Officer|Leaders/i.test(title)) return "officers";
+  if (/^(MT|WT|PT|FFT|SG)\b|Team|Small Group/i.test(title)) return "teams";
+  if (/Break|Classes|Finals|Reading Day|Labor Day/i.test(title)) return "school";
+  return "special";
+}
+function calParseCSV(text) {
+  var rows = [], row = [], cell = "", q = false;
+  for (var i = 0; i < text.length; i++) {
+    var c = text[i];
+    if (q) {
+      if (c === '"') {
+        if (text[i + 1] === '"') { cell += '"'; i++; } else q = false;
+      } else cell += c;
+    } else if (c === '"') q = true;
+    else if (c === ",") { row.push(cell); cell = ""; }
+    else if (c === "\n" || c === "\r") {
+      if (c === "\r" && text[i + 1] === "\n") i++;
+      row.push(cell); rows.push(row); row = []; cell = "";
+    } else cell += c;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  return rows;
+}
+function calEventsFromCSV(rows, tab, known) {
+  var out = [], week = null;
+  var timeRe = /(\d{1,2}(:\d{2})?\s*(AM|PM)?\s*-\s*\d{1,2}(:\d{2})?\s*(AM|PM)?)|^(Start |End )?Time\b|^TBD$/i;
+  rows.forEach(function (r) {
+    var a = (r[0] || "").trim();
+    if (/^0 Date/.test(a)) {
+      // Anchor the week on any cell that parses, then count out the rest.
+      week = null;
+      for (var c = 1; c <= 7; c++) {
+        var m = /(\d{1,2})\/(\d{1,2})/.exec(r[c] || "");
+        if (m) {
+          var anchor = new Date(tab.year, +m[1] - 1, +m[2]);
+          week = [];
+          for (var k = 1; k <= 7; k++) {
+            var d = new Date(anchor);
+            d.setDate(anchor.getDate() + (k - c));
+            week.push(calKey(d));
+          }
+          break;
+        }
+      }
+      return;
+    }
+    var tm = /^\d\s+(.*)/.exec(a);
+    if (!week || !tm) return;
+    for (var col = 1; col <= 7; col++) {
+      var text = (r[col] || "").trim();
+      if (!text) continue;
+      var lines = text.split("\n").map(function (l) { return l.trim(); }).filter(Boolean);
+      var e = { d: week[col - 1], t: lines[0], time: "", loc: "", track: tm[1].trim(), term: tab.term };
+      lines.slice(1).forEach(function (l) {
+        if (!e.time && timeRe.test(l)) e.time = l.replace(/^Time\s+/, "");
+        else e.loc = e.loc ? e.loc + ", " + l : l.replace(/^Loc:\s*/, "");
+      });
+      e.cat = calGuessCat(e.t, known);
+      out.push(e);
+    }
+  });
+  return out;
+}
+function refreshCalendar(manual) {
+  var btn = cal.root.querySelector("[data-cal=refresh]");
+  var status = cal.root.querySelector(".kcal-status");
+  btn.classList.add("busy");
+  var known = {};
+  cal.events.forEach(function (e) { known[e.t] = e.cat; });
+  Promise.all(CAL_TABS.map(function (tab) {
+    var url = "https://docs.google.com/spreadsheets/d/" + CAL_SHEET_ID + "/gviz/tq?tqx=out:csv&" + tab.query;
+    return fetch(url, { mode: "cors", credentials: "omit" }).then(function (res) {
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.text();
+    }).then(function (text) {
+      if (/<html/i.test(text.slice(0, 200))) throw new Error("sign-in page");
+      return calEventsFromCSV(calParseCSV(text), tab, known);
+    });
+  })).then(function (parts) {
+    var all = parts[0].concat(parts[1]);
+    if (!all.length) throw new Error("empty");
+    calSetEvents(all);
+    var now = new Date();
+    status.textContent = "Live from the master calendar, read " +
+      now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }) + " today";
+  }).catch(function (err) {
+    // Not shared publicly, offline, or the tab was renamed: keep the snapshot
+    // and say so. Only a manual refresh gets the reason.
+    if (manual) status.textContent = "Could not read the sheet (" + err.message + "). Showing the snapshot from 27 Sep 2026. " +
+      "The sheet has to be shared with anyone who has the link for the live read to work.";
+  }).then(function () {
+    btn.classList.remove("busy");
+  });
+}
+
+function initCalendar() {
+  cal.root = document.getElementById("calendar");
+  if (!cal.root) return;
+  var snapshot = JSON.parse(document.getElementById("kcal-data").textContent);
+
+  // Category chips in the toolbar and rows in the key, both from CAL_CATS.
+  cal.root.querySelector(".kcal-cats").innerHTML = CAL_CATS.map(function (c) {
+    return '<button type="button" class="kcal-cat" data-cat="' + c.id + '" aria-pressed="false" style="--c:var(--kc-' + c.id +
+      ");--d:var(--kd-" + c.id + ')"><span class="dot"></span>' + c.name + "</button>";
+  }).join("");
+  cal.root.querySelector(".kcal-key").innerHTML = CAL_CATS.map(function (c) {
+    return '<li><span class="sw" style="--c:var(--kc-' + c.id + ");--d:var(--kd-" + c.id + ')"></span><div><b>' + c.name +
+      "</b><span>" + c.note + "</span></div></li>";
+  }).join("");
+
+  calSetEvents(snapshot);
+
+  cal.root.addEventListener("click", function (ev) {
+    var t = ev.target.closest("button, a");
+    if (!t || !cal.root.contains(t)) return;
+    var act = t.getAttribute("data-cal");
+    if (t.hasAttribute("data-ev")) { calHidePop(); calOpenEvent(+t.getAttribute("data-ev")); }
+    else if (t.hasAttribute("data-day")) { cal.cursor = calParse(t.getAttribute("data-day")); cal.view = "week"; renderCalendar(); }
+    else if (t.hasAttribute("data-view")) { cal.view = t.getAttribute("data-view"); renderCalendar(); }
+    else if (t.hasAttribute("data-cat")) {
+      var id = t.getAttribute("data-cat"), at = cal.cats.indexOf(id);
+      if (at === -1) cal.cats.push(id); else cal.cats.splice(at, 1);
+      renderCalendar();
+    }
+    else if (act === "prev" || act === "next") {
+      var dir = act === "next" ? 1 : -1;
+      if (cal.view === "month") cal.cursor = new Date(cal.cursor.getFullYear(), cal.cursor.getMonth() + dir, 1);
+      else cal.cursor.setDate(cal.cursor.getDate() + dir * 7);
+      renderCalendar();
+    }
+    else if (act === "today") { cal.cursor = new Date(); renderCalendar(); }
+    else if (act === "key") cal.root.querySelector("#kcal-keydlg").showModal();
+    else if (act === "close") t.closest("dialog").close();
+    else if (act === "clear-q") { cal.q = ""; cal.root.querySelector("#kcal-q").value = ""; renderCalendar(); }
+    else if (act === "clear") { cal.cats = []; cal.track = ""; cal.root.querySelector("#kcal-track").value = ""; renderCalendar(); }
+    else if (act === "refresh") refreshCalendar(true);
+  });
+  cal.root.querySelector("#kcal-q").addEventListener("input", function (e) {
+    cal.q = e.target.value;
+    renderCalendar();
+  });
+  cal.root.querySelector("#kcal-track").addEventListener("change", function (e) {
+    cal.track = e.target.value;
+    renderCalendar();
+  });
+  // Clicking the dim backdrop closes a dialog; Escape already does.
+  cal.root.querySelectorAll("dialog").forEach(function (d) {
+    d.addEventListener("click", function (e) {
+      if (e.target === d) d.close();
+    });
+  });
+  cal.root.addEventListener("mouseover", function (e) {
+    var chip = e.target.closest(".kcal-chip");
+    if (chip && chip.matches(":hover")) calShowPop(chip);
+  });
+  cal.root.addEventListener("mouseout", function (e) {
+    if (e.target.closest(".kcal-chip") && !(e.relatedTarget && e.relatedTarget.closest(".kcal-chip"))) calHidePop();
+  });
+  window.addEventListener("scroll", calHidePop, { passive: true });
+
+  refreshCalendar(false);
+}
+
 initCopyButtons();
 initThemeToggle();
 initFab();
@@ -2094,6 +2730,7 @@ initLogoCards();
 initLaser();
 initLens();
 initPages();
+initCalendar();
 
 </script>
 </body>

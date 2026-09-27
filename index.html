@@ -252,10 +252,14 @@ body{background:#ffffff;}
 .docbar .acts{display:flex;gap:8px;}
 
 .btn{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;border-radius:8px;
-  font-family:'Libre',serif;font-size:13px;font-weight:700;transition:background-color .15s,color .15s;
+  font-family:'Libre',serif;font-size:13px;font-weight:700;transition:background-color .15s,color .15s,transform .12s,box-shadow .12s;
   outline-offset:2px;height:36px;padding:0 16px;border:1px solid var(--line);background:var(--btn-bg);
   color:var(--deep);box-shadow:0 1px 2px rgba(0,0,0,.05);cursor:pointer;text-decoration:none;gap:7px;}
 .btn:hover{background:var(--btn-hover);}
+/* Pressing sinks the button into the page, after Blueberry's buttons: the
+   raised shadow goes and it drops a pixel. */
+.btn:active{transform:translateY(1px) scale(.97);box-shadow:inset 0 1px 2px rgba(0,0,0,.15);}
+@media (prefers-reduced-motion:reduce){.btn{transition:none;}}
 .btn:focus-visible{outline:2px solid var(--acc);}
 .btn-primary{background:var(--acc);color:#fff;border-color:var(--acc);}
 .btn-primary:hover{background:#5E4396;}
@@ -644,6 +648,7 @@ body{background:#ffffff;}
 .foot-meta{margin:0;font-family:'Mono';font-size:11px;color:#A8A29E;}
 .foot .xbtn{background:rgba(255,255,255,.06);border-color:#292524;color:#FFFFFF;box-shadow:none;}
 .foot .xbtn:hover{background:rgba(255,255,255,.12);}
+.foot .xbtn:active{background:rgba(255,255,255,.03);box-shadow:inset 0 1px 3px rgba(0,0,0,.6);}
 .foot-h{margin:0 0 6px 0;font-family:'Mono';font-size:10.5px;font-weight:400;letter-spacing:.18em;text-transform:uppercase;color:#D6D3D1;}
 .foot-note{margin:0 0 12px 0;font-family:'Instr';font-size:12.5px;color:#A8A29E;}
 .foot-links{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:2px 16px;}
@@ -707,7 +712,11 @@ body{background:#ffffff;}
 .kcal{position:relative;border:1px solid var(--line);border-radius:8px;padding:16px 20px 12px 20px;margin:0 0 26px 0;
   font-family:'Instr',sans-serif;font-size:13px;line-height:1.45;color:var(--ink);
   --kc-regular:#D9D2E9;--kc-special:#D9EAD3;--kc-officers:#FCE5CD;--kc-teams:#FF9ADA;--kc-school:#EA9999;
-  --kd-regular:#6B4EA8;--kd-special:#2E7A61;--kd-officers:#9C6420;--kd-teams:#B0287A;--kd-school:#B3261E;}
+  --kd-regular:#6B4EA8;--kd-special:#2E7A61;--kd-officers:#9C6420;--kd-teams:#B0287A;--kd-school:#B3261E;
+  /* The filled accent. The page turns --acc white at night, which is fine for
+     text and rings but not for a fill under white text, so fills take this. */
+  --kcal-on:var(--acc);}
+.dark .kcal{--kcal-on:#7B5FC7;}
 .kcal-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-bottom:12px;}
 .kcal-title{font-family:'Libre',serif;font-size:19px;font-weight:700;color:var(--deep);margin:0;line-height:1.2;}
 .kcal-nav,.kcal-views{display:inline-flex;align-items:center;gap:4px;}
@@ -718,7 +727,7 @@ body{background:#ffffff;}
 .kcal .btn svg{width:16px;height:16px;}
 .kcal-views .btn{border:0;box-shadow:none;background:none;height:26px;padding:0 10px;color:var(--sub);}
 .kcal-views .btn[aria-pressed="true"]{background:var(--acc-soft);color:var(--acc);}
-.dark .kcal-views .btn[aria-pressed="true"]{background:var(--acc);color:#fff;}
+.dark .kcal-views .btn[aria-pressed="true"]{background:var(--kcal-on);color:#fff;}
 .kcal-corner{display:inline-flex;gap:4px;}
 .kcal .btn.busy svg{animation:kcal-spin 1s linear infinite;}
 .kcal-role{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);}
@@ -756,7 +765,7 @@ body{background:#ffffff;}
 .kcal-day.out{background:var(--soft);}
 .kcal-day.out .kcal-dn{color:var(--mut);}
 .kcal-dn{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;color:var(--sub);margin-bottom:2px;}
-.kcal-day.today .kcal-dn{background:var(--acc);color:#fff;}
+.kcal-day.today .kcal-dn{background:var(--kcal-on);color:#fff;}
 .kcal-chip{display:block;width:100%;text-align:left;border:0;border-left:3px solid var(--d);border-radius:4px;background:var(--c);color:#1A1B22;
   font:inherit;font-size:11px;font-weight:700;line-height:1.25;padding:3px 5px;margin-bottom:3px;cursor:pointer;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:transform .15s,box-shadow .15s;}

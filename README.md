@@ -54,6 +54,25 @@ the sheet; that works once the sheet is shared with anyone who has the link
 shows and the Refresh button says why. To move the snapshot forward, re-export
 the sheet and rebuild the JSON in the `kcal-data` block.
 
+## The scheduler
+
+Under the calendar sits "Find a time", a when2meet replacement with two modes:
+
+- **Group:** pick dates or weekdays and a time range, share one link, and each person
+  types their name and drags over the grid (green available, yellow maybe). Submitting
+  turns everything unmarked red and asks for a review before saving. Results show as a
+  heat grid (click a slot for who is free, maybe, busy, or hasn't answered), a ranked
+  list of best times, and a per-person view. The organiser picks the final time.
+- **One-on-one:** a short wizard, then one of three flows: offer times and they book
+  one, they share times and you pick, or propose a time they accept or answer.
+
+The expand icon (top right) turns it full screen. Links look like `?meet=<id>`; the
+organiser's own link adds `&admin=<token>` and is the only way to edit from another
+device. Data lives in the `andrew-dashboard` Supabase project, schema `sched`, reached
+only through four `public.sched_*` functions (migration
+`dashboard/supabase/migrations/20260928120000_sched.sql`). Until that migration is
+applied, everything saves in the browser only and the footer says so.
+
 ## Credits
 
 Background effect from Canvas UI HexFloat. Fonts under the SIL Open Font License.

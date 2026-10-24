@@ -39,6 +39,8 @@ Then visit `http://localhost:8000`. A server is needed because the browser block
     guide.pdf             printable version
     example-pamphlet.pdf  a finished pamphlet, Spring FF #06, imposed for printing (after Step 10)
     example-pamphlet-pages.pdf  the same pamphlet's four pages in reading order (before Step 10)
+    pamphlet-template.pdf the pamphlet as a fill-in PDF (Fall FF #02 with the weekly parts as form fields)
+    tools/make_template.py rebuilds it: python tools/make_template.py <Doc exported as PDF> pamphlet-template.pdf
     pdf-editor.html       the PDF editor's page, with its loading curtain
     apps-script/          the scheduler's shared store (Code.gs) and its test
     pdfcraft/             PdfCraft 0.13.0's web build, the PDF editor (see below)

@@ -21,6 +21,9 @@
 // Reading one page at a time needs JavaScript, so the switch for it is set
 // here, before paint. Without JavaScript the guide stays one long page.
 document.documentElement.classList.add("paged");
+// A scheduler link (?meet=<id>) shows the scheduler alone, set before paint so
+// a guest never sees the guide flash past first.
+if (/[?&]meet=/.test(location.search)) document.documentElement.classList.add("meet-only");
 </script>
 <style>
 
@@ -997,6 +1000,18 @@ html.ksch-lock .fab{display:none;}
 }
 @media (prefers-reduced-motion:reduce){.ksch-steps .bar i,.ksch-opt{transition:none;}}
 @media print{.ksch{display:none;}}
+/* Scheduler link view. Guests came for the poll, not the pamphlet guide, so
+   everything but the scheduler and the top bar hides; the bar keeps the theme
+   switch and says whose scheduler this is. The #scheduler rule outranks the
+   paging rule, so a link carrying another page's #/hash still shows it. */
+@media screen{
+  html.meet-only .page-wrap > :not(.docbar):not(#scheduler),
+  html.meet-only .foot,html.meet-only .fab,html.meet-only .laser,
+  html.meet-only .burger,html.meet-only .lensbtn,html.meet-only .xbtn,
+  html.meet-only .brand-t{display:none !important;}
+  html.meet-only #scheduler{display:block;}
+  html.meet-only .brand{pointer-events:none;}
+}
 
 /* Scheduler widgets. The grid scrolls inside its own box so the day row
    and the time column can both stay stuck while the other axis moves. */
@@ -3515,10 +3530,10 @@ var KSCH = (function () {
   var root = document.getElementById("scheduler");
   if (!root) return null;
 
-  var SB_URL = "https://uahfbnteqqnrdqnahmqk.supabase.co";
-  // Publishable key: safe in a page by design. It can only call the four
-  // sched_* functions below; the tables themselves are not exposed.
-  var SB_KEY = "sb_publishable_Lbi4kzGDVR6IKmYX_5d-2Q_E5Ml5eXN";
+  // The Apps Script web app in front of the KCM scheduler sheet
+  // (apps-script/Code.gs). Paste its /exec URL here after deploying. Empty
+  // means not set up yet: polls then save in this browser only.
+  var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzmsNUqlXFmb3G3Olg4CLI78bQY7bTlZ6SYId852WA1iIOhbPL5JmLNEhtZloJGB79K/exec";
 
   /* ---------- small DOM helpers ---------- */
 
@@ -3671,27 +3686,25 @@ var KSCH = (function () {
   function forget(id) { save("ksch:recent", recent().filter(function (r) { return r.id !== id; })); }
 
   /* ---------- the store ----------
-     Remote: four Postgres functions in the andrew-dashboard project, called
-     over PostgREST. Local: the same four shapes in localStorage, used until
-     the migration is applied (the functions 404) or when offline. Local polls
-     only exist in this browser, and the footer says so. */
+     Remote: four functions in the Apps Script web app, which keeps polls in a
+     Google Sheet in the KCM account. Local: the same four shapes in
+     localStorage, used only while SCRIPT_URL is empty. A remote call that fails
+     says so instead of quietly saving locally, because a poll saved locally
+     opens in no other browser. */
 
   var mode = "unknown"; // "remote" | "local"
   function rpc(fn, args) {
-    return fetch(SB_URL + "/rest/v1/rpc/" + fn, {
-      method: "POST",
-      headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" },
-      body: JSON.stringify(args)
-    }).then(function (r) {
-      return r.json().catch(function () { return null; }).then(function (body) {
-        if (r.ok) return body;
-        var err = new Error((body && (body.message || body.hint)) || ("HTTP " + r.status));
-        // PGRST202: no such function, i.e. the migration is not applied yet.
-        err.missing = r.status === 404 || (body && body.code === "PGRST202");
-        err.code = body && body.message;
-        throw err;
+    // A plain-text body keeps this a "simple" request, so the browser sends it
+    // straight to Google without a CORS preflight that Apps Script cannot answer.
+    return fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ fn: fn, args: args }) })
+      .then(function (r) { return r.json(); }, function () {
+        throw Object.assign(new Error("Couldn't reach the scheduler. Check your connection and try again."), { code: "offline" });
+      })
+      .then(function (body) {
+        if (body && "result" in body) return body.result;
+        var msg = (body && body.error) || "unexpected reply";
+        throw Object.assign(new Error(msg), { code: msg });
       });
-    });
   }
   function randomId(len) {
     var a = new Uint8Array(len), s = "", abc = "abcdefghijkmnpqrstuvwxyz23456789";
@@ -3736,11 +3749,8 @@ var KSCH = (function () {
   };
 
   function call(fn, args) {
-    if (mode === "local") return Promise.resolve().then(function () { return local[fn](args); });
-    return rpc("sched_" + fn, args).then(function (r) { setMode("remote"); return r; }, function (err) {
-      if (err.missing || err instanceof TypeError) { setMode("local"); return local[fn](args); }
-      throw err;
-    });
+    if (!SCRIPT_URL) { setMode("local"); return Promise.resolve().then(function () { return local[fn](args); }); }
+    return rpc(fn, args).then(function (r) { setMode("remote"); return r; });
   }
 
   var store = {
@@ -3784,7 +3794,7 @@ var KSCH = (function () {
     mode = m;
     var s = root.querySelector(".ksch-status");
     s.textContent = m === "local"
-      ? "Saved on this device only: the shared database is not switched on yet, so links open only in this browser."
+      ? "Saved on this device only: the scheduler sheet is not connected yet, so links open only in this browser."
       : "Shared: anyone with a link sees the same poll.";
   }
 
@@ -6821,9 +6831,8 @@ var KSCH = (function () {
   if (!id) return KSCH.start("group");
   var admin = q.get("admin");
   if (admin) { KSCH.tok(id).admin = admin; KSCH.keepTokens(); }
+  document.title = "Find a time · KCM Focus Family";
   KSCH.openPoll(id);
-  // Someone arriving from a link came for this, not the pamphlet guide.
-  KSCH.root.scrollIntoView({ block: "start" });
 })();
 
 /* ksch:end */

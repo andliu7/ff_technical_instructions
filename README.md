@@ -38,6 +38,7 @@ Then visit `http://localhost:8000`. A server is needed because the browser block
     index.html            the guide
     guide.pdf             printable version
     example-pamphlet.pdf  a finished pamphlet, Spring FF #06, as a reference
+    apps-script/          the scheduler's shared store (Code.gs) and its test
 
 The styles, the background effect, the copy buttons, the fonts (Libre Baskerville,
 Instrument Sans, JetBrains Mono, Allura) and the annotated screenshots are all
@@ -68,10 +69,14 @@ Under the calendar sits "Find a time", a when2meet replacement with two modes:
 
 The expand icon (top right) turns it full screen. Links look like `?meet=<id>`; the
 organiser's own link adds `&admin=<token>` and is the only way to edit from another
-device. Data lives in the `andrew-dashboard` Supabase project, schema `sched`, reached
-only through four `public.sched_*` functions (migration
-`dashboard/supabase/migrations/20260928120000_sched.sql`). Until that migration is
-applied, everything saves in the browser only and the footer says so.
+device. Data lives in a Google Sheet in the KCM account, behind the Apps Script web
+app in `apps-script/Code.gs` (one row per poll, one per answer; tokens stored only as
+hashes). The page reaches it through `SCRIPT_URL` near the top of the scheduler script.
+While `SCRIPT_URL` is empty, everything saves in the browser only and the footer says
+so. Test the script without Google: `node apps-script/test.mjs`. After changing
+`Code.gs`, paste it into the Apps Script editor and use Deploy > Manage deployments >
+edit > New version: saving alone does not update the live URL. A `?meet=` link shows
+the scheduler alone, with the guide hidden.
 
 ## Credits
 

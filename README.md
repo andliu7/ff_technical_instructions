@@ -37,7 +37,9 @@ Then visit `http://localhost:8000`. A server is needed because the browser block
 
     index.html            the guide
     guide.pdf             printable version
-    example-pamphlet.pdf  a finished pamphlet, Spring FF #06, as a reference
+    example-pamphlet.pdf  a finished pamphlet, Spring FF #06, imposed for printing (after Step 10)
+    example-pamphlet-pages.pdf  the same pamphlet's four pages in reading order (before Step 10)
+    pdf-editor.html       the PDF editor's page, with its loading curtain
     apps-script/          the scheduler's shared store (Code.gs) and its test
     pdfcraft/             PdfCraft 0.13.0's web build, the PDF editor (see below)
 
@@ -84,6 +86,12 @@ so. Test the script without Google: `node apps-script/test.mjs`. After changing
 `Code.gs`, paste it into the Apps Script editor and use Deploy > Manage deployments >
 edit > New version: saving alone does not update the live URL. A `?meet=` link shows
 the scheduler alone, with the guide hidden.
+
+## The QR maker
+
+On the example pamphlet page: paste a link and a QR code draws as you type, to copy into the Doc
+or save as a PNG. It uses qrcode-generator 2.0.4 (Kazuhiko Arase, MIT), inlined in `index.html`
+so the guide stays one file.
 
 ## The PDF editor
 

@@ -1721,7 +1721,7 @@ html.ksch-lock .fab{display:none;}
       <p class="val"><a href="https://docs.google.com/spreadsheets/d/1nghaUIhNLTYmfYwly1ZY2fAgsFh4VD6dNNcuquHFQgg/edit?gid=1234033160#gid=1234033160" target="_blank" rel="noopener">26-27 KCM Master Calendar</a>, the Fall 2026 and Spring 2027 tabs. This page reads the sheet and never writes to it: to change a room or a time, change the sheet, then refresh here.</p>
       <div class="lbl">Status</div>
       <p class="val kcal-status">Snapshot of the master calendar, 27 Sep 2026</p>
-      <p class="kcal-hint">The live read works once the sheet is shared with anyone who has the link (Share, General access, Anyone with the link, Viewer). Until then this page shows its built-in snapshot.</p>
+      <p class="kcal-hint">The master calendar is shared only with KCM leaders, so this page shows its built-in snapshot. Use Open the sheet for the latest; it opens only for people the sheet is shared with. Do not change the sheet to "Anyone with the link".</p>
     </div>
     <div class="kcal-df">
       <button type="button" class="btn" data-cal="refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>Refresh now</button>
@@ -2248,8 +2248,10 @@ html.ksch-lock .fab{display:none;}
 
   <!-- PDF TOOL. PdfCraft's web build (pdfcraft/, Apache-2.0 or MIT, see
        pdfcraft/NOTICE), a full PDF app compiled from Rust to WebAssembly.
-       It is about 15 MB, so it loads only when someone presses the button,
-       never for everyone who opens the guide. Screen only. -->
+       It is about 15 MB to download, so the iframe is only made when someone
+       presses the button; the guide does fetch the file in the background a
+       few seconds after opening (see the preload below) so it is usually
+       cached by then. Screen only. -->
   <div class="tip pdftool" id="pdf-tool"><span class="tl">No Acrobat? Use the PDF editor on this page</span>
     <p>A full PDF editor in your browser: add text and images, highlight, draw, rotate and reorder pages, and print as a booklet with the same settings as Acrobat. Your PDF never leaves your computer.</p>
     <ol class="sub">
@@ -5023,8 +5025,8 @@ document.addEventListener("click", function (e) {
   el.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
-// The PDF tool loads on request: the button swaps itself for the app in an
-// iframe, so the 15 MB download happens only for people who want it.
+// The PDF tool appears on request: the button swaps itself for the app in an
+// iframe. The 15 MB download itself is usually already cached by the preload.
 document.addEventListener("click", function (e) {
   var b = e.target.closest("[data-pdftool]");
   if (!b) return;
@@ -5930,10 +5932,10 @@ function refreshCalendar(manual) {
     setStatus("Live from the master calendar, read " +
       now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }) + " today");
   }).catch(function (err) {
-    // Not shared publicly, offline, or the tab was renamed: keep the snapshot
+    // Not shared publicly (on purpose), offline, or the tab was renamed: keep the snapshot
     // and say so. Only a manual refresh gets the reason.
     if (manual) setStatus("Could not read the sheet (" + err.message + "). Showing the snapshot from 27 Sep 2026. " +
-      "The sheet has to be shared with anyone who has the link for the live read to work.");
+      "The sheet is shared only with KCM leaders, so use Open the sheet for the latest.");
   }).then(function () {
     btns.forEach(function (b) { b.classList.remove("busy"); });
   });
@@ -6189,8 +6191,8 @@ var KSCH = (function () {
   function forget(id) { save("ksch:recent", recent().filter(function (r) { return r.id !== id; })); }
 
   /* ---------- the store ----------
-     Remote: four functions in the Apps Script web app, which keeps polls in a
-     Google Sheet in the KCM account. Local: the same four shapes in
+     Remote: five functions in the Apps Script web app, which keeps polls in a
+     Google Sheet. Local: the same five shapes in
      localStorage, used only while SCRIPT_URL is empty. A remote call that fails
      says so instead of quietly saving locally, because a poll saved locally
      opens in no other browser. */

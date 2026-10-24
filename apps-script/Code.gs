@@ -3,8 +3,8 @@
 // leader inherits it with the Drive. Two tabs, one row per poll and one row per
 // answer, readable by anyone who opens the sheet.
 //
-// The page sends {fn, args} as a POST and gets back {result} or {error}. The four
-// functions and their rules match the old Supabase ones exactly:
+// The page sends {fn, args} as a POST and gets back {result} or {error}. The first
+// four match the old Supabase functions' rules exactly; remove is new:
 //   create  -> {id, admin_token}       the admin token is the only way to edit later
 //   get     -> {poll, responses} | null, never a hash or a token
 //   respond -> {token}                 a name is owned by its token, or the organizer

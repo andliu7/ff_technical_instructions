@@ -47,17 +47,18 @@ Then visit `http://localhost:8000`. A server is needed because the browser block
 
 The styles, the background effect, the copy buttons, the fonts (Libre Baskerville,
 Instrument Sans, JetBrains Mono, Allura) and the annotated screenshots are all
-inlined into `index.html`, so it is one self-contained file with no dependencies.
+inlined into `index.html`, so the guide itself is one self-contained file. Two parts reach
+outside it: the scheduler talks to a Google Apps Script, and the PDF editor lives in
+`pdfcraft/` beside it (the guide fetches it in the background, about 15 MB compressed).
 
 ## The calendar
 
 The first page carries the 26-27 KCM Master Calendar (Fall 2026 and Spring 2027
 tabs) as a month, week and list view with the sheet's own colour code behind the
 key icon. The events are a snapshot taken 2026-09-27, baked into `index.html`.
-On load the page tries to read the sheet again so room numbers and times follow
-the sheet; that works once the sheet is shared with anyone who has the link
-(Share, General access, Anyone with the link, Viewer). Until then the snapshot
-shows and the Refresh button says why. To move the snapshot forward, re-export
+On load the page tries to read the sheet again, but the sheet is shared only with
+KCM leaders on purpose, so the live read fails and the snapshot shows; the Refresh
+button says why. Never set the sheet to "Anyone with the link". To move the snapshot forward, re-export
 the sheet and rebuild the JSON in the `kcal-data` block.
 
 ## The scheduler

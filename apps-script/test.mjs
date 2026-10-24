@@ -241,6 +241,10 @@ const tests = {
     respond(quiet.id, "Sam", "1");
     ctx.daily();
     assert.equal(mail.length, 0, "no answers yet, and the other poll has no email");
+    // Timestamps are to the millisecond, and in a real poll an answer comes
+    // seconds after creation. Without this wait the answer can share the
+    // creation millisecond and not count as new, which made this test flaky.
+    const t = Date.now(); while (Date.now() <= t) { /* wait for the clock to tick */ }
     respond(id, "Marc", "1");
     ctx.daily();
     assert.equal(mail.length, 1);

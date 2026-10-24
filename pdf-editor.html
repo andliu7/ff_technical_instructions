@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF Editor · KCM Focus Family</title>
+<!-- The guide's PDF editor: PdfCraft's web build (pdfcraft/, unmodified) behind a
+     loading curtain. The app is one 42 MB WebAssembly file, so this page fetches it
+     itself, counts the bytes for the percentage, and hands the same stream to the app
+     to compile while it downloads. When PdfCraft is updated, change APP below to the
+     new release's file names (they are in pdfcraft/index.html) and the same two
+     names in index.html's preload. -->
+<script>
+  // Same theme switch as the guide, read before paint.
+  try { if (localStorage.getItem("theme") === "dark") document.documentElement.classList.add("dark"); } catch (e) { /* storage blocked */ }
+</script>
+<style>
+  :root{--paper:#FBF7EE;--ink:#1A1B22;--mut:#6B6880;--acc:#6B4EA8;--track:#E7E0F3;}
+  .dark{--paper:#19191C;--ink:#ECEAF2;--mut:#9A97AA;--acc:#A98BE6;--track:#2E2B38;}
+  html,body{margin:0;height:100%;overflow:hidden;background:#f1f1f3;}
+  .dark body{background:#19191c;}
+  canvas{width:100%;height:100%;display:block;outline:none;}
+  .curtain{position:fixed;inset:0;z-index:10;display:grid;place-items:center;background:var(--paper);color:var(--ink);
+    font-family:"Instrument Sans",system-ui,sans-serif;transition:transform .7s cubic-bezier(.7,0,.2,1);}
+  .curtain.up{transform:translateY(-100%);}
+  .c-box{width:min(420px,calc(100vw - 48px));}
+  .c-eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin:0 0 6px;}
+  .c-title{font-family:"Libre Baskerville",Georgia,serif;font-size:26px;margin:0 0 22px;}
+  .c-pct{font-family:"Libre Baskerville",Georgia,serif;font-size:64px;line-height:1;font-variant-numeric:tabular-nums;margin:0 0 14px;}
+  .c-bar{height:6px;border-radius:99px;background:var(--track);overflow:hidden;}
+  .c-bar i{display:block;height:100%;width:10%;background:var(--acc);border-radius:99px;transition:width .25s linear;}
+  .c-note{font-size:13px;color:var(--mut);margin:12px 0 0;min-height:1.4em;}
+  .c-note a{color:var(--acc);}
+  @media (prefers-reduced-motion:reduce){.curtain,.c-bar i{transition:none;}}
+</style>
+</head>
+<body>
+<canvas id="pdfcraft"></canvas>
+<div class="curtain" role="status" aria-live="polite">
+  <div class="c-box">
+    <p class="c-eyebrow">KCM Focus Family</p>
+    <h1 class="c-title">PDF editor</h1>
+    <p class="c-pct">10%</p>
+    <div class="c-bar"><i></i></div>
+    <p class="c-note">Getting the editor. Your PDF never leaves this computer.</p>
+  </div>
+</div>
+<script type="module">
+import init, * as bindings from "./pdfcraft/pdfcraft-web-3011a456ef82ee06.js";
+
+const APP = "./pdfcraft/pdfcraft-web-3011a456ef82ee06_bg.wasm";
+const APP_BYTES = 42482990; // the file's size; the server may send it compressed
+
+const curtain = document.querySelector(".curtain");
+const pct = curtain.querySelector(".c-pct");
+const bar = curtain.querySelector(".c-bar i");
+const note = curtain.querySelector(".c-note");
+
+let shown = 10;
+function show(p) {
+  shown = Math.max(shown, Math.min(100, Math.round(p)));
+  pct.textContent = shown + "%";
+  bar.style.width = shown + "%";
+}
+
+// 10 to 90 follows the download. Chrome compiles as the bytes arrive, so after the
+// last byte only a little work is left: 90 to 99 creeps on a timer until it is done.
+async function load() {
+  const res = await fetch(APP);
+  if (!res.ok) throw new Error("the editor file did not load (" + res.status + ")");
+  let got = 0;
+  const reader = res.body.getReader();
+  const counted = new ReadableStream({
+    async pull(ctrl) {
+      const { done, value } = await reader.read();
+      if (done) { ctrl.close(); creep(); return; }
+      got += value.byteLength;
+      show(10 + 80 * got / APP_BYTES);
+      note.textContent = "Getting the editor: " + (got / 1048576).toFixed(0) + " of " + (APP_BYTES / 1048576).toFixed(0) + " MB.";
+      ctrl.enqueue(value);
+    }
+  });
+  const wasm = await init({ module_or_path: new Response(counted, { headers: { "Content-Type": "application/wasm" } }) });
+  window.wasmBindings = bindings;
+  dispatchEvent(new CustomEvent("TrunkApplicationStarted", { detail: { wasm } }));
+}
+let timer;
+function creep() {
+  note.textContent = "Getting it ready.";
+  timer = setInterval(() => show(shown < 99 ? shown + 1 : 99), 250);
+}
+
+load().then(() => {
+  clearInterval(timer);
+  show(100);
+  note.textContent = "Ready.";
+  setTimeout(() => {
+    curtain.classList.add("up");
+    curtain.addEventListener("transitionend", () => curtain.remove(), { once: true });
+    setTimeout(() => curtain.remove(), 1200); // reduced motion: no transition fires
+  }, 250);
+}, (err) => {
+  clearInterval(timer);
+  note.innerHTML = "";
+  note.append("The editor couldn't start: " + err.message + ". ");
+  const again = document.createElement("a");
+  again.href = location.href; again.textContent = "Try again";
+  note.append(again);
+});
+</script>
+</body>
+</html>

@@ -91,9 +91,12 @@ the scheduler alone, with the guide hidden.
 0.13.0 (`pdfcraft-web-0.13.0.zip`, SHA-256 checked against the release's `SHA256SUMS.txt`),
 under MIT or Apache-2.0; its `NOTICE` and licences sit beside it. It is a Rust app compiled
 to WebAssembly: open, edit (text, images, highlights, drawing), organise pages, and print as a
-booklet, all in the browser. The cover links to it as a full page, and Step 10 loads it in
-place on request, because the app is about 15 MB compressed. To update it, replace the folder
-with a newer release's files.
+booklet, all in the browser. `pdf-editor.html` is its page: a curtain counts 10 to 100% from
+the real download while the app compiles, then lifts. The cover links to that page, Step 10
+loads it in place on request, and the guide preloads the app once idle (not on scheduler
+links or with data saver on) so the editor opens from the cache. To update it, replace the
+folder with a newer release's files and change the two file names in `pdf-editor.html` and
+in the preload in `index.html`.
 
 ## Credits
 

@@ -1601,7 +1601,7 @@ html.ksch-lock .fab{display:none;}
       <a class="btn" href="#calendar" data-scroll>KCM master calendar &darr;</a>
       <a class="btn" href="#scheduler" data-scroll>Find a meeting time &darr;</a>
       <a class="btn" href="#step-10">Step 10: Print the booklet &rarr;</a>
-      <a class="btn" href="pdfcraft/" target="_blank" rel="noopener">PDF editor (full page) &#8599;</a>
+      <a class="btn" href="pdf-editor.html" target="_blank" rel="noopener">PDF editor (full page) &#8599;</a>
     </nav>
     <div class="cv-meta">
       <b>Written by</b> &nbsp; Andrew Liu, Focus Family Leader<br>
@@ -2207,9 +2207,9 @@ html.ksch-lock .fab{display:none;}
     </ol>
     <p class="pdftool-acts">
       <button type="button" class="btn btn-primary" data-pdftool>Load the PDF editor here (about 15 MB, once)</button>
-      <a class="btn" href="pdfcraft/" target="_blank" rel="noopener">Open it as a full page &#8599;</a>
+      <a class="btn" href="pdf-editor.html" target="_blank" rel="noopener">Open it as a full page &#8599;</a>
     </p>
-    <p class="pdftool-wait" hidden>The first load takes up to half a minute, and the page may not respond until the editor appears.</p>
+    <p class="pdftool-wait" hidden>A loading screen counts up to 100% while the editor downloads; after the first time it opens much faster.</p>
     <div class="pdftool-frame" hidden></div>
   </div>
 
@@ -2643,11 +2643,27 @@ document.addEventListener("click", function (e) {
   var b = e.target.closest("[data-pdftool]");
   if (!b) return;
   var box = b.closest(".pdftool").querySelector(".pdftool-frame");
-  box.innerHTML = '<iframe src="pdfcraft/" title="PDF editor" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>';
+  box.innerHTML = '<iframe src="pdf-editor.html" title="PDF editor" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>';
   box.hidden = false;
   b.closest(".pdftool").querySelector(".pdftool-wait").hidden = false;
   b.remove();
 });
+
+// Preload the PDF editor. A few seconds in, once the browser is idle, fetch the
+// editor's 15 MB app in the background so the browser keeps it, and
+// pdf-editor.html then opens from the cache. Not tied to the page's load event:
+// the embedded PDFs further down hold that back for a long time. Skipped for
+// guests on a scheduler link and when the device asks to save data. Same file
+// name as pdf-editor.html.
+(function () {
+  var c = navigator.connection;
+  if (document.documentElement.classList.contains("meet-only") || (c && (c.saveData || /2g/.test(c.effectiveType || "")))) return;
+  setTimeout(function () {
+    (window.requestIdleCallback || function (f) { f(); })(function () {
+      fetch("pdfcraft/pdfcraft-web-3011a456ef82ee06_bg.wasm").then(function (r) { return r.arrayBuffer(); }).catch(function () { /* the editor page fetches it itself */ });
+    }, { timeout: 5000 });
+  }, 3000);
+})();
 
 function initPages() {
   document.querySelectorAll("[data-page]").forEach(function (el) {

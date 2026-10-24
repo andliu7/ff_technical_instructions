@@ -9,27 +9,39 @@
 //   get     -> {poll, responses} | null, never a hash or a token
 //   respond -> {token}                 a name is owned by its token, or the organizer
 //   update  -> {ok: true}              organizer only
-// Tokens are handed to the browser once and stored only as a sha256 hash.
+//   remove  -> {ok: true}              organizer only: the poll and every answer
+// Tokens are handed to the browser once and stored only as a sha256 hash. The
+// organizer's email is optional, never handed back, and only used by daily().
 //
-// Deploy: Extensions > Apps Script in the sheet, paste this file, run setup once,
-// then Deploy > New deployment > Web app, Execute as Me, Who has access Anyone.
+// daily() runs each morning: it emails each organizer whose poll got new answers
+// since the last email, and deletes each poll 5 days after its date.
+//
+// Deploy: paste this file, run setup once (it also schedules daily), then
+// Deploy > New deployment > Web app, Execute as Me, Who has access Anyone.
+// After any change: Deploy > Manage deployments > edit > New version.
 
-var POLLS = ["id", "kind", "title", "config", "status", "final", "admin_hash", "created_at", "updated_at"];
+var POLLS = ["id", "kind", "title", "config", "status", "final", "admin_hash", "created_at", "updated_at", "email", "notified_at"];
 var RESPONSES = ["poll_id", "name", "name_key", "slots", "data", "token_hash", "updated_at"];
 var ID_ABC = "abcdefghijkmnpqrstuvwxyz23456789";
 var MAX_ANSWERS = 200;
+var KEEP_DAYS = 5;          // a poll is deleted this many days after its date
+var UNDATED_DAYS = 30;      // weekday-only polls have no date: this long after the last change
+var PAGE_URL = "https://andliu7.github.io/ff_technical_instructions/";
 // The sheet the polls live in, from its address (docs.google.com/spreadsheets/d/<this>/edit).
 // Used when the script is not inside that sheet; a script made from the sheet's
 // Extensions > Apps Script menu finds it without this.
 var SHEET_ID = "1u-KAFEc4JSALOOoKSSnIQLimElWbkONQfvlFpzfrqUE";
 
-// Run once from the editor. Makes both tabs with their header rows.
+// Run from the editor once, and again after this file changes: writes both
+// tabs' header rows and schedules daily() for 8 each morning, once.
 function setup() {
   var ss = book();
   [["polls", POLLS], ["responses", RESPONSES]].forEach(function (t) {
     var sh = ss.getSheetByName(t[0]) || ss.insertSheet(t[0]);
     sh.getRange(1, 1, 1, t[1].length).setValues([t[1]]);
   });
+  var scheduled = ScriptApp.getProjectTriggers().some(function (t) { return t.getHandlerFunction() === "daily"; });
+  if (!scheduled) ScriptApp.newTrigger("daily").timeBased().everyDays(1).atHour(8).create();
 }
 
 function doPost(e) {
@@ -55,12 +67,13 @@ function doGet() {
 
 var API = {
   create: function (a) {
-    var title = trim(a.p_title);
+    var title = trim(a.p_title), email = trim(a.p_email);
     check(a.p_kind === "group" || a.p_kind === "one", "invalid_kind");
+    check(email === "" || (email.length <= 200 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)), "invalid_email");
     check(title.length >= 1 && title.length <= 120, "invalid_title");
     check(a.p_config != null && JSON.stringify(a.p_config).length < 20000, "invalid_config");
     var id = newId(), admin = newToken(), now = new Date().toISOString();
-    sheet("polls").appendRow(text([id, a.p_kind, title, JSON.stringify(a.p_config), "open", "", hash(admin), now, now]));
+    sheet("polls").appendRow(text([id, a.p_kind, title, JSON.stringify(a.p_config), "open", "", hash(admin), now, now, email, now]));
     return { id: id, admin_token: admin };
   },
 
@@ -117,8 +130,76 @@ var API = {
       answersFor(a.p_id).reverse().forEach(function (r) { if (r.v[2] === key) sheet("responses").deleteRow(r.row); });
     }
     return { ok: true };
+  },
+
+  remove: function (a) {
+    var p = findPoll(a.p_id);
+    if (!p || p.v[6] !== hash(a.p_admin)) throw new Error("forbidden");
+    deletePolls([a.p_id]);
+    return { ok: true };
   }
 };
+
+/* ---------- the daily run ---------- */
+
+function daily() {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    var today = todayKey(), now = new Date().toISOString(), expired = [];
+    var answers = rows("responses", RESPONSES.length);
+    rows("polls", POLLS.length).forEach(function (p) {
+      if (today > deleteOn(p.v)) { expired.push(p.v[0]); return; }
+      var email = p.v[9];
+      if (!email || p.v[4] !== "open") return;
+      var since = p.v[10] || p.v[7];
+      var mine = answers.filter(function (r) { return r.v[0] === p.v[0]; });
+      var fresh = mine.filter(function (r) { return r.v[6] > since; });
+      if (!fresh.length) return;
+      MailApp.sendEmail({ to: email, name: "KCM Scheduler", subject: "New answers: " + p.v[2], body: digest(p.v, fresh, mine) });
+      p.v[10] = now;
+      sheet("polls").getRange(p.row, 1, 1, POLLS.length).setValues([text(p.v)]);
+    });
+    deletePolls(expired);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+// The date a poll goes: KEEP_DAYS after its confirmed time, else after its last
+// day; a weekday-only poll has no date, so UNDATED_DAYS after its last change.
+function deleteOn(v) {
+  var config = JSON.parse(v[3] || "{}"), final = v[5] ? JSON.parse(v[5]) : null;
+  var dated = function (d) { return /^\d{4}-\d{2}-\d{2}$/.test(d); };
+  if (final && dated(final.day)) return addDays(final.day, KEEP_DAYS);
+  var days = (config.days || []).filter(dated).sort();
+  if (days.length) return addDays(days[days.length - 1], KEEP_DAYS);
+  return addDays(v[8].slice(0, 10), UNDATED_DAYS);
+}
+
+function digest(v, fresh, all) {
+  var config = JSON.parse(v[3] || "{}");
+  var names = all.map(function (r) { return r.v[2]; });
+  var waiting = (config.invitees || []).filter(function (n) { return names.indexOf(trim(n).toLowerCase()) === -1; });
+  return [
+    fresh.length + (fresh.length === 1 ? " new answer" : " new answers") + " to \"" + v[2] + "\": " +
+      fresh.map(function (r) { return r.v[1]; }).join(", ") + ".",
+    all.length + " answered so far." + (waiting.length ? " Still waiting on: " + waiting.join(", ") + "." : ""),
+    "",
+    "See the results: " + PAGE_URL + "?meet=" + v[0],
+    "To pick the final time, open the poll from the browser you made it in, or from your organiser link.",
+    "",
+    "This poll deletes itself on " + deleteOn(v) + ". You get this email only on days someone answers."
+  ].join("\n");
+}
+
+// Removes polls and all their answers. Bottom up, so deleting a row does not
+// shift the rows still to delete.
+function deletePolls(ids) {
+  if (!ids.length) return;
+  rows("responses", RESPONSES.length).reverse().forEach(function (r) { if (ids.indexOf(r.v[0]) !== -1) sheet("responses").deleteRow(r.row); });
+  rows("polls", POLLS.length).reverse().forEach(function (r) { if (ids.indexOf(r.v[0]) !== -1) sheet("polls").deleteRow(r.row); });
+}
 
 /* ---------- helpers ---------- */
 
@@ -144,6 +225,9 @@ function findPoll(id) {
 function answersFor(id) {
   return rows("responses", RESPONSES.length).filter(function (r) { return r.v[0] === String(id); });
 }
+function todayKey() { return Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd"); }
+function addDays(day, n) { return new Date(Date.parse(day + "T00:00:00Z") + n * 86400000).toISOString().slice(0, 10); }
+
 function pollOut(v) {
   return {
     id: v[0], kind: v[1], title: v[2], config: JSON.parse(v[3]), status: v[4],

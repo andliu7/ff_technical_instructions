@@ -21,6 +21,9 @@ function fakeSheet() {
     })
   };
 }
+const clock = { today: "2026-10-24" };
+const mail = [];
+const triggers = [];
 function load() {
   const sheets = {};
   const ss = { getSheetByName: n => sheets[n] || null, insertSheet: n => (sheets[n] = fakeSheet()) };
@@ -28,10 +31,17 @@ function load() {
     // A standalone script has no active spreadsheet, so Code.gs opens it by id.
     SpreadsheetApp: { getActiveSpreadsheet: () => null, openById: () => ss },
     LockService: { getScriptLock: () => ({ waitLock() {}, releaseLock() {} }) },
+    MailApp: { sendEmail: m => mail.push(m) },
+    Session: { getScriptTimeZone: () => "America/New_York" },
+    ScriptApp: {
+      getProjectTriggers: () => triggers.map(f => ({ getHandlerFunction: () => f })),
+      newTrigger: f => ({ timeBased: () => ({ everyDays: () => ({ atHour: () => ({ create: () => triggers.push(f) }) }) }) })
+    },
     ContentService: { MimeType: { JSON: "json" }, createTextOutput: s => ({ text: s, setMimeType() { return this; } }) },
     Utilities: {
       DigestAlgorithm: { SHA_256: "sha256" }, Charset: { UTF_8: "utf8" },
       getUuid: () => randomUUID(),
+      formatDate: () => clock.today,
       // Apps Script hands back signed bytes, -128 to 127.
       computeDigest: (_alg, s) => [...createHash("sha256").update(String(s), "utf8").digest()].map(b => (b > 127 ? b - 256 : b))
     }
@@ -45,12 +55,14 @@ function load() {
     if (out.error) throw new Error(out.error);
     return out.result;
   };
-  return { call, sheets };
+  return { call, sheets, ctx };
 }
 
-const { call, sheets } = load();
+const { call, sheets, ctx } = load();
 const CONFIG = { days: ["2026-10-06"], startMin: 540, endMin: 600, step: 30 };
-const create = (title = "Leaders meeting", kind = "group", config = CONFIG) => call("create", { p_kind: kind, p_title: title, p_config: config });
+const create = (title = "Leaders meeting", kind = "group", config = CONFIG, email = "") => call("create", { p_kind: kind, p_title: title, p_config: config, p_email: email });
+const remove = (id, admin) => call("remove", { p_id: id, p_admin: admin });
+const answerRows = id => sheets.responses.data.filter(r => r[0] === id).length;
 const get = id => call("get", { p_id: id });
 const respond = (id, name, slots, token = null, admin = null, data = {}) =>
   call("respond", { p_id: id, p_name: name, p_slots: slots, p_data: data, p_token: token, p_admin: admin });
@@ -175,6 +187,70 @@ const tests = {
     respond(id, "Sam", "2".repeat(5000));
     respond(id, "Ana", "", null, null, { pick: { day: "2026-10-06", startMin: 540, endMin: 600 } });
     assert.deepEqual(get(id).responses.map(r => r.slots.length).sort(), [0, 5000]);
+  },
+  "lets only the organizer delete a poll, answers and all"() {
+    const { id, admin_token } = create();
+    respond(id, "Sam", "1");
+    assert.throws(() => remove(id, "wrong"), /^Error: forbidden$/);
+    assert.throws(() => remove(id, ""), /^Error: forbidden$/);
+    assert.notEqual(get(id), null);
+    assert.deepEqual(remove(id, admin_token), { ok: true });
+    assert.equal(get(id), null);
+    assert.equal(answerRows(id), 0);
+  },
+  "keeps the organizer email private and checks its shape"() {
+    const { id } = create("t", "group", CONFIG, "lead@example.com");
+    assert.doesNotMatch(JSON.stringify(get(id)), /lead@example\.com/);
+    assert.throws(() => create("t", "group", CONFIG, "not an email"), /invalid_email/);
+    assert.ok(create("t", "group", CONFIG, "").id);
+  },
+  "schedules daily once, however often setup runs"() {
+    ctx.setup(); ctx.setup();
+    assert.equal(triggers.filter(f => f === "daily").length, 1);
+  },
+  "deletes a poll 5 days after its confirmed time, else its last day"() {
+    clock.today = "2026-10-24";
+    const last = create("Last day", "group", { ...CONFIG, days: ["2026-10-20", "2026-11-01"] });
+    const fixed = create("Confirmed", "group", { ...CONFIG, days: ["2026-10-20", "2026-11-01"] });
+    update(fixed.id, fixed.admin_token, { final: { day: "2026-10-20", startMin: 540, endMin: 600 } });
+    respond(fixed.id, "Sam", "1");
+    clock.today = "2026-10-25"; ctx.daily();
+    assert.notEqual(get(fixed.id), null, "day 5 after the confirmed time still kept");
+    clock.today = "2026-10-26"; ctx.daily();
+    assert.equal(get(fixed.id), null);
+    assert.equal(answerRows(fixed.id), 0);
+    assert.notEqual(get(last.id), null, "last day is Nov 1, so kept");
+    clock.today = "2026-11-07"; ctx.daily();
+    assert.equal(get(last.id), null);
+    clock.today = "2026-10-24";
+  },
+  "keeps a weekday-only poll for 30 days after its last change"() {
+    const { id } = create("Weekly", "group", { ...CONFIG, days: ["dow:1", "dow:3"] });
+    const changed = get(id).poll.updated_at.slice(0, 10);
+    clock.today = changed; ctx.daily();
+    assert.notEqual(get(id), null);
+    clock.today = "2099-01-01"; ctx.daily();
+    assert.equal(get(id), null);
+    clock.today = "2026-10-24";
+  },
+  "emails the organizer only on days with new answers"() {
+    clock.today = "2026-10-24";
+    mail.length = 0;
+    const { id } = create("Bible study", "group", { ...CONFIG, days: ["2026-11-01"], invitees: ["Marc", "Ana"] }, "lead@example.com");
+    const quiet = create("No email", "group", { ...CONFIG, days: ["2026-11-01"] });
+    respond(quiet.id, "Sam", "1");
+    ctx.daily();
+    assert.equal(mail.length, 0, "no answers yet, and the other poll has no email");
+    respond(id, "Marc", "1");
+    ctx.daily();
+    assert.equal(mail.length, 1);
+    assert.equal(mail[0].to, "lead@example.com");
+    assert.match(mail[0].subject, /Bible study/);
+    assert.match(mail[0].body, /1 new answer to "Bible study": Marc\./);
+    assert.match(mail[0].body, /Still waiting on: Ana\./);
+    assert.match(mail[0].body, new RegExp("\\?meet=" + id));
+    ctx.daily();
+    assert.equal(mail.length, 1, "nothing new, no second email");
   },
   "refuses an unknown status from the organizer and changes nothing"() {
     const { id, admin_token } = create();

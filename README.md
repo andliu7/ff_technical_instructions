@@ -57,15 +57,21 @@ the sheet and rebuild the JSON in the `kcal-data` block.
 
 ## The scheduler
 
-Under the calendar sits "Find a time", a when2meet replacement with two modes:
+Under the calendar sits "Find a time", a when2meet replacement. It starts by asking who the
+meeting is with (one person or a group) and how to find the time:
 
-- **Group:** pick dates or weekdays and a time range, share one link, and each person
-  types their name and drags over the grid (green available, yellow maybe). Submitting
-  turns everything unmarked red and asks for a review before saving. Results show as a
-  heat grid (click a slot for who is free, maybe, busy, or hasn't answered), a ranked
-  list of best times, and a per-person view. The organiser picks the final time.
-- **One-on-one:** a short wizard, then one of three flows: offer times and they book
-  one, they share times and you pick, or propose a time they accept or answer.
+- **They share when they're free, I pick:** each person types their name and drags over
+  the grid (green available, yellow maybe). Results show as a heat grid, a ranked list
+  of best times and a per-person view. The organiser picks the final time.
+- **I have a time in mind:** for one person, they accept it or suggest another; for a
+  group, a poll of just that time, so everyone marks whether they can come.
+- **I offer times, they book one:** one person only. They book one of your free slots.
+
+Invitees can be pasted as `Marc, Ana and Sam.`. The organiser can delete a poll from its
+menu or from "Your polls" (the clock icon), where polls this browser made are highlighted.
+An optional email gets a short digest each morning someone new answered. Each poll
+deletes itself 5 days after its confirmed time, else after its last day (weekday-only
+polls: 30 days after their last change).
 
 The expand icon (top right) turns it full screen. Links look like `?meet=<id>`; the
 organiser's own link adds `&admin=<token>` and is the only way to edit from another

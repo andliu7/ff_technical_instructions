@@ -81,6 +81,10 @@ p{margin:0 0 8pt 0;}
 .cv-sub{font-family:'Libre';font-size:10.4pt;font-style:italic;color:var(--sub);line-height:1.55;margin:0 0 34pt 0;}
 .cv-chip{display:inline-block;font-family:'Instr';font-size:7.4pt;font-weight:700;letter-spacing:.09em;
   text-transform:uppercase;color:var(--acc);border:.7pt solid var(--acc);border-radius:2pt;padding:3.5pt 7pt;margin:0 5pt 6pt 0;}
+.cv-onpage{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:22pt 0 0 0;}
+.cv-onpage-l{font-family:'Instr';font-size:7.4pt;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--mut);margin-right:4px;}
+#calendar,#scheduler{scroll-margin-top:72px;}
+@media print{.cv-onpage{display:none;}}
 .cv-meta{border-top:.6pt solid var(--line);padding-top:14pt;margin-top:48pt;font-family:'Instr';
   font-size:8.8pt;line-height:1.95;color:#3D3A4A;}
 .cv-meta b{font-weight:700;color:var(--deep);}
@@ -888,10 +892,10 @@ body{background:#ffffff;}
 .ksch .btn-primary{background:var(--ks-on);border-color:var(--ks-on);color:#fff;}
 .ksch .btn-primary:hover{filter:brightness(.92);}
 .ksch .btn[disabled]{opacity:.45;}
-.ksch-views,.ksch-seg{display:inline-flex;align-items:center;gap:2px;border:1px solid var(--line);border-radius:8px;padding:3px;background:var(--btn-bg);}
-.ksch-views .btn,.ksch-seg .btn{border:0;box-shadow:none;background:none;height:26px;padding:0 10px;color:var(--sub);}
-.ksch-views .btn[aria-pressed="true"],.ksch-seg .btn[aria-pressed="true"]{background:var(--acc-soft);color:var(--acc);}
-.dark .ksch-views .btn[aria-pressed="true"],.dark .ksch-seg .btn[aria-pressed="true"]{background:var(--ks-on);color:#fff;}
+.ksch-seg{display:inline-flex;align-items:center;gap:2px;border:1px solid var(--line);border-radius:8px;padding:3px;background:var(--btn-bg);}
+.ksch-seg .btn{border:0;box-shadow:none;background:none;height:26px;padding:0 10px;color:var(--sub);}
+.ksch-seg .btn[aria-pressed="true"]{background:var(--acc-soft);color:var(--acc);}
+.dark .ksch-seg .btn[aria-pressed="true"]{background:var(--ks-on);color:#fff;}
 .ksch-corner{display:inline-flex;gap:4px;}
 .ksch .ksch-ico-min{display:none;}
 .ksch.full .ksch-ico-min{display:block;}
@@ -975,7 +979,21 @@ html.ksch-lock .fab{display:none;}
 .ksch-link{display:flex;gap:6px;align-items:center;}
 .ksch-link input{flex:1;min-width:0;font-family:'JetBrains Mono',monospace;font-size:12px;}
 
-.ksch-empty,.ksch-loading{padding:36px 0;text-align:center;color:var(--mut);}
+.ksch-empty{padding:36px 0;text-align:center;color:var(--mut);}
+/* Loading. A poll opening draws grey blocks in its own shape; a save runs a
+   bar along the panel's top edge. Both shimmer unless motion is reduced. */
+.ksch-skel{display:flex;flex-direction:column;gap:10px;padding:6px 0 10px;}
+.ksch-skel i{display:block;border-radius:6px;background:linear-gradient(90deg,var(--line) 0%,var(--btn-bg) 50%,var(--line) 100%);
+  background-size:200% 100%;animation:ksch-shimmer 1.2s linear infinite;}
+.ksch-skel-t{width:42%;height:22px;}
+.ksch-skel-s{width:28%;height:12px;}
+.ksch-skel-g{width:100%;height:260px;margin-top:8px;}
+.ksch.busy{cursor:progress;}
+.ksch.busy::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;border-radius:8px 8px 0 0;z-index:2;
+  background:linear-gradient(90deg,transparent,var(--acc),transparent) no-repeat;background-size:40% 100%;animation:ksch-bar 1s linear infinite;}
+@keyframes ksch-shimmer{from{background-position:200% 0;}to{background-position:0 0;}}
+@keyframes ksch-bar{from{background-position:-60% 0;}to{background-position:160% 0;}}
+@media (prefers-reduced-motion:reduce){.ksch-skel i,.ksch.busy::before{animation:none;}.ksch.busy::before{background-size:100% 100%;}}
 .ksch-empty .btn{margin-top:8px;}
 
 .ksch-toast{position:absolute;left:50%;bottom:52px;transform:translateX(-50%);z-index:40;background:var(--deep);color:var(--sheet);
@@ -987,8 +1005,13 @@ html.ksch-lock .fab{display:none;}
 .ksch-dialog.wide{width:min(640px,calc(100vw - 32px));}
 .ksch-dialog .kcal-df{justify-content:space-between;}
 .ksch-dialog .kcal-df .btn:only-child{margin-left:auto;}
+.ksch-start .ksch-h{margin:4px 0 10px;}
+.ksch-start .ksch-chips{margin-bottom:18px;}
 .ksch-recent{list-style:none;margin:0;padding:0;max-height:50vh;overflow:auto;}
-.ksch-recent-row{display:flex;gap:10px;align-items:center;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;color:var(--ink);font:inherit;padding:9px 4px;cursor:pointer;}
+.ksch-recent li{display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--line);}
+.ksch-recent li.mine{background:var(--lav-bg);box-shadow:inset 3px 0 0 var(--acc);}
+.ksch-recent-del{flex:none;margin-right:6px;}
+.ksch-recent-row{flex:1;min-width:0;display:flex;gap:10px;align-items:center;width:100%;text-align:left;border:0;background:none;color:var(--ink);font:inherit;padding:9px 8px;cursor:pointer;}
 .ksch-recent-row:hover{background:var(--btn-hover);}
 .ksch-recent-ico svg{width:16px;height:16px;color:var(--acc);}
 .ksch-recent-main b{display:block;color:var(--deep);}
@@ -996,7 +1019,6 @@ html.ksch-lock .fab{display:none;}
 
 @media (max-width:640px){
   .ksch{padding:12px 12px 8px 12px;}
-  .ksch-views .btn{padding:0 8px;}
 }
 @media (prefers-reduced-motion:reduce){.ksch-steps .bar i,.ksch-opt{transition:none;}}
 @media print{.ksch{display:none;}}
@@ -1161,26 +1183,7 @@ html.ksch-lock .fab{display:none;}
 
 
 /* Start */
-.ksch-g-start{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:14px;align-items:stretch;}
-.ksch-g-cta{display:flex;align-items:center;gap:14px;text-align:left;border:0;border-radius:12px;padding:20px;cursor:pointer;
   background:var(--ks-on);color:#fff;font:inherit;transition:transform .12s,filter .15s;}
-.ksch-g-cta:hover{filter:brightness(.94);}
-.ksch-g-cta:active{transform:translateY(1px) scale(.99);}
-.ksch-g-cta:focus-visible{outline:2px solid var(--ks-on);outline-offset:3px;}
-.ksch-g-cta > span:nth-child(2){flex:1;}
-.ksch-g-cta b{display:block;font-family:'Libre',serif;font-size:18px;}
-.ksch-g-cta span span{display:block;font-size:12.5px;opacity:.85;margin-top:2px;}
-.ksch-g-cta > svg{width:20px;height:20px;flex:0 0 auto;}
-.ksch-g-cta-ico{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.18);flex:0 0 auto;}
-.ksch-g-cta-ico svg{width:20px;height:20px;}
-.ksch-g-how{list-style:none;margin:0;padding:12px 14px;display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-radius:12px;background:var(--soft);}
-.ksch-g-how li{display:flex;gap:10px;align-items:flex-start;}
-.ksch-g-how b{display:block;color:var(--deep);font-size:13px;}
-.ksch-g-how span span{display:block;font-size:12px;color:var(--sub);}
-.ksch-g-how-ico{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:var(--acc-soft);color:var(--acc);flex:0 0 auto;}
-.dark .ksch-g-how-ico{background:var(--ks-on);color:#fff;}
-.ksch-g-how-ico svg{width:15px;height:15px;}
-.ksch-g-recent .ksch-lbl{margin:0 0 4px 0;}
 
 /* Wizard */
 .ksch-g-wiz{display:flex;flex-direction:column;gap:14px;max-width:760px;width:100%;}
@@ -1306,7 +1309,7 @@ html.ksch-lock .fab{display:none;}
 .ksch-g-empty-ico svg{width:20px;height:20px;}
 
 @media (max-width:760px){
-  .ksch-g-start,.ksch-g-days{grid-template-columns:1fr;}
+  .ksch-g-days{grid-template-columns:1fr;}
   .ksch-g-paint,.ksch-g-results{grid-template-columns:1fr;}
   .ksch-g-rail{position:static;flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px 14px;padding:8px 10px;}
   .ksch-g-rail > .ksch-lbl{display:none;}
@@ -1333,7 +1336,7 @@ html.ksch-lock .fab{display:none;}
   .ksch-g-tools .ksch-seg .btn{flex:1;justify-content:center;}
   .ksch-g-why{font-size:11px;}
 }
-@media (prefers-reduced-motion:reduce){.ksch-g-cta,.ksch-g-side{transition:none;}}
+@media (prefers-reduced-motion:reduce){.ksch-g-side{transition:none;}}
 
 /* One-on-one. The guest side is built as cards (booking, accept, done) in
    the spirit of a coach's booking page; the host side reuses the screen
@@ -1588,6 +1591,14 @@ html.ksch-lock .fab{display:none;}
       <a class="dock-item" tabindex="-1" href="https://printwithme.com/" target="_blank" rel="noopener"><span class="dock-ico" style="--tile:#6B4EA8"><svg aria-hidden="true"><use href="#i-print"/></svg></span><span class="dock-tip">Print · PrintWithMe</span></a>
       </div>
     </nav>
+    <!-- What sits below the cover on this first page, plus the step people
+         most often jump to. Screen only: print has the contents page. -->
+    <nav class="cv-onpage" aria-label="On this page">
+      <span class="cv-onpage-l">On this page</span>
+      <a class="btn" href="#calendar" data-scroll>KCM master calendar &darr;</a>
+      <a class="btn" href="#scheduler" data-scroll>Find a meeting time &darr;</a>
+      <a class="btn" href="#step-10">Step 10: Print the booklet &rarr;</a>
+    </nav>
     <div class="cv-meta">
       <b>Written by</b> &nbsp; Andrew Liu, Focus Family Leader<br>
       <b>For</b> &nbsp; Incoming Focus Family Leaders<br>
@@ -1696,10 +1707,6 @@ html.ksch-lock .fab{display:none;}
 <section class="ksch" id="scheduler" data-page="home" aria-label="Find a meeting time">
   <div class="ksch-head">
     <h2 class="ksch-title" id="ksch-title">Find a time</h2>
-    <div class="ksch-views" role="group" aria-label="Kind of meeting">
-      <button type="button" class="btn" data-ksch-mode="group" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Group</button>
-      <button type="button" class="btn" data-ksch-mode="one" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>One-on-one</button>
-    </div>
     <div class="ksch-corner">
       <button type="button" class="btn btn-icon" data-ksch="recent" aria-label="Your polls on this device" title="Your polls" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg></button>
       <button type="button" class="btn btn-icon" data-ksch="expand" aria-label="Expand to full screen" title="Full screen" aria-pressed="false"><svg class="ksch-ico-max" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg><svg class="ksch-ico-min" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14h6v6"/><path d="M20 10h-6V4"/><path d="M14 10l7-7"/><path d="M3 21l7-7"/></svg></button>
@@ -2596,6 +2603,16 @@ function turnPage(dir) {
   var page = PAGES[indexOfPage(currentPage) + dir];
   if (page) location.hash = "#/" + page.name;
 }
+
+// The cover's "On this page" links point at sections of the page already
+// open, where a page change would only jump back to the top, so they scroll.
+document.addEventListener("click", function (e) {
+  var a = e.target.closest("a[data-scroll]");
+  var el = a && document.getElementById(a.getAttribute("href").replace(/^#\/?/, ""));
+  if (!el) return;
+  e.preventDefault();
+  el.scrollIntoView({ behavior: "smooth", block: "start" });
+});
 
 function initPages() {
   document.querySelectorAll("[data-page]").forEach(function (el) {
@@ -3683,6 +3700,8 @@ var KSCH = (function () {
     save("ksch:recent", list.slice(0, 30));
   }
   function recent() { return load("ksch:recent", []); }
+  // Empty counts: the email is optional. Same rule the script checks.
+  function validEmail(s) { s = s.trim(); return !s || (s.length <= 200 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)); }
   function forget(id) { save("ksch:recent", recent().filter(function (r) { return r.id !== id; })); }
 
   /* ---------- the store ----------
@@ -3693,17 +3712,24 @@ var KSCH = (function () {
      opens in no other browser. */
 
   var mode = "unknown"; // "remote" | "local"
-  function rpc(fn, args) {
+  function rpc(fn, args, retried) {
     // A plain-text body keeps this a "simple" request, so the browser sends it
     // straight to Google without a CORS preflight that Apps Script cannot answer.
-    return fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ fn: fn, args: args }) })
-      .then(function (r) { return r.json(); }, function () {
+    // No cookies either: the script runs as its owner and needs no sign-in.
+    return fetch(SCRIPT_URL, { method: "POST", credentials: "omit", body: JSON.stringify({ fn: fn, args: args }) })
+      .then(function (r) { return r.text(); }, function () {
         throw Object.assign(new Error("Couldn't reach the scheduler. Check your connection and try again."), { code: "offline" });
       })
-      .then(function (body) {
+      .then(function (text) {
+        var body = null;
+        try { body = JSON.parse(text); } catch (e) { /* not the script's reply */ }
         if (body && "result" in body) return body.result;
-        var msg = (body && body.error) || "unexpected reply";
-        throw Object.assign(new Error(msg), { code: msg });
+        if (body && body.error) throw Object.assign(new Error(body.error), { code: body.error });
+        // Google answered for the script, usually its "is running" page, so the
+        // script never saw the request and a retry cannot save anything twice.
+        // Seen in a Chrome signed into several Google accounts.
+        if (!retried) return rpc(fn, args, true);
+        throw Object.assign(new Error("Google didn't pass the request on to the scheduler. Try again, or open this link in an incognito window."), { code: "bad_reply" });
       });
   }
   function randomId(len) {
@@ -3737,6 +3763,13 @@ var KSCH = (function () {
       local.put(db);
       return { token: token };
     },
+    remove: function (a) {
+      var db = local.db(), row = db[a.p_id];
+      if (!row || row.admin !== a.p_admin) throw Object.assign(new Error("forbidden"), { code: "forbidden" });
+      delete db[a.p_id];
+      local.put(db);
+      return { ok: true };
+    },
     update: function (a) {
       var db = local.db(), row = db[a.p_id];
       if (!row || row.admin !== a.p_admin) throw Object.assign(new Error("forbidden"), { code: "forbidden" });
@@ -3750,13 +3783,19 @@ var KSCH = (function () {
 
   function call(fn, args) {
     if (!SCRIPT_URL) { setMode("local"); return Promise.resolve().then(function () { return local[fn](args); }); }
-    return rpc(fn, args).then(function (r) { setMode("remote"); return r; });
+    // A save takes a second or two through Google, so the panel shows a moving
+    // bar meanwhile. Reads stay quiet: the 20 s refresh would flash it.
+    var write = fn !== "get";
+    if (write) busy(1);
+    return rpc(fn, args).then(function (r) { if (write) busy(-1); setMode("remote"); return r; },
+      function (err) { if (write) busy(-1); throw err; });
   }
 
   var store = {
-    // -> {id, admin}. Organizer token kept on this device.
-    create: function (kind, title, config) {
-      return call("create", { p_kind: kind, p_title: title, p_config: config }).then(function (r) {
+    // -> {id, admin}. Organizer token kept on this device. The email is optional,
+    // kept private by the script, and only used for the daily "new answers" email.
+    create: function (kind, title, config, email) {
+      return call("create", { p_kind: kind, p_title: title, p_config: config, p_email: email || "" }).then(function (r) {
         tok(r.id).admin = r.admin_token; keepTokens();
         remember({ id: r.id, title: title, kind: kind }, "organizer");
         return { id: r.id, admin: r.admin_token };
@@ -3783,11 +3822,22 @@ var KSCH = (function () {
     update: function (id, patch) {
       return call("update", { p_id: id, p_admin: tok(id).admin || "", p_patch: patch || {}, p_remove: null });
     },
+    // Organizer only: the poll and every answer, for good.
+    remove: function (id) {
+      return call("remove", { p_id: id, p_admin: tok(id).admin || "" }).then(function (r) { forget(id); return r; });
+    },
     removeResponse: function (id, name) {
       return call("update", { p_id: id, p_admin: tok(id).admin || "", p_patch: {}, p_remove: name });
     },
     mode: function () { return mode; }
   };
+
+  var busyCount = 0;
+  function busy(d) {
+    busyCount += d;
+    root.classList.toggle("busy", busyCount > 0);
+    root.setAttribute("aria-busy", busyCount > 0 ? "true" : "false");
+  }
 
   function setMode(m) {
     if (mode === m) return;
@@ -3894,55 +3944,120 @@ var KSCH = (function () {
 
   var modes = {};
   var current = null;
-  function setModeButtons(name) {
-    root.querySelectorAll("[data-ksch-mode]").forEach(function (b) {
-      b.setAttribute("aria-pressed", b.getAttribute("data-ksch-mode") === name ? "true" : "false");
-    });
-  }
   function setUrl(id) {
     var u = new URL(location.href);
     u.searchParams.delete("admin");
     if (id) u.searchParams.set("meet", id); else u.searchParams.delete("meet");
     history.replaceState(history.state, "", u.pathname + u.search + u.hash);
   }
-  function start(name) {
-    current = name; setModeButtons(name); setUrl(null);
-    modes[name].start();
+  // start() asks who and how; start(name, opts) goes straight into that mode's
+  // wizard, opts saying which way of choosing the time was picked.
+  function start(name, opts) {
+    setUrl(null);
+    if (!name) return chooser();
+    current = name;
+    modes[name].start(opts || {});
+  }
+
+  // The first screen: who it is with, then how the time gets chosen. Offering
+  // your own free times only makes sense for one person, so that card shows
+  // only then. A group "time in mind" is a group poll of that one time.
+  var HOW = [
+    { id: "collect", icon: "users", title: "They share when they're free, I pick", sub: "Everyone marks their free times. You choose the time." },
+    { id: "propose", icon: "clock", title: "I have a time in mind", sub: "Suggest a time. They say whether it works." },
+    { id: "offer", icon: "cal", title: "I offer times, they book one", sub: "You mark when you're free. They book a slot.", one: true }
+  ];
+  function chooser() {
+    var who = "", how = "";
+    var go = button("Continue", { primary: true, onClick: next });
+    var whoChips = h("div", { class: "ksch-chips", role: "radiogroup", "aria-label": "Who is it with?" });
+    var howOpts = h("div", { class: "ksch-opts", role: "radiogroup", "aria-label": "How do you want to find a time?" });
+    [["one", "user", "One person"], ["group", "users", "A group"]].forEach(function (w) {
+      var c = h("button", { type: "button", class: "ksch-chip", role: "radio", "aria-checked": "false", "aria-pressed": "false",
+        onclick: function () { who = w[0]; draw(); } });
+      c.innerHTML = icon(w[1]) + esc(w[2]);
+      c.setAttribute("data-v", w[0]);
+      whoChips.appendChild(c);
+    });
+    function draw() {
+      whoChips.querySelectorAll(".ksch-chip").forEach(function (c) {
+        var on = c.getAttribute("data-v") === who;
+        c.setAttribute("aria-checked", on ? "true" : "false"); c.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+      if (how === "offer" && who === "group") how = "";
+      howOpts.innerHTML = "";
+      HOW.forEach(function (o) {
+        if (o.one && who !== "one") return;
+        var b = h("button", { type: "button", class: "ksch-opt", role: "radio", "aria-checked": how === o.id ? "true" : "false",
+          onclick: function () { how = o.id; draw(); }, ondblclick: function () { how = o.id; next(); } });
+        b.innerHTML = icon(o.icon) + "<div><b>" + esc(o.title) + "</b><span>" + esc(o.sub) + "</span></div>";
+        howOpts.appendChild(b);
+      });
+      go.disabled = !who || !how;
+    }
+    function next() {
+      if (!who || !how) return;
+      if (who === "one") start("one", { mode: how });
+      else start("group", { propose: how === "propose" });
+    }
+    render(h("div", { class: "ksch-screen ksch-start" },
+      h("h3", { class: "ksch-h", text: "Who is it with?" }), whoChips,
+      h("h3", { class: "ksch-h", text: "How do you want to find a time?" }), howOpts,
+      h("div", { class: "ksch-actions" }, h("div", { class: "end" }, go))), "Find a time");
+    draw();
   }
   function openPoll(id) {
-    render(h("div", { class: "ksch-loading", text: "Opening the poll..." }));
+    // Grey blocks in the shape of a poll (title, subtitle, grid) so the panel
+    // reads as loading, not empty, for the second or two Google takes.
+    render(h("div", { class: "ksch-skel", role: "status", "aria-label": "Opening the poll" },
+      h("i", { class: "ksch-skel-t" }), h("i", { class: "ksch-skel-s" }), h("i", { class: "ksch-skel-g" })));
     return store.get(id).then(function (data) {
       var name = data.poll.kind === "one" ? "one" : "group";
-      current = name; setModeButtons(name); setUrl(id);
+      current = name; setUrl(id);
       remember(data.poll, isAdmin(id) ? "organizer" : "guest");
       modes[name].open(data);
     }, function (err) {
       render(h("div", { class: "ksch-empty" },
         h("p", { text: err.code === "not_found" ? "That poll doesn't exist, or it was made in another browser before sharing was switched on." : "Couldn't open the poll: " + err.message }),
-        button("Start a new one", { primary: true, onClick: function () { start(current || "group"); } })));
+        button("Start a new one", { primary: true, onClick: function () { start(); } })));
     });
   }
-  root.querySelectorAll("[data-ksch-mode]").forEach(function (b) {
-    b.addEventListener("click", function () { start(b.getAttribute("data-ksch-mode")); });
-  });
+
+  // Organizer only (the menus that call it show to the organizer alone): asks
+  // first, deletes the poll and its answers, then starts a fresh one.
+  function deletePoll(id, title) {
+    dialog({
+      title: "Delete " + title + "?",
+      body: "The poll and every answer go for good, and its link stops working. This can't be undone.",
+      actions: [{ label: "Keep it" }, { label: "Delete poll", primary: true, onClick: function (close) {
+        close();
+        store.remove(id).then(function () { toast("Poll deleted"); start(); }, function (err) { toast("Couldn't delete: " + err.message); });
+      } }]
+    });
+  }
 
   // The recent list: polls made or answered on this device.
   root.querySelector('[data-ksch="recent"]').addEventListener("click", function () {
-    var list = recent();
+    // Polls this browser made come first and stand out, each with its own
+    // Delete; the ones only answered here can be opened, never deleted.
+    var list = recent().slice().sort(function (a, b) { return (b.role === "organizer") - (a.role === "organizer"); });
     var ul = h("ul", { class: "ksch-recent" });
     if (!list.length) ul.appendChild(h("li", { class: "ksch-muted", text: "Nothing yet. Polls you make or answer here show up in this list." }));
     list.forEach(function (r) {
-      ul.appendChild(h("li", null,
+      var mine = r.role === "organizer" && isAdmin(r.id);
+      ul.appendChild(h("li", { class: mine ? "mine" : null },
         h("button", { type: "button", class: "ksch-recent-row", onclick: function () { dlg.close(); openPoll(r.id); } },
           h("span", { class: "ksch-recent-ico", html: icon(r.kind === "one" ? "user" : "users") }),
-          h("span", { class: "ksch-recent-main" }, h("b", { text: r.title }), h("span", { text: (r.role === "organizer" ? "You organise" : "You answered") + " \u00b7 " + new Date(r.at).toLocaleDateString() })))));
+          h("span", { class: "ksch-recent-main" }, h("b", { text: r.title }), h("span", { text: (mine ? "You made this" : "You answered") + " \u00b7 " + new Date(r.at).toLocaleDateString() }))),
+        mine ? h("button", { type: "button", class: "btn btn-icon ksch-recent-del", "aria-label": "Delete " + r.title, title: "Delete poll", html: icon("trash"),
+          onclick: function () { dlg.close(); deletePoll(r.id, r.title); } }) : null));
     });
     dialog({ title: "Your polls", body: ul, actions: [{ label: "Close" }] });
   });
 
   return {
     root: root, h: h, esc: esc, icon: icon, button: button, render: render, toast: toast, dialog: dialog,
-    store: store, modes: modes, start: start, openPoll: openPoll, setFull: setFull,
+    store: store, modes: modes, start: start, openPoll: openPoll, setFull: setFull, deletePoll: deletePoll, validEmail: validEmail,
     isAdmin: isAdmin, me: me, setMe: setMe, tok: tok, keepTokens: keepTokens, remember: remember, forget: forget,
     shareUrl: shareUrl, copy: copy, recent: recent, nativeShare: nativeShare, gcalUrl: gcalUrl, downloadIcs: downloadIcs,
     dayKey: dayKey, parseDay: parseDay, isDow: isDow, dayParts: dayParts, fmtDay: fmtDay, fmtTime: fmtTime, fmtRange: fmtRange, todayKey: todayKey,
@@ -4692,11 +4807,17 @@ var KSCH = (function () {
     el.addEventListener("click", function (e) { if (e.target === el || e.target === list) input.focus(); });
 
     function has(n) { var k = n.toLowerCase(); return names.some(function (x) { return x.toLowerCase() === k; }); }
+    // "Marc, Ana and Sam." -> Marc, Ana, Sam: split on commas, semicolons,
+    // new lines and a whole-word "and" or "&", then drop end punctuation.
+    function parse(text) {
+      return String(text).split(/[,;\n]+|\s+(?:and|&)\s+/i).map(function (raw) {
+        return raw.replace(/\s+/g, " ").trim().replace(/^(?:and|&)\s+/i, "").replace(/[.!?:;]+$/, "").trim().slice(0, 60);
+      }).filter(Boolean);
+    }
     function add(text) {
       var added = false;
-      String(text).split(/[,;\n]+/).forEach(function (raw) {
-        var n = raw.replace(/\s+/g, " ").trim().slice(0, 60);
-        if (n && !has(n)) { names.push(n); added = true; }
+      parse(text).forEach(function (n) {
+        if (!has(n)) { names.push(n); added = true; }
       });
       if (added) draw(true);
     }
@@ -4721,7 +4842,7 @@ var KSCH = (function () {
     });
     input.addEventListener("paste", function (e) {
       var t = (e.clipboardData || window.clipboardData).getData("text");
-      if (!/[,;\n]/.test(t)) return;
+      if (!/[,;\n]|\s(?:and|&)\s/i.test(t)) return;
       e.preventDefault(); add(input.value + t); input.value = "";
     });
     input.addEventListener("blur", function () { if (input.value.trim()) { add(input.value); input.value = ""; } });
@@ -4731,8 +4852,8 @@ var KSCH = (function () {
       el: el,
       // Includes a half-typed name, so pressing Continue without Enter keeps it.
       get: function () {
-        var out = names.slice(), p = input.value.trim();
-        if (p && !has(p)) out.push(p);
+        var out = names.slice();
+        parse(input.value).forEach(function (n) { if (!has(n)) out.push(n); });
         return out;
       },
       set: function (list2) { names = []; add((list2 || []).join(",")); draw(false); }
@@ -4841,46 +4962,23 @@ var KSCH = (function () {
 
   /* ---------- G0: start ---------- */
 
-  function start() {
+  // From the start screen: a fresh wizard. propose: one fixed time that
+  // everyone says yes, maybe or no to, instead of a range of days.
+  function start(opts) {
     stopRefresh();
-    P = null;
-    var mine = K.recent().filter(function (r) { return r.kind === "group"; });
-    var cta = h("button", { type: "button", class: "ksch-g-cta", autofocus: true, onclick: function () { W = null; wizard(1); } });
-    cta.innerHTML = '<span class="ksch-g-cta-ico">' + K.icon("plus") + "</span><span><b>New group poll</b><span>Takes about a minute. No accounts for anyone.</span></span>" + K.icon("next");
-    var how = h("ol", { class: "ksch-g-how" });
-    [["cal", "Pick days", "Dates or days of the week, and a time range."],
-     ["link", "Share one link", "People open it and type their name."],
-     ["users", "See the overlap", "The best times rise to the top."]].forEach(function (s, i) {
-      how.appendChild(h("li", null, h("span", { class: "ksch-g-how-ico", html: K.icon(s[0]) }),
-        h("span", null, h("b", { text: (i + 1) + ". " + s[1] }), h("span", { text: s[2] }))));
-    });
-    var list = null;
-    if (mine.length) {
-      list = h("div", { class: "ksch-g-recent" }, h("p", { class: "ksch-lbl", text: "Your recent group polls" }));
-      var ul = h("ul", { class: "ksch-recent" });
-      mine.slice(0, 6).forEach(function (r) {
-        ul.appendChild(h("li", null, h("button", { type: "button", class: "ksch-recent-row", onclick: function () { K.openPoll(r.id); } },
-          h("span", { class: "ksch-recent-ico", html: K.icon("users") }),
-          h("span", { class: "ksch-recent-main" }, h("b", { text: r.title }),
-            h("span", { text: (r.role === "organizer" ? "You organise" : "You answered") + MID + new Date(r.at).toLocaleDateString() })))));
-      });
-      list.appendChild(ul);
-    }
-    K.render(screen(
-      toolbar("Find a time for your team", "Pick the days, share one link, everyone paints when they're free."),
-      h("div", { class: "ksch-g-start" }, cta, how),
-      list), "Find a time");
+    P = null; W = null;
+    wizard(1, !!opts.propose);
   }
 
   /* ---------- create wizard ---------- */
 
   var W = null;
-  function wizard(step) {
-    if (!W) W = { title: "", organizer: ls("ksch:name", ""), length: 60, location: "", note: "", details: false,
+  function wizard(step, propose) {
+    if (!W) W = { propose: !!propose, title: "", organizer: ls("ksch:name", ""), email: ls("ksch:email", ""), length: 60, location: "", note: "", details: false,
       dayMode: "dates", dates: [], dows: [], startMin: 540, endMin: 1260, step: 30, people: [] };
     var prev = W.page || step;
     W.page = step;
-    ({ 1: stepWhat, 2: stepDays, 3: stepWho })[step](prev);
+    ({ 1: stepWhat, 2: W.propose ? stepTime : stepDays, 3: stepWho })[step](prev);
   }
 
   // One wizard page: progress bar, question, content, Back and the primary.
@@ -4900,7 +4998,7 @@ var KSCH = (function () {
       h("div", { class: "ksch-steps" }, h("span", { text: "Step " + W.page + " of 3" }), h("div", { class: "bar" }, bar)),
       toolbar(title, sub),
       h("div", { class: "ksch-g-wiz" }, content),
-      actions(button(W.page === 1 ? "Cancel" : "Back", { icon: "back", onClick: function () { W.page === 1 ? start() : wizard(W.page - 1); } }), [why, next]));
+      actions(button("Back", { icon: "back", onClick: function () { W.page === 1 ? K.start() : wizard(W.page - 1); } }), [why, next]));
     el.addEventListener("keydown", function (e) {
       var t = e.target;
       if (e.key !== "Enter" || e.defaultPrevented || e.shiftKey || t.tagName === "TEXTAREA" || t.tagName === "BUTTON" || t.closest(".ksch-g-noenter")) return;
@@ -4919,6 +5017,8 @@ var KSCH = (function () {
       oninput: function () { W.title = title.value; update(); } });
     var who = h("input", { class: "ksch-input", maxlength: "60", placeholder: "So people know who's asking", value: W.organizer, autocomplete: "name",
       oninput: function () { W.organizer = who.value; update(); } });
+    var mail = h("input", { class: "ksch-input", type: "email", maxlength: "200", placeholder: "you@example.com", value: W.email, autocomplete: "email",
+      oninput: function () { W.email = mail.value; update(); } });
     var lens = h("div", { class: "ksch-chips", role: "group", "aria-label": "Meeting length" });
     LENGTHS.forEach(function (m) {
       lens.appendChild(h("button", { type: "button", class: "ksch-chip", "aria-pressed": W.length === m ? "true" : "false", text: fmtLen(m),
@@ -4939,12 +5039,38 @@ var KSCH = (function () {
       } });
     toggle.innerHTML = K.icon("plus") + "Add details: location, note";
     update = wizPage(prev, "What's it for?", "Give it a name people will recognise.",
-      [field("Meeting name", title), h("div", { class: "ksch-row" }, field("Your name", who)), field("How long is the meeting?", lens), toggle, more],
+      [field("Meeting name", title), h("div", { class: "ksch-row" }, field("Your name", who),
+        field("Your email (optional)", mail, "A short email on days people answer.")), field("How long is the meeting?", lens), toggle, more],
       "Continue", function () {
         if (!W.title.trim()) return "Name the meeting to continue";
         if (!W.organizer.trim()) return "Add your name to continue";
+        if (!K.validEmail(W.email)) return "Check the email address";
         return "";
       }, function () { wizard(2); });
+  }
+
+  // The "time in mind" page: one day and a start time; the length came from page 1.
+  function stepTime(prev) {
+    var update;
+    var dp = K.w.datePicker({ selected: W.dates.slice(0, 1), min: K.todayKey(), multiple: false, onChange: function () { setTimeout(sync, 0); } });
+    var tp = K.w.timePicker({ value: W.startMin, minutes: W.startMin, onChange: function () { setTimeout(sync, 0); } });
+    var summary = h("p", { class: "ksch-g-summary", "aria-live": "polite" });
+    var host = h("div", null, field("Day", dp.el), field("Start time", tp.el), summary);
+    function sync() {
+      var k = dp.get(), m = tp.get();
+      W.dates = k.length ? [k[k.length - 1]] : [];
+      if (m != null) W.startMin = m;
+      summary.textContent = W.dates.length ? K.fmtDay(W.dates[0]) + ", " + K.fmtRange(W.startMin, W.startMin + W.length) : "";
+      update && update();
+    }
+    ["click", "change", "input", "pointerup", "keyup"].forEach(function (ev) { host.addEventListener(ev, function () { setTimeout(sync, 0); }); });
+    update = wizPage(prev, "When is it?", "Everyone says whether they can make it. You confirm it after.", [host],
+      "Continue", function () {
+        if (!W.dates.length) return "Pick the day";
+        if (W.startMin + W.length > 1440) return "That runs past midnight";
+        return "";
+      }, function () { wizard(3); });
+    sync();
   }
 
   function stepDays(prev) {
@@ -5013,7 +5139,7 @@ var KSCH = (function () {
   function stepWho(prev) {
     var update, people;
     var host = h("div");
-    people = K.w.peopleInput({ names: W.people, value: W.people, placeholder: "Type a name, then Enter", onChange: function () { setTimeout(sync, 0); } });
+    people = K.w.peopleInput({ names: W.people, value: W.people, placeholder: "Names, separated by commas", onChange: function () { setTimeout(sync, 0); } });
     host.appendChild(people.el);
     function sync() { W.people = people.get().slice(); update && update(); }
     ["click", "keyup", "input", "change", "paste"].forEach(function (ev) { host.addEventListener(ev, function () { setTimeout(sync, 0); }); });
@@ -5023,10 +5149,15 @@ var KSCH = (function () {
       function () { return ""; },
       function (btn) {
         btn.disabled = true; btn.lastChild.textContent = "Creating...";
-        var cfg = { days: W.dayMode === "dates" ? W.dates.slice().sort() : W.dows.slice().sort(), startMin: W.startMin, endMin: W.endMin, step: W.step,
+        var cfg = W.propose
+          ? { days: W.dates.slice(0, 1), startMin: W.startMin, endMin: W.startMin + W.length, step: 30, proposed: true,
+              duration: W.length, organizer: W.organizer.trim(), location: W.location.trim(), note: W.note.trim(), invitees: W.people.slice() }
+          : { days: W.dayMode === "dates" ? W.dates.slice().sort() : W.dows.slice().sort(), startMin: W.startMin, endMin: W.endMin, step: W.step,
           duration: W.length, organizer: W.organizer.trim(), location: W.location.trim(), note: W.note.trim(), invitees: W.people.slice() };
         var title = W.title.trim();
-        K.store.create("group", title, cfg).then(function (r) {
+        var email = W.email.trim();
+        try { localStorage.setItem("ksch:email", JSON.stringify(email)); } catch (e) { /* storage blocked */ }
+        K.store.create("group", title, cfg, email).then(function (r) {
           K.setMe(r.id, cfg.organizer);
           W = null;
           shareScreen(r.id, r.admin, title);
@@ -5167,7 +5298,8 @@ var KSCH = (function () {
       poll.final ? ["x", "Clear final time", function () { patch({ final: null }, "Final time cleared"); }] : null,
       isClosed() ? ["check", "Reopen poll", function () { patch({ status: "open" }, "Poll reopened"); }]
                  : ["x", "Close poll", confirmClose],
-      ["trash", "Delete a response", deleteResponse, !responses().length]
+      ["trash", "Delete a response", deleteResponse, !responses().length],
+      ["trash", "Delete poll", function () { K.deletePoll(poll.id, poll.title); }]
     ];
     items.forEach(function (it) {
       if (!it) return;
@@ -5656,6 +5788,7 @@ var KSCH = (function () {
   function initial(name) { return (String(name || "?").trim().charAt(0) || "?").toUpperCase(); }
   function key(name) { return String(name || "").trim().toLowerCase(); }
   function savedName() { try { return JSON.parse(localStorage.getItem("ksch:name")) || ""; } catch (e) { return ""; } }
+  function savedEmail() { try { return JSON.parse(localStorage.getItem("ksch:email")) || ""; } catch (e) { return ""; } }
   function nowMin() { var d = new Date(); return d.getHours() * 60 + d.getMinutes(); }
   function isPast(day, min) { var t = K.todayKey(); return day < t || (day === t && min <= nowMin()); }
   function overlaps(a, b) { return a.day === b.day && a.startMin < b.endMin && b.startMin < a.endMin; }
@@ -5809,14 +5942,15 @@ var KSCH = (function () {
   /* ================= setup wizard ================= */
 
   var draft;
-  var STEPS = 5;
+  var STEPS = 4;
 
-  function start() {
+  function start(opts) {
     draft = {
-      title: "", host: savedName(), guest: "", duration: 30, other: false, mode: "",
+      title: "", host: savedName(), email: savedEmail(), guest: "", duration: 30, other: false, mode: "",
       days: [], startMin: 540, endMin: 1020, hostSlots: "", slotsCfg: null,
       propose: { day: "", min: 600 }, backups: [], location: "", note: ""
     };
+    draft.mode = opts.mode || "";
     step1();
   }
 
@@ -5825,16 +5959,18 @@ var KSCH = (function () {
     var title = input(d.title, { class: "ksch-input big", maxlength: 120, placeholder: "e.g. Check-in with Sam", autofocus: true, "aria-required": "true" });
     var host = input(d.host, { maxlength: 60, placeholder: "Your name", autocomplete: "name" });
     var guest = input(d.guest, { maxlength: 60, placeholder: "Their name" });
+    var mail = input(d.email, { type: "email", maxlength: 200, placeholder: "you@example.com", autocomplete: "email" });
     function check() {
-      d.title = title.value; d.host = host.value; d.guest = guest.value;
-      scr.setReason(!d.title.trim() ? "Add a title" : !d.host.trim() ? "Add your name" : "");
+      d.title = title.value; d.host = host.value; d.guest = guest.value; d.email = mail.value;
+      scr.setReason(!d.title.trim() ? "Add a title" : !d.host.trim() ? "Add your name" : !K.validEmail(d.email) ? "Check the email address" : "");
     }
-    [title, host, guest].forEach(function (i) { i.addEventListener("input", check); });
+    [title, host, guest, mail].forEach(function (i) { i.addEventListener("input", check); });
     scr = frame({
       steps: [1, STEPS], title: "What's the meeting?", sub: "A name they'll recognise, and who it's with.",
       body: [
         field("Title", title),
         h("div", { class: "ksch-row" }, field("Your name", host), field("Who is it with? (optional)", guest, "Personalises their link: \"Hi Sam\".")),
+        field("Your email (optional)", mail, "A short email on days they answer."),
       ],
       primary: { label: "Continue", icon: null, onClick: step2 }
     });
@@ -5872,7 +6008,7 @@ var KSCH = (function () {
       steps: [2, STEPS], title: "How long?", sub: "They'll see this before they pick a time.",
       body: [chips, otherWrap],
       back: { label: "Back", onClick: step1 },
-      primary: { label: "Continue", onClick: step3 }
+      primary: { label: "Continue", onClick: step4 }
     });
     show(scr); paint(); check();
     var cur = chips.querySelector('[aria-checked="true"]'); if (cur) cur.focus({ preventScroll: true });
@@ -5895,7 +6031,7 @@ var KSCH = (function () {
       opts.appendChild(b);
     });
     scr = frame({
-      steps: [3, STEPS], title: "How should the time be chosen?", sub: "You can't change this after the link is made.",
+      steps: [2, STEPS], title: "How should the time be chosen?", sub: "You can't change this after the link is made.",
       body: [opts],
       back: { label: "Back", onClick: step2 },
       primary: { label: "Continue", onClick: function () { step4(); } }
@@ -5925,14 +6061,14 @@ var KSCH = (function () {
       scr.setReason(!n ? "Pick at least one day" : n > 31 ? "31 days at most" : len <= 0 ? "End after the start" : len < d.duration ? "Leave room for " + fmtDur(d.duration) : "");
     }
     scr = frame({
-      steps: [4, STEPS], title: offer ? "Which days can they book?" : "Which days should they look at?",
+      steps: [3, STEPS], title: offer ? "Which days can they book?" : "Which days should they look at?",
       sub: offer ? "Pick the days, then the hours. Next you'll mark when you're actually free." : "They'll paint their free time across these days and hours.",
       body: [
         h("div", { class: "ksch-o-days2" },
           h("div", { class: "ksch-field" }, h("span", { class: "ksch-lbl", text: "Days" }), dp.el),
           h("div", { class: "ksch-field" }, h("span", { class: "ksch-lbl", text: "Between" }), tr.el, summary))
       ],
-      back: { label: "Back", onClick: step3 },
+      back: { label: "Back", onClick: step2 },
       primary: { label: "Continue", onClick: offer ? step4paint : step5 }
     });
     show(scr); check();
@@ -5955,7 +6091,7 @@ var KSCH = (function () {
       scr.setReason(c ? "" : "Mark at least one " + fmtDur(d.duration) + " block");
     }
     scr = frame({
-      steps: [4, STEPS], title: "When are you free?", sub: "Drag across the grid. Drag over marked time to clear it.",
+      steps: [3, STEPS], title: "When are you free?", sub: "Drag across the grid. Drag over marked time to clear it.",
       tools: [
         textBtn("Mark all", function () { d.hostSlots = K.blank(cfg).replace(/0/g, "1"); grid.set(d.hostSlots); check(); }),
         textBtn("Clear", function () { d.hostSlots = K.blank(cfg); grid.set(d.hostSlots); check(); })
@@ -5994,14 +6130,14 @@ var KSCH = (function () {
       scr.setReason(!p.day ? "Pick a day" : isPast(p.day, p.min) ? "That time has passed" : end > 1440 ? "Ends after midnight" : bad ? "Fix the backup time" : "");
     }
     scr = frame({
-      steps: [4, STEPS], title: "When?", sub: "The time you'd like. Backups give them an easy yes if it doesn't work.",
+      steps: [3, STEPS], title: "When?", sub: "The time you'd like. Backups give them an easy yes if it doesn't work.",
       body: [
         h("div", { class: "ksch-o-days2" },
           h("div", { class: "ksch-field" }, h("span", { class: "ksch-lbl", text: "Day" }), dp.el),
           h("div", { class: "ksch-field" }, h("span", { class: "ksch-lbl", text: "Start time" }), tp.el, chosen,
             h("span", { class: "ksch-lbl ksch-o-gap", text: "Backup times (optional)" }), list, addBtn))
       ],
-      back: { label: "Back", onClick: step3 },
+      back: { label: "Back", onClick: step2 },
       primary: { label: "Continue", onClick: step5 }
     });
     show(scr); drawBackups(); check();
@@ -6052,7 +6188,7 @@ var KSCH = (function () {
       row("How", HOW[d.mode].short, step3),
       row(d.mode === "propose" ? "Time" : "Days", timesLine(cfg), step4));
     scr = frame({
-      steps: [5, STEPS], title: "Where, and anything else?", sub: "Both optional. Check the summary, then make the link.",
+      steps: [4, STEPS], title: "Where, and anything else?", sub: "Both optional. Check the summary, then make the link.",
       body: [
         h("div", { class: "ksch-row" }, field("Where", loc), field("Note for them", note)),
         h("div", { class: "ksch-o-reviewbox" }, h("span", { class: "ksch-lbl", text: "Summary" }), review)
@@ -6062,7 +6198,8 @@ var KSCH = (function () {
         label: "Create link", icon: "link", onClick: function () {
           scr.primary.disabled = true; scr.primary.textContent = "Creating...";
           var c = buildConfig();
-          K.store.create("one", d.title.trim(), c).then(function (r) {
+          try { localStorage.setItem("ksch:email", JSON.stringify(d.email.trim())); } catch (e) { /* storage blocked */ }
+          K.store.create("one", d.title.trim(), c, d.email.trim()).then(function (r) {
             K.setMe(r.id, c.host);
             return K.store.get(r.id);
           }).then(function (data) {
@@ -6299,11 +6436,12 @@ var KSCH = (function () {
           { label: "Preview as guest", icon: "user", onClick: function () { guestView(data, { preview: true }); } },
           p.final ? { label: "Clear the confirmed time", icon: "x", onClick: function () { clearFinal(p); } } : null,
           closed ? { label: "Reopen meeting", icon: "check", onClick: function () { setStatus(p, "open"); } }
-            : { label: "Cancel meeting", icon: "trash", danger: true, onClick: function () { cancelMeeting(p); } }
+            : { label: "Cancel meeting", icon: "trash", danger: true, onClick: function () { cancelMeeting(p); } },
+          { label: "Delete link", icon: "trash", danger: true, onClick: function () { K.deletePoll(p.id, p.title); } }
         ])
       ],
       body: [timeline(state, p, lastAnswerLine)].concat(content),
-      back: { label: "New one-on-one", onClick: function () { K.start("one"); } },
+      back: { label: "Start a new one", onClick: function () { K.start(); } },
       primary: primary
     });
     show(scr); scr.setReason("");
@@ -6828,7 +6966,7 @@ var KSCH = (function () {
   if (!KSCH) return;
   var q = new URLSearchParams(location.search);
   var id = q.get("meet");
-  if (!id) return KSCH.start("group");
+  if (!id) return KSCH.start();
   var admin = q.get("admin");
   if (admin) { KSCH.tok(id).admin = admin; KSCH.keepTokens(); }
   document.title = "Find a time · KCM Focus Family";

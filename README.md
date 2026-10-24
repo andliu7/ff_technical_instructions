@@ -39,6 +39,7 @@ Then visit `http://localhost:8000`. A server is needed because the browser block
     guide.pdf             printable version
     example-pamphlet.pdf  a finished pamphlet, Spring FF #06, as a reference
     apps-script/          the scheduler's shared store (Code.gs) and its test
+    pdfcraft/             PdfCraft 0.13.0's web build, the PDF editor (see below)
 
 The styles, the background effect, the copy buttons, the fonts (Libre Baskerville,
 Instrument Sans, JetBrains Mono, Allura) and the annotated screenshots are all
@@ -83,6 +84,16 @@ so. Test the script without Google: `node apps-script/test.mjs`. After changing
 `Code.gs`, paste it into the Apps Script editor and use Deploy > Manage deployments >
 edit > New version: saving alone does not update the live URL. A `?meet=` link shows
 the scheduler alone, with the guide hidden.
+
+## The PDF editor
+
+`pdfcraft/` is the unmodified web release of [PdfCraft](https://github.com/storytold/pdfcraft)
+0.13.0 (`pdfcraft-web-0.13.0.zip`, SHA-256 checked against the release's `SHA256SUMS.txt`),
+under MIT or Apache-2.0; its `NOTICE` and licences sit beside it. It is a Rust app compiled
+to WebAssembly: open, edit (text, images, highlights, drawing), organise pages, and print as a
+booklet, all in the browser. The cover links to it as a full page, and Step 10 loads it in
+place on request, because the app is about 15 MB compressed. To update it, replace the folder
+with a newer release's files.
 
 ## Credits
 

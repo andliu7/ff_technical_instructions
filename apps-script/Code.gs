@@ -61,8 +61,32 @@ function doPost(e) {
 }
 
 // Opening the web app URL in a browser shows this, which is a quick "is it up" check.
-function doGet() {
-  return ContentService.createTextOutput("KCM scheduler is running.");
+// Add ?check=1 for a health report: can the script still open its sheet, are the
+// tabs there, is the daily job scheduled. Each problem comes with what to do.
+function doGet(e) {
+  if (!(e && e.parameter && e.parameter.check)) return ContentService.createTextOutput("KCM scheduler is running.");
+  return ContentService.createTextOutput(JSON.stringify(health(), null, 2)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function health() {
+  var out = { ok: true, problems: [] };
+  function problem(what, fix) { out.ok = false; out.problems.push({ problem: what, fix: fix }); }
+  var ss = null;
+  try { ss = book(); } catch (err) { /* reported below */ }
+  if (!ss) {
+    problem("The script cannot open its Google Sheet (id " + SHEET_ID + ").",
+      ["If the sheet was deleted, restore it from the Drive trash of the account that owned it.",
+       "If it now belongs to someone else, ask them to share it back with the account that owns this script, as Editor.",
+       "Or start fresh: make a new sheet, put its id in SHEET_ID at the top of Code.gs, run setup, then Deploy > Manage deployments > New version."]);
+    return out;
+  }
+  out.sheet = ss.getName();
+  [["polls", POLLS], ["responses", RESPONSES]].forEach(function (t) {
+    if (!ss.getSheetByName(t[0])) problem("The sheet has no '" + t[0] + "' tab.", ["Run setup from the Apps Script editor; it recreates the tabs and keeps existing rows."]);
+  });
+  var daily = ScriptApp.getProjectTriggers().some(function (t) { return t.getHandlerFunction() === "daily"; });
+  if (!daily) problem("The daily cleanup and email job is not scheduled.", ["Run setup from the Apps Script editor once."]);
+  return out;
 }
 
 var API = {
@@ -203,8 +227,19 @@ function deletePolls(ids) {
 
 /* ---------- helpers ---------- */
 
-function book() { return SpreadsheetApp.getActiveSpreadsheet() || SpreadsheetApp.openById(SHEET_ID); }
-function sheet(name) { return book().getSheetByName(name); }
+// The sheet is found by id, so moving or renaming it in Drive changes nothing.
+// Deleting it, or the script's account losing access, does: that surfaces as
+// "sheet_unavailable", which the page explains, and ?check=1 says how to fix.
+function book() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  if (ss) return ss;
+  try { return SpreadsheetApp.openById(SHEET_ID); } catch (err) { throw new Error("sheet_unavailable"); }
+}
+function sheet(name) {
+  var sh = book().getSheetByName(name);
+  if (!sh) throw new Error("sheet_not_set_up");
+  return sh;
+}
 
 // A leading apostrophe makes Sheets keep a value as typed text: "0011" stays
 // "0011" rather than 11, and a name starting with = is never run as a formula.

@@ -22,14 +22,18 @@ function fakeSheet() {
   };
 }
 const clock = { today: "2026-10-24" };
+// drive.gone = true makes openById fail the way Apps Script does when the sheet
+// was deleted or the script's account lost access to it.
+const drive = { gone: false };
 const mail = [];
 const triggers = [];
 function load() {
   const sheets = {};
-  const ss = { getSheetByName: n => sheets[n] || null, insertSheet: n => (sheets[n] = fakeSheet()) };
+  const ss = { getName: () => "KCM Scheduler", getSheetByName: n => sheets[n] || null, insertSheet: n => (sheets[n] = fakeSheet()) };
   const ctx = {
     // A standalone script has no active spreadsheet, so Code.gs opens it by id.
-    SpreadsheetApp: { getActiveSpreadsheet: () => null, openById: () => ss },
+    SpreadsheetApp: { getActiveSpreadsheet: () => null,
+      openById: () => { if (drive.gone) throw new Error("Exception: You do not have access to the requested document."); return ss; } },
     LockService: { getScriptLock: () => ({ waitLock() {}, releaseLock() {} }) },
     MailApp: { sendEmail: m => mail.push(m) },
     Session: { getScriptTimeZone: () => "America/New_York" },
@@ -255,6 +259,36 @@ const tests = {
     assert.match(mail[0].body, new RegExp("\\?meet=" + id));
     ctx.daily();
     assert.equal(mail.length, 1, "nothing new, no second email");
+  },
+  "says sheet_unavailable when the sheet is deleted or access is lost, and recovers when it is back"() {
+    const { id } = create();
+    drive.gone = true;
+    try {
+      assert.throws(() => get(id), /^Error: sheet_unavailable$/);
+      assert.throws(() => create(), /^Error: sheet_unavailable$/);
+      const report = JSON.parse(ctx.doGet({ parameter: { check: "1" } }).text);
+      assert.equal(report.ok, false);
+      assert.match(report.problems[0].problem, /cannot open its Google Sheet/);
+      assert.ok(report.problems[0].fix.length >= 2, "gives more than one way to fix it");
+    } finally { drive.gone = false; }
+    assert.notEqual(get(id), null, "works again once the sheet is reachable");
+  },
+  "says sheet_not_set_up when a tab is missing, and the health check names it"() {
+    const saved = sheets.responses;
+    delete sheets.responses;
+    try {
+      const { id } = create();
+      assert.throws(() => get(id), /^Error: sheet_not_set_up$/);
+      const report = JSON.parse(ctx.doGet({ parameter: { check: "1" } }).text);
+      assert.equal(report.ok, false);
+      assert.match(report.problems.map(p => p.problem).join(" "), /'responses' tab/);
+    } finally { sheets.responses = saved; }
+  },
+  "reports healthy when the sheet, tabs and daily job are all there"() {
+    const report = JSON.parse(ctx.doGet({ parameter: { check: "1" } }).text);
+    assert.deepEqual(report.problems, []);
+    assert.equal(report.ok, true);
+    assert.equal(ctx.doGet({ parameter: {} }).text, "KCM scheduler is running.");
   },
   "refuses an unknown status from the organizer and changes nothing"() {
     const { id, admin_token } = create();

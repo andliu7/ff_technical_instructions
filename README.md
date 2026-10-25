@@ -41,6 +41,7 @@ Then visit `http://localhost:8000`. A server is needed because the browser block
     example-pamphlet-pages.pdf  the same pamphlet's four pages in reading order (before Step 10)
     pamphlet-template.pdf the pamphlet as a fill-in PDF (Fall FF #02 with the weekly parts as form fields)
     tools/make_template.py rebuilds it: python tools/make_template.py <Doc exported as PDF> pamphlet-template.pdf
+    tools/check_links.py  tests every link, the scheduler's health and the calendar's privacy: python tools/check_links.py
     pdf-editor.html       the PDF editor's page, with its loading curtain
     apps-script/          the scheduler's shared store (Code.gs) and its test
     pdfcraft/             PdfCraft 0.13.0's web build, the PDF editor (see below)
@@ -108,6 +109,28 @@ loads it in place on request, and the guide preloads the app once idle (not on s
 links or with data saver on) so the editor opens from the cache. To update it, replace the
 folder with a newer release's files and change the two file names in `pdf-editor.html` and
 in the preload in `index.html`.
+
+## When something breaks
+
+Run `python tools/check_links.py` first: it says which part is broken. For the scheduler,
+open the script's address (`SCRIPT_URL` in `index.html`) with `?check=1` on the end; it lists
+each problem with the ways to fix it.
+
+Google finds files by id, not by folder, so **moving or renaming** the sheets in Drive, or
+passing a folder to the next leader, changes nothing. What does break things:
+
+| What happened | What you see | Options |
+|---|---|---|
+| The scheduler's sheet was deleted | Guests see "can't reach its storage sheet"; `?check=1` says it cannot open the sheet | Restore it from the Drive trash of the account that owned it; or make a new sheet, put its id in `SHEET_ID` in `Code.gs`, run `setup`, deploy a New version |
+| The sheet now belongs to someone else and the script's account lost access | Same as above | Ask the new owner to share it with the script's account as Editor; or the new owner copies `Code.gs` into their own Apps Script, deploys it, and `SCRIPT_URL` in `index.html` changes to their address |
+| A tab was removed from the sheet | Guests see "storage sheet isn't set up" | Run `setup` in the Apps Script editor; it recreates the tabs |
+| `Code.gs` changed but was not redeployed | The link check says "older version"; new features answer `unknown_function` | Deploy > Manage deployments > edit > New version |
+| Next year's master calendar is a new sheet | The link check says the calendar ids disagree, or "no sheet with this id" | Change `CAL_SHEET_ID` and every calendar link in `index.html` together (the check finds any you miss), then refresh the snapshot |
+| The master calendar became readable by anyone | The link check says "readable by anyone" | Share, General access, Restricted. It should be shared with KCM leaders only |
+
+The scheduler's script and sheet live on Andrew's Google account for now. At handoff,
+either keep them there and share the sheet with the next leader, or move them with the
+second row of the table.
 
 ## Credits
 

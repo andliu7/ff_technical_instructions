@@ -118,7 +118,7 @@ p{margin:0 0 8pt 0;}
 @media print{.qr-sec{display:none;}}
 .pdftool-acts{display:flex;flex-wrap:wrap;gap:8px;}
 .pdftool-frame iframe{display:block;width:100%;height:min(760px,80vh);border:1px solid var(--line);border-radius:8px;background:#f1f1f3;margin-top:8px;}
-@media print{.pdftool{display:none;}}
+@media print{.pdftool,#editor{display:none;}}
 @media print{.cv-onpage{display:none;}}
 .cv-meta{border-top:.6pt solid var(--line);padding-top:14pt;margin-top:48pt;font-family:'Instr';
   font-size:8.8pt;line-height:1.95;color:#3D3A4A;}
@@ -127,6 +127,10 @@ p{margin:0 0 8pt 0;}
   color:var(--mut);letter-spacing:.05em;border-top:.6pt solid var(--line);padding-top:9pt;}
 
 .partpage{break-before:page;}
+/* Drop cap on the memo's first paragraph: the W is bold, three lines tall, and the text wraps round it. */
+#memo table + p::first-letter{font-family:'Sig','Libre',serif;font-weight:400;color:var(--ink);margin-right:8px;
+  -webkit-initial-letter:2;initial-letter:2;}
+@supports not (initial-letter:2){#memo table + p::first-letter{float:left;font-size:3.4em;line-height:.8;padding:4px 8px 0 0;}}
 .part-label{font-family:'Instr';font-size:7.8pt;font-weight:700;letter-spacing:.17em;
   text-transform:uppercase;color:var(--acc);margin-bottom:5pt;}
 h1{font-family:'Libre';font-size:15.5pt;font-weight:700;color:var(--deep);margin:0 0 4pt 0;line-height:1.28;}
@@ -288,13 +292,55 @@ body{background:#ffffff;}
   .partpage{break-before:auto;margin-top:64px;padding-top:40px;border-top:.6pt solid var(--line);}
 }
 
+/* Editor page: short procedures split by coloured rules, steps indented under each heading. */
+.ed-lead{margin:0 0 var(--s3,16px);}
+.ed-links{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2,8px) var(--s2,8px);margin:0 0 var(--s4,24px);padding:var(--s3,16px) 0;
+  border-top:2px solid var(--green);border-bottom:2px solid var(--green);}
+.ed-links b{font-family:'Instr',sans-serif;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--green-dk);margin-right:var(--s3,16px);}
+.ed-proc{--pc:var(--acc);border-top:2px solid var(--pc);padding:var(--s3,16px) 0 var(--s2,8px);}
+.ed-g{--pc:var(--green);}
+.ed-o{--pc:var(--amber-rule);}
+.ed-h{margin:0 0 var(--s2,8px);}
+.ed-n{display:inline-block;min-width:1.4em;margin-right:var(--s2,8px);font-family:'Instr',sans-serif;color:var(--pc);}
+.ed-proc ol.sub{margin-left:var(--s5,32px);}
+.ed-proc .qr-sec h2{display:none;}
+.ed-proc .qr-sec{margin-left:var(--s5,32px);}
+.ed-aside{margin:0 0 var(--s2,8px) var(--s5,32px);font-size:14px;color:var(--sub);}
+#editor > .ed-aside{margin-left:0;}
+/* Banner: a tinted card in the FAQ's style, for a block that deserves a colour of its own (green here). */
+.banner{--fc:var(--green);margin:var(--s4,24px) 0;padding:var(--s3,16px) var(--s4,24px);border:1px solid color-mix(in srgb,var(--fc) 45%,var(--line));
+  border-radius:14px;background:var(--tip-bg);box-shadow:0 3px 0 color-mix(in srgb,var(--fc) 40%,var(--line));}
+.banner .kicker{display:flex;align-items:center;gap:var(--s3,16px);margin:0 0 var(--s2,8px);font-size:15px;color:var(--deep);}
+.banner .kicker::before{content:"";flex:none;width:14px;height:14px;border-radius:50%;background:var(--fc);}
+.banner > :last-child{margin-bottom:0;}
+/* Screen type scale, one set of sizes for every page: 16px reading text, then 20, 25, 31.
+   Libre for headings and prose, Instrument Sans for controls and labels. Print keeps its own sizes. */
+@media screen{
+  :root{--s1:4px;--s2:8px;--s3:16px;--s4:24px;--s5:32px;--s6:48px;}
+  body{font-size:12pt;line-height:1.7;}
+  h1{font-size:23pt;line-height:1.2;}
+  h2{font-family:'Libre',serif;font-size:14pt;}
+  .warn p{font-size:11.5pt;}
+  :is(.partpage,.page,.pdfsection) > :is(p,ol.sub,ul.tick,ul.check),.step > :is(p,ol.sub,ul.tick,ul.check){max-width:68ch;}
+  .step-head{align-items:center;gap:var(--s3);margin-bottom:var(--s2);}
+  .step-t{font-family:'Libre',serif;font-size:13.5pt;line-height:1.3;}
+  .step-n{font-size:9pt;}
+  /* Three tiers only: 16px reading text, 15px for notes, tips and tables, 14px for captions,
+     12px for the small uppercase labels. Anything not listed inherits 16px. */
+  .note,.tip,.tip p,.verse,.msgbox,.phase .pd,.cv-meta,p.small,.cv-sub,td,td.k,.reslist td.k .u,.tl{font-size:15px;}
+  figcaption,.pdftool-wait,.qr-note,.cv-foot{font-size:14px;}
+  th,.part-label,.tip .tl,.verse .ref,.kicker,.toc-ph,.dock-tip,.cv-onpage-l{font-size:12px;}
+  .ui,code,td.k .u{font-size:.92em;}
+  pre{font-size:13px;}
+}
+
 .docbar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:8px;align-items:center;
   justify-content:space-between;background:var(--sheet-fade);backdrop-filter:blur(8px);
   border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:22px;}
 .docbar .acts{display:flex;gap:8px;}
 
 .btn{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;border-radius:8px;
-  font-family:'Libre',serif;font-size:13px;font-weight:700;transition:background-color .15s,color .15s,transform .12s,box-shadow .12s;
+  font-family:'Instr',sans-serif;font-size:13px;font-weight:700;transition:background-color .15s,color .15s,transform .12s,box-shadow .12s;
   outline-offset:2px;height:36px;padding:0 16px;border:1px solid var(--line);background:var(--btn-bg);
   color:var(--deep);box-shadow:0 1px 2px rgba(0,0,0,.05);cursor:pointer;text-decoration:none;gap:7px;}
 .btn:hover{background:var(--btn-hover);}
@@ -472,16 +518,31 @@ body{background:#ffffff;}
 @media (hover:hover){.xbtn:hover .xlbl{max-width:9rem;opacity:1;margin-left:7px;}}
 .xbtn:focus-visible .xlbl{max-width:9rem;opacity:1;margin-left:7px;}
 
-/* Top-right tabs. Gray words; on hover the glow follows the pointer through
-   --mx and --my, which initTabs() sets. The gradient is clipped to the text. */
-.tabs{display:flex;align-items:center;gap:22px;}
-.tab{font-family:'Instr';font-size:13px;font-weight:700;letter-spacing:.02em;text-decoration:none;color:var(--mut);
-  padding:6px 0;transition:color .15s;}
-.tab:hover{color:transparent;background-image:radial-gradient(circle 52px at var(--mx,50%) var(--my,50%),#FF3DDC 0,#D61FB8 38%,var(--mut) 100%);
-  -webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 0 6px rgba(255,61,220,.4));}
+/* Edge page turn cursors (see the script): the arrow images are set on :root by the script. */
+html.edge-next,html.edge-next *{cursor:var(--edge-next,pointer) !important;}
+html.edge-prev,html.edge-prev *{cursor:var(--edge-prev,pointer) !important;}
+@media print{html.edge-next,html.edge-prev{cursor:auto;}}
+
+/* Top-right tabs. Gray words, a gray pill under the hovered one, magenta for
+   the page you are on. */
+.tabs{position:relative;display:flex;align-items:center;gap:2px;--tab-on:#C2189F;--tab-gray:#6B6880;}
+.dark .tabs{--tab-on:#FF6BE6;--tab-gray:#A1A1AA;}
+.tab{position:relative;z-index:1;font-family:'Instr';font-size:13px;font-weight:700;letter-spacing:.02em;text-decoration:none;color:var(--tab-gray);
+  padding:7px 12px;border-radius:10px;transition:color .15s;}
+.tab:hover{color:var(--ink);}
 .tab-ico{display:inline-flex;align-items:center;}
-.tab-ico:hover{color:#D61FB8;background:none;filter:drop-shadow(0 0 6px rgba(255,61,220,.5));}
-.tab[aria-current="page"]{color:var(--deep);}
+/* The current tab is magenta with a soft glow, so it reads at a glance. */
+.tab[aria-current="page"]{color:var(--tab-on);text-shadow:0 0 12px color-mix(in srgb,var(--tab-on) 55%,transparent);}
+/* The underline means the current tab is not shown by colour alone. */
+.tab[aria-current="page"]::after{content:"";position:absolute;left:12px;right:12px;bottom:3px;height:2px;border-radius:2px;background:currentColor;}
+@media (pointer:coarse){.tab{min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center;}}
+/* The hover box: one gray rounded pill that slides to whichever tab the pointer
+   is on (initTabs positions it) and fades out when the pointer leaves the row. */
+.tab-pill{position:absolute;left:0;top:0;z-index:0;border-radius:10px;pointer-events:none;opacity:0;
+  background:color-mix(in srgb,var(--mut) 24%,transparent);
+  transition:transform .22s cubic-bezier(.3,.9,.3,1),width .22s cubic-bezier(.3,.9,.3,1),height .22s,opacity .15s;}
+.tab-pill.on{opacity:1;}
+@media (prefers-reduced-motion:reduce){.tab-pill{transition:opacity .15s;}}
 .tab:focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:4px;}
 @media (max-width:640px){.tabs{order:3;width:100%;justify-content:space-between;gap:10px;}}
 @media print{.tabs{display:none;}}
@@ -493,32 +554,49 @@ body{background:#ffffff;}
   transition:opacity .15s;}
 .lenswrap:hover .lensbtn,.lenswrap .lensbtn:focus-visible{opacity:1;pointer-events:auto;}
 
-/* FAQ. Closed items are plain with a coloured dot; the item fills with its own
-   colour when open. Answers use a 0fr to 1fr grid row so the height can animate. */
-.faq{margin:34px 0 10px;}
-.faq-title{font-size:20px;margin:0 0 4px;}
-.faq-sub{color:var(--sub);font-size:13px;margin:0 0 14px;}
-.faq-list{display:flex;flex-direction:column;gap:8px;}
-.faq-item{--fc:var(--green);--fb:var(--tip-bg);border:1px solid var(--line);border-left:4px solid var(--fc);border-radius:8px;
-  background:var(--sheet);transition:background-color .2s,border-color .2s;}
+/* FAQ. Each item is a raised card tinted in its own colour (red breaks the pamphlet, amber is a
+   caution, green is background). The tint deepens when it opens. One item is open at a time. */
+.faq{margin:var(--s6,48px) 0 var(--s3,16px);}
+.faq-title{font-family:'Libre',serif;font-size:15pt;margin:0 0 var(--s1,4px);}
+.faq-sub{color:var(--sub);font-size:14px;margin:0 0 var(--s3,16px);}
+.faq-list{display:flex;flex-direction:column;gap:12px;}
+.faq-item{--fc:var(--green);--fb:var(--tip-bg);border:1px solid color-mix(in srgb,var(--fc) 45%,var(--line));border-radius:14px;
+  background:color-mix(in srgb,var(--fc) 7%,var(--sheet));box-shadow:0 3px 0 color-mix(in srgb,var(--fc) 40%,var(--line));
+  transition:background-color .2s,box-shadow .12s,transform .12s;}
 .faq-amber{--fc:var(--amber-rule);--fb:var(--amber-bg);}
 .faq-red{--fc:var(--red-rule);--fb:var(--red-bg);}
-.faq-item.open{background:var(--fb);border-color:var(--fc);}
+.faq-item.open{background:var(--fb);}
+.faq-item:has(.faq-q:active){transform:translateY(2px);box-shadow:0 1px 0 color-mix(in srgb,var(--fc) 40%,var(--line));}
 .faq-h{margin:0;font-size:inherit;text-transform:none;letter-spacing:0;color:inherit;}
-.faq-q{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:12px;width:100%;padding:13px 16px;cursor:pointer;
-  font-family:'Instr';font-size:14px;font-weight:700;color:var(--deep);}
-.faq-q:focus-visible{outline:2px solid var(--acc);outline-offset:-2px;border-radius:6px;}
-.faq-dot{flex:none;width:10px;height:10px;border-radius:50%;background:var(--fc);}
+.faq-q{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:var(--s3,16px);width:100%;min-height:56px;padding:var(--s2,8px) var(--s3,16px);
+  cursor:pointer;font-family:'Instr',sans-serif;font-size:15px;font-weight:700;color:var(--deep);}
+.faq-q:focus-visible{outline:2px solid var(--acc);outline-offset:-2px;border-radius:12px;}
+.faq-dot{flex:none;width:14px;height:14px;border-radius:50%;background:var(--fc);}
 .faq-qt{flex:1;}
-.faq-chev{flex:none;transition:transform .25s;}
-.faq-item.open .faq-chev{transform:rotate(180deg);}
+.faq-h{position:relative;}
+/* The step label sits over the row's right side. Shut, it is plain text; open, it is a button with the
+   same gray hover box as the tabs, and it goes to that step. */
+.faq-step{position:absolute;right:calc(var(--s3,16px) + 28px + var(--s3,16px));top:50%;transform:translateY(-50%);padding:7px 10px;border-radius:10px;
+  font-family:'Instr',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;line-height:1;text-decoration:none;
+  color:var(--sub);pointer-events:none;transition:background-color .15s,color .15s;}
+.faq-item.open .faq-step{pointer-events:auto;}
+.faq-item.open .faq-step::after{content:" \2192";}
+.faq-item.open .faq-step:hover{background:color-mix(in srgb,var(--mut) 24%,transparent);color:var(--ink);}
+.faq-step:focus-visible{outline:2px solid var(--acc);outline-offset:2px;}
+.faq-h:has(.faq-step) .faq-qt{padding-right:92px;}
+.faq-tog{flex:none;position:relative;width:28px;height:28px;border-radius:50%;background:color-mix(in srgb,var(--fc) 22%,var(--sheet));transition:transform .25s;}
+.faq-tog::before,.faq-tog::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:2px;margin:-1px 0 0 -6px;border-radius:2px;background:var(--deep);}
+.faq-tog::after{transform:rotate(90deg);}
+.faq-item.open .faq-tog{transform:rotate(45deg);}
 .faq-a{display:grid;grid-template-rows:0fr;transition:grid-template-rows .25s ease;}
 .faq-item.open .faq-a{grid-template-rows:1fr;}
-.faq-ai{overflow:hidden;min-height:0;padding:0 16px 0 38px;}
-.faq-item.open .faq-ai{padding-bottom:6px;}
-.faq-ai p{font-size:13.5px;line-height:1.6;}
-@media (prefers-reduced-motion:reduce){.faq-a,.faq-chev,.faq-item{transition:none;}}
-@media print{.faq-a{display:block;}.faq-chev{display:none;}.faq-item{break-inside:avoid;}}
+.faq-ai{overflow:hidden;min-height:0;padding:0 var(--s3,16px) 0 46px;}
+.faq-item.open .faq-ai{padding-bottom:var(--s2,8px);}
+.faq-ai p{font-size:16px;line-height:1.65;max-width:62ch;}
+.faq-list:not(.all) .faq-more{display:none;}
+.faq-all{margin-top:var(--s3,16px);}
+@media (prefers-reduced-motion:reduce){.faq-a,.faq-tog,.faq-item{transition:none;}}
+@media print{.faq-a{display:block;}.faq-tog,.faq-all{display:none;}.faq-list:not(.all) .faq-more{display:block;}.faq-item{break-inside:avoid;box-shadow:none;}}
 
 /* Header: the flower mark, the guide's name, and who it is for. */
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--deep);min-width:0;}
@@ -713,7 +791,9 @@ body{background:#ffffff;}
 
 /* Flame wrap (see initFlames). The host is a wrapper put round the burning
    element so the canvas can hang off it; the canvas never takes the pointer. */
-.flame-host{position:relative;display:inline-block;vertical-align:middle;transition:transform .2s ease;}
+/* line-height:0 keeps an inline svg from leaving a baseline gap under it. Without it the host was 8px
+   taller than the mark and the flame ring wrapped a box that hung below the logo. */
+.flame-host{position:relative;display:inline-block;vertical-align:middle;line-height:0;transition:transform .2s ease;}
 .cover-logo .flame-host{display:block;}
 .flame{position:absolute;z-index:1;pointer-events:none;}
 @media print{.flame{display:none;}}
@@ -1634,7 +1714,7 @@ html.ksch-lock .fab{display:none;}
   <span class="acts">
     <nav class="tabs" aria-label="Tools">
       <a class="tab" href="#memo">Memo</a>
-      <a class="tab" href="pdf-editor.html" target="_blank" rel="noopener">Editor</a>
+      <a class="tab" href="#editor">Editor</a>
       <a class="tab" href="#scheduler">Scheduler</a>
       <a class="tab" href="#calendar">Calendar</a>
       <a class="tab tab-ico" href="guide.pdf" download aria-label="Download PDF" title="Download PDF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg></a>
@@ -1818,6 +1898,103 @@ html.ksch-lock .fab{display:none;}
 
 <!-- ksch:end -->
 
+<!-- PDF EDITOR PAGE. Reached from the Editor tab: the finished-pamphlet links, the editor itself (loaded on
+     request, same embed as Step 10), then short procedures. Every button name was checked against the running editor. -->
+<section class="partpage" id="editor" data-page="editor" data-title="The PDF Editor">
+  <div class="part-label">Tool</div>
+  <h1>The PDF Editor</h1><div class="h1rule"></div>
+  <p class="ed-lead">It runs in your browser. Nothing to install, and your PDF never leaves your computer.</p>
+
+  <div class="ed-links"><b>Finished pamphlet</b>
+    <a class="btn" href="example-pamphlet.pdf" download>Print-ready PDF</a>
+    <a class="btn" href="example-pamphlet-pages.pdf" download>Pages in order</a>
+    <a class="btn" href="#example">See it on the site</a>
+  </div>
+
+  <div class="tip pdftool"><span class="tl">The editor</span>
+    <p class="pdftool-acts">
+      <button type="button" class="btn btn-primary" data-pdftool>Load it here (about 15 MB, once)</button>
+      <a class="btn" href="pdf-editor.html" target="_blank" rel="noopener">Open it as a full page &#8599;</a>
+    </p>
+    <p class="pdftool-wait" hidden>A loading screen counts up to 100%. After the first time it opens much faster.</p>
+    <div class="pdftool-frame" hidden></div>
+  </div>
+
+  <div class="ed-proc ed-p">
+    <h2 class="ed-h"><span class="ed-n">1</span>Open a PDF</h2>
+    <ol class="sub">
+      <li>Press <span class="ui">+ Open</span> at the top left, or drop the file anywhere on the editor.</li>
+      <li>Each file opens as a tab.</li>
+    </ol>
+  </div>
+  <div class="ed-proc ed-o">
+    <h2 class="ed-h"><span class="ed-n">2</span>Make the booklet</h2>
+    <ol class="sub">
+      <li>Open the final pamphlet. Press the <b>printer icon</b> at the top right.</li>
+      <li>Under <span class="ui">Page Sizing &amp; Handling</span> choose <span class="ui">Booklet</span>, <span class="ui">Both sides</span>, and Binding <span class="ui">Left</span>.</li>
+      <li>Check the preview, press <span class="ui">Print</span>, and save as PDF.</li>
+      <li>Open that file, rotate page 2 by 180 (procedure 3), and save it as the <code>- Flipped</code> file.</li>
+    </ol>
+    <p class="ed-aside"><a href="#step-10">Step 10</a> has the reasons and the figures.</p>
+  </div>
+  <div class="ed-proc ed-g">
+    <h2 class="ed-h"><span class="ed-n">3</span>Rotate or delete pages</h2>
+    <ol class="sub">
+      <li>Press <span class="ui">Edit</span>, then <span class="ui">Organize pages</span>. Click a page.</li>
+      <li>Use the rotate arrows (twice for 180) or the bin.</li>
+      <li>Press <span class="ui">Save pages</span>, then save (procedure 7).</li>
+    </ol>
+  </div>
+  <div class="ed-proc ed-p">
+    <h2 class="ed-h"><span class="ed-n">4</span>Add text or an image</h2>
+    <ol class="sub">
+      <li>Press <span class="ui">Edit</span>. Under <span class="ui">Add content</span> choose <span class="ui">Text</span> or <span class="ui">Image</span>, then follow the prompts.</li>
+    </ol>
+  </div>
+  <div class="ed-proc ed-g">
+    <h2 class="ed-h"><span class="ed-n">5</span>Combine PDFs</h2>
+    <ol class="sub">
+      <li>Press <span class="ui">All tools</span>, then <span class="ui">Combine files</span>.</li>
+      <li>Add the files in order, run it, and save.</li>
+    </ol>
+  </div>
+  <div class="ed-proc ed-o">
+    <h2 class="ed-h"><span class="ed-n">6</span>Convert a file</h2>
+    <ol class="sub">
+      <li><b>PDF to another format:</b> open it, press <span class="ui">Convert</span>, and pick Word, PowerPoint, PNG, HTML, RTF or plain text.</li>
+      <li><b>To PDF:</b> <span class="ui">All tools</span>, then <span class="ui">Create a PDF</span>. A code file (<code>.c</code>, <code>.py</code>) must be renamed to end in <code>.txt</code> first.</li>
+    </ol>
+  </div>
+  <div class="ed-proc ed-p">
+    <h2 class="ed-h"><span class="ed-n">7</span>Save</h2>
+    <ol class="sub">
+      <li>Press the <b>save icon</b> at the top right (next to the printer), or <code>Ctrl+S</code> (<code>Cmd+S</code> on a Mac).</li>
+    </ol>
+  </div>
+  <div class="ed-proc ed-g">
+  <!-- QR maker. qrcode-generator (MIT) is inlined in the script below, so it works offline.
+       The cover's QR tile links here (#qr-maker resolves to this page). -->
+  <div class="qr-sec" id="qr-maker">
+    <h2 class="ed-h"><span class="ed-n">8</span>Make a QR code</h2>
+    <p>For the back page: paste a link and the code draws as you type. Copy it straight into the Google Doc, or save it as an image.</p>
+    <div class="qr-tool">
+      <div>
+        <label for="qr-in">Link or text</label>
+        <input id="qr-in" type="text" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://forms.gle/...">
+        <p class="pam-acts" style="margin-top:12px;">
+          <button type="button" class="btn btn-primary" data-qr="copy" disabled>Copy image</button>
+          <button type="button" class="btn" data-qr="save" disabled>Save as PNG</button>
+        </p>
+        <p class="qr-note" aria-live="polite"></p>
+      </div>
+      <div class="qr-out"><p>The code appears here.</p></div>
+    </div>
+  </div>
+  </div>
+
+  <p class="ed-aside">The Discord button on the editor's home screen is its maker's, not KCM's. Ignore it.</p>
+</section>
+
 <!-- CONTENTS -->
 <nav class="toc" id="contents" aria-label="Contents" data-page="home">
   <div class="part-label">Contents</div>
@@ -1868,50 +2045,51 @@ html.ksch-lock .fab{display:none;}
   <p class="faq-sub">The seven cautions are in here too, each one again in the step where it applies.</p>
   <div class="faq-list">
     <div class="faq-item faq-green">
-      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a0"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">Who is this guide for?</span><svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a0"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">Who is this guide for?</span><span class="faq-tog" aria-hidden="true"></span></button></h3>
       <div class="faq-a" id="faq-a0"><div class="faq-ai"><p>A new Focus Family Leader, probably appointed within the last few weeks, with a first pamphlet due sooner than feels comfortable. You already use <span class="tool">Google Docs</span> and <span class="tool">Discord</span> without thinking about it. You have most likely never opened <span class="tool">Adobe Acrobat</span>'s print settings, used Bible Hub's research tools, or run a campus print kiosk. Everything here assumes exactly that starting point.</p></div></div>
     </div>
     <div class="faq-item faq-green">
-      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a1"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">Do I need to be technical?</span><svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a1"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">Do I need to be technical?</span><span class="faq-tog" aria-hidden="true"></span></button></h3>
       <div class="faq-a" id="faq-a1"><div class="faq-ai"><p>No. None of this requires it. If some part is not your strength, split it with your co-leader and take the other half. And ask when you get stuck, at any point and about anything. A question on Sunday beats a jammed printer on Monday morning, and no one here will think less of you for asking.</p></div></div>
     </div>
     <div class="faq-item faq-green">
-      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a2"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">What am I actually producing?</span><svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a2"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">What am I actually producing?</span><span class="faq-tog" aria-hidden="true"></span></button></h3>
       <div class="faq-a" id="faq-a2"><div class="faq-ai"><p>A four-page folded booklet, roughly eighty copies, in the room before your members arrive. Page 1 is the cover with your logistics, Pages 2 and 3 are the historical background and the reflection questions, and Page 4 carries general ministry info and space for notes. The layout is fixed and the page count cannot change, which is the single most important constraint in this guide.</p></div></div>
     </div>
     <div class="faq-item faq-green">
-      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a3"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">What matters most?</span><svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a3"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">What matters most?</span><span class="faq-tog" aria-hidden="true"></span></button></h3>
       <div class="faq-a" id="faq-a3"><div class="faq-ai"><p><b>Accuracy</b>, because the pamphlet goes out under the ministry's name. <b>Warmth</b>, because the reflection questions are the point. <b>Reliability</b>, because a late pamphlet does not exist. And <b>talking early</b> with your team, because it is how the work gets finished and how you learn to trust each other.</p></div></div>
     </div>
     <div class="faq-item faq-red">
-      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a4"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">How long can the Google Doc be?</span><svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a4"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">How long can the Google Doc be?</span><span class="faq-tog" aria-hidden="true"></span></button><a class="faq-step" href="#step-1" tabindex="-1">Step 1</a></h3>
       <div class="faq-a" id="faq-a4"><div class="faq-ai"><p><b class="lead">Layout is fragile, so watch the page count as you draft.</b> If your text pushes the <span class="tool">Google Doc</span> past four pages, the booklet fold breaks completely. There is no partial failure here; the imposition simply stops working.</p></div></div>
     </div>
-    <div class="faq-item faq-amber">
-      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a5"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">Can I change the automated logistics email?</span><svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+    <div class="faq-item faq-amber faq-more">
+      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a5"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">Can I change the automated logistics email?</span><span class="faq-tog" aria-hidden="true"></span></button><a class="faq-step" href="#step-2" tabindex="-1">Step 2</a></h3>
       <div class="faq-a" id="faq-a5"><div class="faq-ai"><p><b class="lead">Treat the automated logistics email as read-only.</b> It carries other groups' room bookings and contact information. Copy your own group's data and leave the rest alone. If you ever need help with the script behind it, describe the problem instead of pasting its settings block, which holds folder identifiers and a personal email address.</p></div></div>
     </div>
-    <div class="faq-item faq-amber">
-      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a6"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">Which Bible translation should I use?</span><svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
-      <div class="faq-a" id="faq-a6"><div class="faq-ai"><p><b class="lead">Pick a translation your group can follow.</b> We lean on the ESV and NIV. Focus Families regularly include new Christians and people who are not Christians at all, and both versions read cleanly out loud without much explanation. This is not a rule. If your passage reads better in something else, use it, and say which translation you used on the pamphlet.</p></div></div>
+    <div class="faq-item faq-amber faq-more">
+      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a6"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">Which Bible translation should I use?</span><span class="faq-tog" aria-hidden="true"></span></button><a class="faq-step" href="#step-4" tabindex="-1">Step 4</a></h3>
+      <div class="faq-a" id="faq-a6"><div class="faq-ai"><p>We lean on the NIV, and sometimes the ESV. If a passage reads better in a different translation, get the advisors' approval first. This pamphlet is for new Christians and Christians alike, and we should respect the advisors' decision.</p></div></div>
     </div>
-    <div class="faq-item faq-red">
-      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a7"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">Can I skip peer review if I am short on time?</span><svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+    <div class="faq-item faq-red faq-more">
+      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a7"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">Can I skip peer review if I am short on time?</span><span class="faq-tog" aria-hidden="true"></span></button><a class="faq-step" href="#step-8" tabindex="-1">Step 8</a></h3>
       <div class="faq-a" id="faq-a7"><div class="faq-ai"><p><b class="lead">Do not skip peer review to save time.</b> The pamphlet goes out under the ministry's name, not just yours, and unapproved background text or images can misrepresent KCM's position on a passage.</p></div></div>
     </div>
-    <div class="faq-item faq-red">
-      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a8"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">What if I miss the Saturday feedback deadline?</span><svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+    <div class="faq-item faq-red faq-more">
+      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a8"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">What if I miss the Saturday feedback deadline?</span><span class="faq-tog" aria-hidden="true"></span></button><a class="faq-step" href="#step-9" tabindex="-1">Step 9</a></h3>
       <div class="faq-a" id="faq-a8"><div class="faq-ai"><p><b class="lead">Respect the Saturday feedback deadline.</b> Missing it squeezes your printing window and raises the odds you are troubleshooting a jammed printer the morning of Focus Family. If you are stuck on anything, ask your co-leader or your advisor early rather than working around it quietly. Nobody here minds the question.</p></div></div>
     </div>
-    <div class="faq-item faq-amber">
-      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a9"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">Why print one test copy first?</span><svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+    <div class="faq-item faq-amber faq-more">
+      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a9"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">Why print one test copy first?</span><span class="faq-tog" aria-hidden="true"></span></button><a class="faq-step" href="#step-11" tabindex="-1">Step 11</a></h3>
       <div class="faq-a" id="faq-a9"><div class="faq-ai"><p><b class="lead">Print one copy and fold it before you print the rest.</b> Check the ink and the print quality, then fold the sheet and open it like a book. Pages 2 and 3 should face you the same way the cover did. The mistake that catches people is skipping the page 2 rotation in Step 10 (or <span class="ui">Flip on Short Edge</span>, if you use <span class="tool">Adobe Acrobat</span>), which prints the inner pages upside down. The <a href="#instructions">Instructions page</a> has a figure of what the two sides have to look like.</p></div></div>
     </div>
-    <div class="faq-item faq-amber">
-      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a10"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">When can I print the full run?</span><svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+    <div class="faq-item faq-amber faq-more">
+      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a10"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">When can I print the full run?</span><span class="faq-tog" aria-hidden="true"></span></button><a class="faq-step" href="#step-12" tabindex="-1">Step 12</a></h3>
       <div class="faq-a" id="faq-a10"><div class="faq-ai"><p><b class="lead">Do not commit the full run until the test copy passes.</b> Eighty sheets is a lot of paper to throw away over a setting you could have caught on one.</p></div></div>
     </div>
   </div>
+  <button type="button" class="btn faq-all">Show all 11 questions</button>
 </section>
 
 <!-- MEMO -->
@@ -1991,30 +2169,30 @@ html.ksch-lock .fab{display:none;}
     <svg viewBox="0 0 700 108" width="100%" xmlns="http://www.w3.org/2000/svg">
       <g font-family="Instr, sans-serif">
         <rect x="2" y="26" width="122" height="56" rx="4" fill="#F3F0FA" stroke="#6B4EA8"/>
-        <text x="63" y="18" font-size="8" font-weight="700" fill="#6B4EA8" text-anchor="middle" letter-spacing="1.2">PHASE 1</text>
-        <text x="63" y="50" font-size="10.5" font-weight="700" fill="#2E2B45" text-anchor="middle">Google Docs</text>
-        <text x="63" y="66" font-size="8.2" fill="#5F5B6E" text-anchor="middle" font-style="italic">Draft and format</text>
+        <text x="63" y="18" font-size="11.5" font-weight="700" fill="#6B4EA8" text-anchor="middle" letter-spacing="1.2">PHASE 1</text>
+        <text x="63" y="50" font-size="13.5" font-weight="700" fill="#2E2B45" text-anchor="middle">Google Docs</text>
+        <text x="63" y="66" font-size="11.5" fill="#5F5B6E" text-anchor="middle" font-style="italic">Draft and format</text>
         <path d="M128 54 L140 54" stroke="#6B4EA8" stroke-width="1.4"/><path d="M140 54 l-5 -3 v6 z" fill="#6B4EA8"/>
         <rect x="144" y="26" width="122" height="56" rx="4" fill="#F3F0FA" stroke="#6B4EA8"/>
-        <text x="205" y="18" font-size="8" font-weight="700" fill="#6B4EA8" text-anchor="middle" letter-spacing="1.2">PHASE 2</text>
-        <text x="205" y="50" font-size="10.5" font-weight="700" fill="#2E2B45" text-anchor="middle">Research</text>
-        <text x="205" y="66" font-size="8.2" fill="#5F5B6E" text-anchor="middle" font-style="italic">Passage context</text>
+        <text x="205" y="18" font-size="11.5" font-weight="700" fill="#6B4EA8" text-anchor="middle" letter-spacing="1.2">PHASE 2</text>
+        <text x="205" y="50" font-size="13.5" font-weight="700" fill="#2E2B45" text-anchor="middle">Research</text>
+        <text x="205" y="66" font-size="11.5" fill="#5F5B6E" text-anchor="middle" font-style="italic">Passage context</text>
         <path d="M270 54 L282 54" stroke="#6B4EA8" stroke-width="1.4"/><path d="M282 54 l-5 -3 v6 z" fill="#6B4EA8"/>
         <rect x="286" y="26" width="122" height="56" rx="4" fill="#F3F0FA" stroke="#6B4EA8"/>
-        <text x="347" y="18" font-size="8" font-weight="700" fill="#6B4EA8" text-anchor="middle" letter-spacing="1.2">PHASE 3</text>
-        <text x="347" y="50" font-size="10.5" font-weight="700" fill="#2E2B45" text-anchor="middle">Discord</text>
-        <text x="347" y="66" font-size="8.2" fill="#5F5B6E" text-anchor="middle" font-style="italic">Peer approval</text>
+        <text x="347" y="18" font-size="11.5" font-weight="700" fill="#6B4EA8" text-anchor="middle" letter-spacing="1.2">PHASE 3</text>
+        <text x="347" y="50" font-size="13.5" font-weight="700" fill="#2E2B45" text-anchor="middle">Discord</text>
+        <text x="347" y="66" font-size="11.5" fill="#5F5B6E" text-anchor="middle" font-style="italic">Peer approval</text>
         <path d="M412 54 L424 54" stroke="#6B4EA8" stroke-width="1.4"/><path d="M424 54 l-5 -3 v6 z" fill="#6B4EA8"/>
         <rect x="428" y="26" width="122" height="56" rx="4" fill="#FDF5E9" stroke="#D99A3D"/>
-        <text x="489" y="18" font-size="8" font-weight="700" fill="#9C6420" text-anchor="middle" letter-spacing="1.2">PHASE 4</text>
-        <text x="489" y="50" font-size="10.5" font-weight="700" fill="#2E2B45" text-anchor="middle">Acrobat</text>
-        <text x="489" y="66" font-size="8.2" fill="#5F5B6E" text-anchor="middle" font-style="italic">Impose the file</text>
+        <text x="489" y="18" font-size="11.5" font-weight="700" fill="#9C6420" text-anchor="middle" letter-spacing="1.2">PHASE 4</text>
+        <text x="489" y="50" font-size="13.5" font-weight="700" fill="#2E2B45" text-anchor="middle">Acrobat</text>
+        <text x="489" y="66" font-size="11.5" fill="#5F5B6E" text-anchor="middle" font-style="italic">Impose the file</text>
         <path d="M554 54 L566 54" stroke="#D99A3D" stroke-width="1.4"/><path d="M566 54 l-5 -3 v6 z" fill="#D99A3D"/>
         <rect x="570" y="26" width="128" height="56" rx="4" fill="#FDF5E9" stroke="#D99A3D"/>
-        <text x="634" y="18" font-size="8" font-weight="700" fill="#9C6420" text-anchor="middle" letter-spacing="1.2">PHASE 4</text>
-        <text x="634" y="50" font-size="10.5" font-weight="700" fill="#2E2B45" text-anchor="middle">Print station</text>
-        <text x="634" y="66" font-size="8.2" fill="#5F5B6E" text-anchor="middle" font-style="italic">Print and fold</text>
-        <text x="350" y="101" font-size="8" fill="#8B8798" text-anchor="middle" font-style="italic">Two weeks of lead time is comfortable. One week is tight but workable.</text>
+        <text x="634" y="18" font-size="11.5" font-weight="700" fill="#9C6420" text-anchor="middle" letter-spacing="1.2">PHASE 4</text>
+        <text x="634" y="50" font-size="13.5" font-weight="700" fill="#2E2B45" text-anchor="middle">Print station</text>
+        <text x="634" y="66" font-size="11.5" fill="#5F5B6E" text-anchor="middle" font-style="italic">Print and fold</text>
+        <text x="350" y="101" font-size="11.5" fill="#8B8798" text-anchor="middle" font-style="italic">Two weeks of lead time is comfortable. One week is tight but workable.</text>
       </g>
     </svg>
     <figcaption><b>Figure 1.</b> The five-stage production pipeline, start to finish.</figcaption>
@@ -2023,28 +2201,28 @@ html.ksch-lock .fab{display:none;}
   <figure>
     <svg viewBox="0 0 580 262" width="96%" xmlns="http://www.w3.org/2000/svg">
       <g font-family="Instr, sans-serif">
-        <text x="255" y="14" font-size="8.6" font-weight="700" fill="#2E2B45" text-anchor="middle" letter-spacing="0.7">PRINTED SHEET, SIDE A (OUTER)</text>
+        <text x="255" y="14" font-size="10.6" font-weight="700" fill="#2E2B45" text-anchor="middle" letter-spacing="0.7">PRINTED SHEET, SIDE A (OUTER)</text>
         <rect x="40" y="24" width="430" height="76" rx="3" fill="#F3F0FA" stroke="#6B4EA8" stroke-width="1.1"/>
         <line x1="255" y1="24" x2="255" y2="100" stroke="#6B4EA8" stroke-width="0.9" stroke-dasharray="4 3"/>
-        <text x="147" y="62" font-size="11" font-weight="700" fill="#2E2B45" text-anchor="middle">Page 4</text>
-        <text x="363" y="62" font-size="11" font-weight="700" fill="#2E2B45" text-anchor="middle">Page 1</text>
-        <text x="147" y="80" font-size="7.4" fill="#5F5B6E" text-anchor="middle" font-style="italic">back cover</text>
-        <text x="363" y="80" font-size="7.4" fill="#5F5B6E" text-anchor="middle" font-style="italic">front cover</text>
-        <text x="255" y="134" font-size="8.6" font-weight="700" fill="#2E2B45" text-anchor="middle" letter-spacing="0.7">PRINTED SHEET, SIDE B (INNER)</text>
+        <text x="147" y="62" font-size="12.5" font-weight="700" fill="#2E2B45" text-anchor="middle">Page 4</text>
+        <text x="363" y="62" font-size="12.5" font-weight="700" fill="#2E2B45" text-anchor="middle">Page 1</text>
+        <text x="147" y="80" font-size="10" fill="#5F5B6E" text-anchor="middle" font-style="italic">back cover</text>
+        <text x="363" y="80" font-size="10" fill="#5F5B6E" text-anchor="middle" font-style="italic">front cover</text>
+        <text x="255" y="134" font-size="10.6" font-weight="700" fill="#2E2B45" text-anchor="middle" letter-spacing="0.7">PRINTED SHEET, SIDE B (INNER)</text>
         <rect x="40" y="144" width="430" height="76" rx="3" fill="#FFFFFF" stroke="#6B4EA8" stroke-width="1.1"/>
         <line x1="255" y1="144" x2="255" y2="220" stroke="#6B4EA8" stroke-width="0.9" stroke-dasharray="4 3"/>
-        <text x="147" y="182" font-size="11" font-weight="700" fill="#2E2B45" text-anchor="middle">Page 2</text>
-        <text x="363" y="182" font-size="11" font-weight="700" fill="#2E2B45" text-anchor="middle">Page 3</text>
-        <text x="147" y="200" font-size="7.4" fill="#5F5B6E" text-anchor="middle" font-style="italic">background</text>
-        <text x="363" y="200" font-size="7.4" fill="#5F5B6E" text-anchor="middle" font-style="italic">questions</text>
+        <text x="147" y="182" font-size="12.5" font-weight="700" fill="#2E2B45" text-anchor="middle">Page 2</text>
+        <text x="363" y="182" font-size="12.5" font-weight="700" fill="#2E2B45" text-anchor="middle">Page 3</text>
+        <text x="147" y="200" font-size="10" fill="#5F5B6E" text-anchor="middle" font-style="italic">background</text>
+        <text x="363" y="200" font-size="10" fill="#5F5B6E" text-anchor="middle" font-style="italic">questions</text>
         <path d="M486 46 C 534 46, 534 198, 486 198" fill="none" stroke="#D99A3D" stroke-width="1.6"/>
         <path d="M486 198 l7 -4.5 v9 z" fill="#D99A3D"/>
         <line x1="470" y1="24" x2="470" y2="100" stroke="#D99A3D" stroke-width="2.4"/>
         <line x1="470" y1="144" x2="470" y2="220" stroke="#D99A3D" stroke-width="2.4"/>
-        <text x="551" y="118" font-size="7.6" font-weight="700" fill="#9C6420" text-anchor="middle">flip</text>
-        <text x="551" y="129" font-size="7.6" font-weight="700" fill="#9C6420" text-anchor="middle">here</text>
-        <text x="255" y="240" font-size="8.2" fill="#5F5B6E" text-anchor="middle">The sheet turns over on its short edge, the way you turn a page. The dashed line is where you fold afterward.</text>
-        <text x="255" y="254" font-size="8.2" fill="#9C6420" text-anchor="middle">Flip on the long edge instead and Side B lands rotated 180 degrees, so Pages 2 and 3 print upside down.</text>
+        <text x="551" y="118" font-size="10" font-weight="700" fill="#9C6420" text-anchor="middle">flip</text>
+        <text x="551" y="129" font-size="10" font-weight="700" fill="#9C6420" text-anchor="middle">here</text>
+        <text x="255" y="240" font-size="10.4" fill="#5F5B6E" text-anchor="middle">The sheet turns over on its short edge, the way you turn a page. The dashed line is where you fold afterward.</text>
+        <text x="255" y="254" font-size="10.4" fill="#9C6420" text-anchor="middle">Flip on the long edge instead and Side B lands rotated 180 degrees, so Pages 2 and 3 print upside down.</text>
       </g>
     </svg>
     <figcaption><b>Figure 2.</b> How the two printed sides have to line up before the sheet is folded.</figcaption>
@@ -2096,31 +2274,31 @@ html.ksch-lock .fab{display:none;}
       <g font-family="Instr, sans-serif">
         <rect x="20" y="26" width="112" height="106" rx="3" fill="#F3F0FA" stroke="#6B4EA8"/>
         <rect x="20" y="26" width="112" height="16" rx="3" fill="#2E2B45"/>
-        <text x="76" y="37" font-size="8" font-weight="700" fill="#FFF" text-anchor="middle">PAGE 1</text>
-        <text x="76" y="80" font-size="8.6" font-weight="700" fill="#2E2B45" text-anchor="middle">Front Cover</text>
-        <text x="76" y="94" font-size="7.6" fill="#5F5B6E" text-anchor="middle">Title and logistics</text>
-        <text x="76" y="148" font-size="7.6" fill="#8B8798" text-anchor="middle" font-style="italic">Closed booklet</text>
+        <text x="76" y="37" font-size="11.5" font-weight="700" fill="#FFF" text-anchor="middle">PAGE 1</text>
+        <text x="76" y="80" font-size="12" font-weight="700" fill="#2E2B45" text-anchor="middle">Front Cover</text>
+        <text x="76" y="94" font-size="11.2" fill="#5F5B6E" text-anchor="middle">Title and logistics</text>
+        <text x="76" y="148" font-size="11.2" fill="#8B8798" text-anchor="middle" font-style="italic">Closed booklet</text>
         <path d="M138 79 L166 79" stroke="#6B4EA8" stroke-width="1.2"/><path d="M166 79 l-5 -3 v6 z" fill="#6B4EA8"/>
-        <text x="152" y="72" font-size="7" fill="#6B4EA8" text-anchor="middle">opens to</text>
+        <text x="152" y="72" font-size="11" fill="#6B4EA8" text-anchor="middle">opens to</text>
         <rect x="172" y="26" width="224" height="106" rx="3" fill="#FFF" stroke="#6B4EA8"/>
         <rect x="172" y="26" width="224" height="16" rx="3" fill="#2E2B45"/>
         <line x1="284" y1="26" x2="284" y2="132" stroke="#6B4EA8" stroke-width="0.8" stroke-dasharray="3 3"/>
-        <text x="228" y="37" font-size="8" font-weight="700" fill="#FFF" text-anchor="middle">PAGE 2</text>
-        <text x="340" y="37" font-size="8" font-weight="700" fill="#FFF" text-anchor="middle">PAGE 3</text>
-        <text x="228" y="80" font-size="8.6" font-weight="700" fill="#2E2B45" text-anchor="middle">Historical</text>
-        <text x="228" y="92" font-size="8.6" font-weight="700" fill="#2E2B45" text-anchor="middle">Background</text>
-        <text x="340" y="80" font-size="8.6" font-weight="700" fill="#2E2B45" text-anchor="middle">Passage and</text>
-        <text x="340" y="92" font-size="8.6" font-weight="700" fill="#2E2B45" text-anchor="middle">Reflection Qs</text>
-        <text x="284" y="148" font-size="7.6" fill="#8B8798" text-anchor="middle" font-style="italic">Inside spread (open flat)</text>
+        <text x="228" y="37" font-size="11.5" font-weight="700" fill="#FFF" text-anchor="middle">PAGE 2</text>
+        <text x="340" y="37" font-size="11.5" font-weight="700" fill="#FFF" text-anchor="middle">PAGE 3</text>
+        <text x="228" y="80" font-size="12" font-weight="700" fill="#2E2B45" text-anchor="middle">Historical</text>
+        <text x="228" y="92" font-size="12" font-weight="700" fill="#2E2B45" text-anchor="middle">Background</text>
+        <text x="340" y="80" font-size="12" font-weight="700" fill="#2E2B45" text-anchor="middle">Passage and</text>
+        <text x="340" y="92" font-size="12" font-weight="700" fill="#2E2B45" text-anchor="middle">Reflection Qs</text>
+        <text x="284" y="148" font-size="11.2" fill="#8B8798" text-anchor="middle" font-style="italic">Inside spread (open flat)</text>
         <path d="M402 79 L430 79" stroke="#6B4EA8" stroke-width="1.2"/><path d="M430 79 l-5 -3 v6 z" fill="#6B4EA8"/>
-        <text x="416" y="72" font-size="7" fill="#6B4EA8" text-anchor="middle">back is</text>
+        <text x="416" y="72" font-size="11" fill="#6B4EA8" text-anchor="middle">back is</text>
         <rect x="436" y="26" width="112" height="106" rx="3" fill="#F3F0FA" stroke="#6B4EA8"/>
         <rect x="436" y="26" width="112" height="16" rx="3" fill="#2E2B45"/>
-        <text x="492" y="37" font-size="8" font-weight="700" fill="#FFF" text-anchor="middle">PAGE 4</text>
-        <text x="492" y="76" font-size="8.6" font-weight="700" fill="#2E2B45" text-anchor="middle">General Info</text>
-        <text x="492" y="90" font-size="7.6" fill="#5F5B6E" text-anchor="middle">Ministry details,</text>
-        <text x="492" y="101" font-size="7.6" fill="#5F5B6E" text-anchor="middle">QR code, note space</text>
-        <text x="492" y="148" font-size="7.6" fill="#8B8798" text-anchor="middle" font-style="italic">Back cover</text>
+        <text x="492" y="37" font-size="11.5" font-weight="700" fill="#FFF" text-anchor="middle">PAGE 4</text>
+        <text x="492" y="76" font-size="12" font-weight="700" fill="#2E2B45" text-anchor="middle">General Info</text>
+        <text x="492" y="90" font-size="11.2" fill="#5F5B6E" text-anchor="middle">Ministry details,</text>
+        <text x="492" y="101" font-size="11.2" fill="#5F5B6E" text-anchor="middle">QR code, note space</text>
+        <text x="492" y="148" font-size="11.2" fill="#8B8798" text-anchor="middle" font-style="italic">Back cover</text>
       </g>
     </svg>
     <figcaption><b>Figure 3.</b> How the four-page booklet actually opens. This layout is fixed and the page count cannot change.</figcaption>
@@ -2249,12 +2427,14 @@ html.ksch-lock .fab{display:none;}
     <div class="verse"><span class="ref">Worked example &nbsp;&middot;&nbsp; 1 Corinthians 13</span>
       Paul says love is patient and kind before he says anything about how love feels. Where this week did loving someone well cost you patience more than it cost you affection?</div>
     <p>That one names something specific in the text, asks for real reflection, and does not need re-reading.</p>
-    <div class="kicker">Bring in a second passage</div>
+    <div class="banner">
+      <div class="kicker">Bring in a second passage</div>
     <p>Reflection questions get better when they reach outside the passage in front of you. Two options work well:</p>
     <ul class="tick">
       <li><b>A passage you have already studied.</b> Name it as a reminder. Groups remember more than you expect, and connecting two studies makes both stick.</li>
       <li><b>The passage coming next.</b> Do not announce it. Ask a question that quietly points at its theme, so the group arrives already thinking about it.</li>
     </ul>
+    </div>
     <div class="note">Some questions need room to set up context before they ask anything, and that is fine. Longer is not the same as unclear. You can open with a short hook, a scenario or an observation, before the question itself, though not every question needs one.</div>
   </div>
 </section>
@@ -2507,24 +2687,6 @@ html.ksch-lock .fab{display:none;}
 
   <p class="pam-acts" style="margin-top:14px;"><a class="btn" href="#pdf-template">Starting your own? Use the PDF template &rarr;</a></p>
 
-  <!-- QR MAKER. Screen only. qrcode-generator (MIT) is inlined in the script
-       below, so it works offline like the rest of the guide. -->
-  <div class="qr-sec" id="qr-maker">
-    <h2>Make a QR code</h2>
-    <p>For the back page: paste a link and the code draws as you type. Copy it straight into the Google Doc, or save it as an image.</p>
-    <div class="qr-tool">
-      <div>
-        <label for="qr-in">Link or text</label>
-        <input id="qr-in" type="text" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://forms.gle/...">
-        <p class="pam-acts" style="margin-top:12px;">
-          <button type="button" class="btn btn-primary" data-qr="copy" disabled>Copy image</button>
-          <button type="button" class="btn" data-qr="save" disabled>Save as PNG</button>
-        </p>
-        <p class="qr-note" aria-live="polite"></p>
-      </div>
-      <div class="qr-out"><p>The code appears here.</p></div>
-    </div>
-  </div>
 </section>
 
 <!-- PAGER. initPages() fills in the titles and hides whichever end is missing. -->
@@ -2546,11 +2708,11 @@ html.ksch-lock .fab{display:none;}
     <p class="foot-note">You do not have to read this front to back. Most people only need one part of it at a time.</p>
     <ul class="foot-links">
       <li><a href="#step-1"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg></span><span><span class="foot-q">I just need to make the document.</span><span class="foot-a">Phase 1, Step 1</span></span></a></li>
-      <li><a href="#step-10"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/></svg></span><span><span class="foot-q">I have the file and just need to print it.</span><span class="foot-a">Phase 4, Step 10</span></span></a></li>
       <li><a href="#step-4"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span><span class="foot-q">I need help researching the passage.</span><span class="foot-a">Phase 2, Step 4</span></span></a></li>
-      <li><a href="#step-8"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></svg></span><span><span class="foot-q">I need to get it approved.</span><span class="foot-a">Phase 3, Step 8</span></span></a></li>
-      <li><a href="#troubleshooting"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span><span><span class="foot-q">My test copy folded wrong.</span><span class="foot-a">Troubleshooting</span></span></a></li>
       <li><a href="#step-10"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg></span><span><span class="foot-q">I have never opened Adobe Acrobat.</span><span class="foot-a">Before Step 10</span></span></a></li>
+      <li><a href="#step-10"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/></svg></span><span><span class="foot-q">I have the file and just need to print it.</span><span class="foot-a">Phase 4, Step 10</span></span></a></li>
+      <li><a href="#troubleshooting"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span><span><span class="foot-q">My test copy folded wrong.</span><span class="foot-a">Troubleshooting</span></span></a></li>
+      <li><a href="#example"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/></svg></span><span><span class="foot-q">I want to see a finished pamphlet.</span><span class="foot-a">A Finished Pamphlet</span></span></a></li>
     </ul>
   </div>
   <div class="foot-brand">
@@ -5049,7 +5211,7 @@ var BASE_TITLE = document.title;
 
 // Pages reached from the top tabs. They stay out of the pager's Previous and
 // Next order, so turning pages through the guide never lands on them.
-var TOOL_PAGES = ["calendar", "scheduler"];
+var TOOL_PAGES = ["calendar", "scheduler", "editor"];
 
 function indexOfPage(name) {
   for (var i = 0; i < PAGES.length; i++) {
@@ -5194,15 +5356,72 @@ document.addEventListener("click", function (e) {
   });
 })();
 
-// Tab glow. The CSS draws a magenta spot at --mx/--my inside each tab, so the
-// pointer's position inside the tab is all this has to report.
-document.addEventListener("pointermove", function (e) {
-  var t = e.target.closest && e.target.closest(".tab");
-  if (!t) return;
-  var r = t.getBoundingClientRect();
-  t.style.setProperty("--mx", e.clientX - r.left + "px");
-  t.style.setProperty("--my", e.clientY - r.top + "px");
-}, { passive: true });
+// Tab hover pill. A gray box slides to the tab under the pointer (or keyboard
+// focus) and fades out when the pointer leaves the row. It is a child of .tabs,
+// so offsetLeft and offsetTop are already in its coordinates.
+(function () {
+  var row = document.querySelector(".tabs");
+  if (!row) return;
+  var pill = document.createElement("span");
+  pill.className = "tab-pill";
+  pill.setAttribute("aria-hidden", "true");
+  row.appendChild(pill);
+  function to(t) {
+    pill.style.width = t.offsetWidth + "px";
+    pill.style.height = t.offsetHeight + "px";
+    pill.style.transform = "translate(" + t.offsetLeft + "px," + t.offsetTop + "px)";
+    pill.classList.add("on");
+  }
+  row.addEventListener("pointerover", function (e) {
+    var t = e.target.closest(".tab");
+    if (t) to(t);
+  });
+  row.addEventListener("focusin", function (e) {
+    var t = e.target.closest(".tab");
+    if (t) to(t);
+  });
+  row.addEventListener("pointerleave", function () { pill.classList.remove("on"); });
+  row.addEventListener("focusout", function () { pill.classList.remove("on"); });
+})();
+
+// Edge page turn, desktop only. On the grid beside the white sheet the cursor becomes a black
+// circle with a white arrow, pointing right on the right side and left on the left. A click turns
+// the page, using the same Previous/Next the buttons use. No arrow where there is no such page
+// (the first page has no left arrow), over the footer, menus or dialogs, or on a scheduler link.
+// It needs room beside the sheet, so on a phone there is nothing to point at.
+(function () {
+  if (!window.matchMedia("(hover:hover) and (pointer:fine)").matches) return;
+  var root = document.documentElement, dir = 0;
+  function arrow(d) {
+    var path = d > 0 ? "M15 22h14M23 15l7 7-7 7" : "M29 22H15M21 15l-7 7 7 7";
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" fill="black" stroke="white" stroke-opacity=".55" stroke-width="2"/>' +
+      '<path d="' + path + '" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    return 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '") 22 22, pointer';
+  }
+  root.style.setProperty("--edge-next", arrow(1));
+  root.style.setProperty("--edge-prev", arrow(-1));
+  function zone(e) {
+    if (root.classList.contains("meet-only")) return 0;
+    var t = e.target;
+    if (t.closest && t.closest(".foot,.fab,.sidebar,.scrim,dialog")) return 0;
+    var r = document.querySelector(".page-wrap").getBoundingClientRect();
+    var d = e.clientX > r.right + 2 ? 1 : e.clientX < r.left - 2 ? -1 : 0;
+    if (!d) return 0;
+    return document.querySelector(d > 0 ? ".pager-next" : ".pager-prev").hidden ? 0 : d;
+  }
+  function set(d) {
+    if (d === dir) return;
+    dir = d;
+    root.classList.toggle("edge-next", d > 0);
+    root.classList.toggle("edge-prev", d < 0);
+  }
+  document.addEventListener("mousemove", function (e) { set(zone(e)); }, { passive: true });
+  document.addEventListener("mouseleave", function () { set(0); });
+  document.addEventListener("click", function (e) {
+    var d = zone(e);
+    if (d) turnPage(d);
+  });
+})();
 
 // On a scheduler link (?meet=<id>) the logo leaves the poll for the guide. The
 // link has to drop the query as well, or the page would stay in scheduler mode.
@@ -5214,13 +5433,34 @@ document.addEventListener("click", function (e) {
 });
 
 // FAQ accordion. The button flips aria-expanded; the .open class on the item
-// drives the colour fill and the height animation. Any number can be open.
+// drives the colour fill and the height animation. Opening one closes the
+// others, so only one answer is ever on screen. "Show all" reveals the items
+// past the first five.
 document.addEventListener("click", function (e) {
+  var more = e.target.closest(".faq-all");
+  if (more) {
+    var list = more.previousElementSibling;
+    var on = list.classList.toggle("all");
+    more.textContent = on ? "Show fewer questions" : "Show all " + list.children.length + " questions";
+    return;
+  }
   var q = e.target.closest(".faq-q");
   if (!q) return;
+  var item = q.closest(".faq-item");
   var open = q.getAttribute("aria-expanded") !== "true";
-  q.setAttribute("aria-expanded", open ? "true" : "false");
-  q.closest(".faq-item").classList.toggle("open", open);
+  // The step link is only reachable by keyboard while its card is open.
+  function setOpen(card, on) {
+    card.classList.toggle("open", on);
+    card.querySelector(".faq-q").setAttribute("aria-expanded", on ? "true" : "false");
+    var go = card.querySelector(".faq-step");
+    if (go) go.tabIndex = on ? 0 : -1;
+  }
+  item.parentNode.querySelectorAll(".faq-item.open").forEach(function (o) {
+    if (o !== item) setOpen(o, false);
+  });
+  setOpen(item, open);
+  // Closing an item above can slide this one up; bring it back into view once the height settles.
+  if (open) setTimeout(function () { item.scrollIntoView({ block: "nearest", behavior: "smooth" }); }, 280);
 });
 
 function initPages() {
@@ -5479,7 +5719,7 @@ var FLAME = { color: [0.7725, 0.0039, 1], intensity: 0.7, speed: 0.4, scale: 0.7
 // Heights are scaled to each element: 170px of flame over a 32px icon would
 // cover everything above it. `page` limits a flame to one page.
 var FLAME_TARGETS = [
-  { sel: ".docbar .brand-mark", height: 40, spread: 8, radius: 8, page: "home" },
+  { sel: ".docbar .brand-mark", height: 40, spread: 8, radius: 8, page: "home", calm: true },
   { sel: ".cover-logo .kcmlogo", height: 90, spread: 14, radius: 8 },
   { sel: '.toc a[href$="step-10"] .toc-ico', height: 30, spread: 8, radius: 7 }
 ];
@@ -5511,7 +5751,8 @@ var FLAME_FRAG = [
   // Above the top edge the fire may lick up to uHeight; round the sides and
   // bottom it only glows out to uSpread.
   "  float over = smoothstep(-uHalf.y, uHalf.y * 0.6, p.y) * (1.0 - smoothstep(uHalf.x - r * 0.3, uHalf.x + uSpread, abs(p.x)));",
-  "  float reach = mix(uSpread, uHeight, over);",
+  // Round the sides and underneath the reach is 1.6x the spread, so the ring has body.
+  "  float reach = mix(uSpread * 1.6, uHeight, over);",
   // Noise that rises with time, swayed by a few sine warps: the turbulence.
   "  float detail = mix(0.6, 2.2, clamp(uScale, 0.0, 1.0));",
   "  vec2 q = vec2(p.x, p.y - t * unit * 1.4) / unit * detail * 3.0;",
@@ -5525,7 +5766,10 @@ var FLAME_FRAG = [
   // The flames thin out more slowly above the top edge than round the sides,
   // so the top licks climb most of the way to uHeight and the outline stays thin.
   "  float slope = mix(1.1, 0.78, over);",
-  "  float dens = clamp((n * 1.25 - k * (slope + 0.45 * n) + 0.1 * (1.0 - k)) * 2.2, 0.0, 1.0) * smoothstep(-1.0, 1.5, d);",
+  // `floorFire` lifts the density where the flames do not climb (sides and bottom), so a
+  // low patch of noise cannot leave a bare gap under the box.
+  "  float floorFire = 0.32 * (1.0 - over);",
+  "  float dens = clamp((n * 1.25 + floorFire - k * (slope + 0.45 * n) + 0.1 * (1.0 - k)) * 2.2, 0.0, 1.0) * smoothstep(-1.0, 1.5, d);",
   "  float body = dens * dens * (3.0 - 2.0 * dens);",
   "  float e = body * uIntensity * 1.6;",
   "  float ramp = 1.0 - exp(-e * 2.5);",
@@ -5623,7 +5867,7 @@ function makeFlame(el, opt) {
     canvas: canvas,
     page: opt.page,
     onScreen: false,
-    live: function () { return this.onScreen && w > 0 && (!this.page || this.page === currentPage); },
+    live: function () { return this.onScreen && w > 0 && (!this.page || this.page === currentPage || opt.calm); },
     draw: function (time) {
       gl.viewport(0, 0, canvas.width, canvas.height);
       gl.uniform2f(u.uRes, canvas.width, canvas.height);
@@ -5633,18 +5877,20 @@ function makeFlame(el, opt) {
       gl.uniform2f(u.uHalf, (w / 2) * dpr, (h / 2) * dpr);
       gl.uniform1f(u.uRadius, opt.radius * dpr);
       gl.uniform3f(u.uColor, FLAME.color[0], FLAME.color[1], FLAME.color[2]);
-      gl.uniform1f(u.uIntensity, FLAME.intensity);
-      gl.uniform1f(u.uHeight, opt.height * dpr);
+      // Off its own page a `calm` flame is mostly smoke and flares: little fire, a lower reach.
+      var calm = opt.calm && opt.page && opt.page !== currentPage;
+      gl.uniform1f(u.uIntensity, calm ? FLAME.intensity * 0.05 : FLAME.intensity);
+      gl.uniform1f(u.uHeight, (calm ? opt.height * 0.6 : opt.height) * dpr);
       gl.uniform1f(u.uSpread, opt.spread * dpr);
       gl.uniform1f(u.uScale, FLAME.scale);
       gl.uniform1f(u.uTurb, FLAME.turbulence);
       gl.uniform1f(u.uTurbScale, FLAME.turbulenceScale);
-      gl.uniform1f(u.uSparks, FLAME.sparks);
+      gl.uniform1f(u.uSparks, calm ? FLAME.sparks * 1.5 : FLAME.sparks);
       gl.uniform1f(u.uSparkSize, FLAME.sparkSize * dpr);
       gl.uniform1f(u.uSparkDensity, FLAME.sparkDensity);
       gl.uniform1f(u.uSparkSpeed, FLAME.sparkSpeed);
-      gl.uniform1f(u.uRim, FLAME.rim);
-      gl.uniform1f(u.uSmoke, FLAME.smoke);
+      gl.uniform1f(u.uRim, calm ? FLAME.rim * 0.3 : FLAME.rim);
+      gl.uniform1f(u.uSmoke, calm ? FLAME.smoke * 2.4 : FLAME.smoke);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     }
   };
@@ -5693,7 +5939,7 @@ function initFlames() {
   flames.forEach(function (flame) {
     io.observe(flame.canvas);
   });
-  // The header mark burns on the first page only, so a page turn can start it.
+  // The header mark burns fully on the first page and calmly elsewhere, so a page turn wakes the loop.
   window.addEventListener("hashchange", wake);
 }
 

@@ -472,6 +472,54 @@ body{background:#ffffff;}
 @media (hover:hover){.xbtn:hover .xlbl{max-width:9rem;opacity:1;margin-left:7px;}}
 .xbtn:focus-visible .xlbl{max-width:9rem;opacity:1;margin-left:7px;}
 
+/* Top-right tabs. Gray words; on hover the glow follows the pointer through
+   --mx and --my, which initTabs() sets. The gradient is clipped to the text. */
+.tabs{display:flex;align-items:center;gap:22px;}
+.tab{font-family:'Instr';font-size:13px;font-weight:700;letter-spacing:.02em;text-decoration:none;color:var(--mut);
+  padding:6px 0;transition:color .15s;}
+.tab:hover{color:transparent;background-image:radial-gradient(circle 52px at var(--mx,50%) var(--my,50%),#FF3DDC 0,#D61FB8 38%,var(--mut) 100%);
+  -webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 0 6px rgba(255,61,220,.4));}
+.tab-ico{display:inline-flex;align-items:center;}
+.tab-ico:hover{color:#D61FB8;background:none;filter:drop-shadow(0 0 6px rgba(255,61,220,.5));}
+.tab[aria-current="page"]{color:var(--deep);}
+.tab:focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:4px;}
+@media (max-width:640px){.tabs{order:3;width:100%;justify-content:space-between;gap:10px;}}
+@media print{.tabs{display:none;}}
+
+/* Magnifier switch, one per screenshot, top right, shown while the pointer is
+   over the image. It flips the same page-wide setting the old header button did. */
+.lenswrap{display:inline-block;position:relative;max-width:100%;vertical-align:top;line-height:0;}
+.lenswrap .lensbtn{position:absolute;top:8px;right:8px;width:32px;height:32px;opacity:0;pointer-events:none;
+  transition:opacity .15s;}
+.lenswrap:hover .lensbtn,.lenswrap .lensbtn:focus-visible{opacity:1;pointer-events:auto;}
+
+/* FAQ. Closed items are plain with a coloured dot; the item fills with its own
+   colour when open. Answers use a 0fr to 1fr grid row so the height can animate. */
+.faq{margin:34px 0 10px;}
+.faq-title{font-size:20px;margin:0 0 4px;}
+.faq-sub{color:var(--sub);font-size:13px;margin:0 0 14px;}
+.faq-list{display:flex;flex-direction:column;gap:8px;}
+.faq-item{--fc:var(--green);--fb:var(--tip-bg);border:1px solid var(--line);border-left:4px solid var(--fc);border-radius:8px;
+  background:var(--sheet);transition:background-color .2s,border-color .2s;}
+.faq-amber{--fc:var(--amber-rule);--fb:var(--amber-bg);}
+.faq-red{--fc:var(--red-rule);--fb:var(--red-bg);}
+.faq-item.open{background:var(--fb);border-color:var(--fc);}
+.faq-h{margin:0;font-size:inherit;text-transform:none;letter-spacing:0;color:inherit;}
+.faq-q{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:12px;width:100%;padding:13px 16px;cursor:pointer;
+  font-family:'Instr';font-size:14px;font-weight:700;color:var(--deep);}
+.faq-q:focus-visible{outline:2px solid var(--acc);outline-offset:-2px;border-radius:6px;}
+.faq-dot{flex:none;width:10px;height:10px;border-radius:50%;background:var(--fc);}
+.faq-qt{flex:1;}
+.faq-chev{flex:none;transition:transform .25s;}
+.faq-item.open .faq-chev{transform:rotate(180deg);}
+.faq-a{display:grid;grid-template-rows:0fr;transition:grid-template-rows .25s ease;}
+.faq-item.open .faq-a{grid-template-rows:1fr;}
+.faq-ai{overflow:hidden;min-height:0;padding:0 16px 0 38px;}
+.faq-item.open .faq-ai{padding-bottom:6px;}
+.faq-ai p{font-size:13.5px;line-height:1.6;}
+@media (prefers-reduced-motion:reduce){.faq-a,.faq-chev,.faq-item{transition:none;}}
+@media print{.faq-a{display:block;}.faq-chev{display:none;}.faq-item{break-inside:avoid;}}
+
 /* Header: the flower mark, the guide's name, and who it is for. */
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--deep);min-width:0;}
 .brand-mark{flex:0 0 auto;width:32px;height:32px;}
@@ -479,7 +527,7 @@ body{background:#ffffff;}
 .brand-t{font-family:'Libre',serif;font-size:16px;font-weight:700;white-space:nowrap;}
 .brand-s{font-family:'Instr';font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--acc);}
 /* On a phone the header keeps to one row: the mark and subtitle go. */
-@media (max-width:480px){.docbar{flex-wrap:nowrap;}.docbar-l{min-width:0;}.docbar .acts{flex-shrink:0;}
+@media (max-width:480px){.docbar-l{min-width:0;}
   .docbar .brand-mark,.brand-s{display:none;}.brand-t{font-size:13px;overflow:hidden;text-overflow:ellipsis;}}
 
 /* KCM logo card. It leans toward the pointer, lifts, and grows, the Blueberry
@@ -1064,10 +1112,9 @@ html.ksch-lock .fab{display:none;}
 @media screen{
   html.meet-only .page-wrap > :not(.docbar):not(#scheduler),
   html.meet-only .foot,html.meet-only .fab,html.meet-only .laser,
-  html.meet-only .burger,html.meet-only .lensbtn,html.meet-only .xbtn,
+  html.meet-only .burger,html.meet-only .lensbtn,html.meet-only .xbtn,html.meet-only .tabs,
   html.meet-only .brand-t{display:none !important;}
-  html.meet-only #scheduler{display:block;}
-  html.meet-only .brand{pointer-events:none;}
+  html.meet-only #scheduler{display:flex;max-height:none;}
 }
 
 /* Scheduler widgets. The grid scrolls inside its own box so the day row
@@ -1077,6 +1124,11 @@ html.ksch-lock .fab{display:none;}
   overscroll-behavior:contain;scrollbar-width:thin;}
 .dark .ksch-w-scroll{color-scheme:dark;}
 .ksch.full .ksch-w-scroll{max-height:var(--ksch-w-grid-h,calc(100vh - 230px));}
+.ksch-w-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 8px;}
+.ksch-w-nav{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-family:'Instr',sans-serif;font-weight:700;color:var(--sub);}
+.ksch-w-nav .btn:disabled{opacity:.35;}
+.ksch-w-cap{font-size:11.5px;color:var(--mut);}
+.ksch-w-c.ov.y,.ksch-w-c.ov.m{box-shadow:inset 3px 0 0 var(--ks-yes),inset 0 0 0 2px var(--ks-yes);}
 .ksch-w-tbl{display:grid;width:100%;position:relative;user-select:none;-webkit-user-select:none;outline:none;}
 .ksch-w-row{display:contents;}
 
@@ -1577,11 +1629,16 @@ html.ksch-lock .fab{display:none;}
   <span class="docbar-l">
     <button type="button" class="btn btn-icon burger" aria-label="Open contents" aria-expanded="false" aria-controls="sidebar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg></button>
     <a class="brand" href="#home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect x=".5" y=".5" width="31" height="31" rx="8" fill="#F6EEDC" stroke="#E2D3AE"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(0 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(60 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(120 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(180 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(240 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(300 16 16)"/><circle cx="16" cy="16" r="3" fill="#E6AE4A" stroke="#B98322" stroke-width=".6"/></svg><span class="brand-txt"><span class="brand-t">Prestudy Pamphlet Guide</span><span class="brand-s">KCM &middot; Focus Family Leaders</span></span></a>
+    <button type="button" class="themebtn" aria-label="Switch to dark theme" aria-pressed="false" title="Switch to dark theme"><svg class="tt" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><mask id="tt-mask"><rect x="-8" y="-8" width="40" height="40" fill="white"/><circle class="tt-bite" cx="33" cy="0" r="9" fill="black"/></mask><g mask="url(#tt-mask)"><circle class="tt-body" cx="12" cy="12" r="9" fill="currentColor" stroke="none"/></g><g class="tt-rays"><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="5.64" y1="5.64" x2="4.22" y2="4.22"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/><line x1="5.64" y1="18.36" x2="4.22" y2="19.78"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/></g></svg></button>
   </span>
   <span class="acts">
-    <button type="button" class="btn btn-icon lensbtn" aria-pressed="true" aria-label="Turn the magnifier off" title="Magnifier on" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path class="lens-plus" d="M11 8v6"/><path class="lens-plus" d="M8 11h6"/><path class="lens-slash" d="M4 4l14 14"/></svg></button>
-    <button type="button" class="themebtn" aria-label="Switch to dark theme" aria-pressed="false" title="Switch to dark theme"><svg class="tt" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><mask id="tt-mask"><rect x="-8" y="-8" width="40" height="40" fill="white"/><circle class="tt-bite" cx="33" cy="0" r="9" fill="black"/></mask><g mask="url(#tt-mask)"><circle class="tt-body" cx="12" cy="12" r="9" fill="currentColor" stroke="none"/></g><g class="tt-rays"><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="5.64" y1="5.64" x2="4.22" y2="4.22"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/><line x1="5.64" y1="18.36" x2="4.22" y2="19.78"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/></g></svg></button>
-    <a class="btn btn-primary xbtn" href="guide.pdf" download><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg><span class="xlbl">Download PDF</span></a>
+    <nav class="tabs" aria-label="Tools">
+      <a class="tab" href="#memo">Memo</a>
+      <a class="tab" href="pdf-editor.html" target="_blank" rel="noopener">Editor</a>
+      <a class="tab" href="#scheduler">Scheduler</a>
+      <a class="tab" href="#calendar">Calendar</a>
+      <a class="tab tab-ico" href="guide.pdf" download aria-label="Download PDF" title="Download PDF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg></a>
+    </nav>
   </span>
 </div>
 
@@ -1629,12 +1686,9 @@ html.ksch-lock .fab{display:none;}
     <!-- What sits below the cover on this first page, plus the step people
          most often jump to. Screen only: print has the contents page. -->
     <nav class="cv-onpage" aria-label="On this page and tools">
-      <span class="cv-onpage-l">On this page, and tools</span>
+      <span class="cv-onpage-l">Jump to</span>
       <div class="cv-go-grid">
-      <a class="cv-go" href="#calendar" data-scroll><span class="cv-go-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="cv-go-t">KCM master calendar</span><span class="cv-go-m" aria-hidden="true">&darr;</span></a>
-      <a class="cv-go" href="#scheduler" data-scroll><span class="cv-go-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span><span class="cv-go-t">Find a meeting time</span><span class="cv-go-m" aria-hidden="true">&darr;</span></a>
       <a class="cv-go" href="#step-10"><span class="cv-go-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span><span class="cv-go-t">Step 10: Print the booklet</span><span class="cv-go-m" aria-hidden="true">&rarr;</span></a>
-      <a class="cv-go" href="pdf-editor.html" target="_blank" rel="noopener"><span class="cv-go-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.5 22H18a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v9.5"/><path d="M14 2v5h5"/><path d="M13.4 12.6a2 2 0 1 1 2.8 2.8L10 21.5 6 22.5l1-4z"/></svg></span><span class="cv-go-t">PDF editor</span><span class="cv-go-m" aria-hidden="true">&#8599;</span></a>
       <a class="cv-go" href="#qr-maker"><span class="cv-go-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM21 14v.01M14 21h.01M17 21h4v-4"/></svg></span><span class="cv-go-t">QR code maker</span><span class="cv-go-m" aria-hidden="true">&rarr;</span></a>
       <a class="cv-go" href="#example"><span class="cv-go-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span><span class="cv-go-t">Example pamphlet</span><span class="cv-go-m" aria-hidden="true">&rarr;</span></a>
       </div>
@@ -1643,7 +1697,7 @@ html.ksch-lock .fab{display:none;}
       <b>Written by</b> &nbsp; Andrew Liu, Focus Family Leader<br>
       <b>For</b> &nbsp; Incoming Focus Family Leaders<br>
       <b>Organization</b> &nbsp; Kharis Campus Ministry (KCM)<br>
-      <b>Updated</b> &nbsp; August 2026
+      <b>Updated</b> &nbsp; October 2026
     </div>
   </div>
   <div class="cover-logo"><svg viewBox="0 0 165 216" xmlns="http://www.w3.org/2000/svg" class="kcmlogo">
@@ -1665,7 +1719,7 @@ html.ksch-lock .fab{display:none;}
      Spring 2027 tabs) taken on 2026-09-27. On load the page tries to refetch
      the sheet, so room numbers and times follow the sheet once it is shared
      with "anyone with the link"; until then the snapshot shows. -->
-<section class="kcal" id="calendar" data-page="home" aria-label="KCM master calendar">
+<section class="kcal" id="calendar" data-page="calendar" data-title="Master Calendar" aria-label="KCM master calendar">
   <div class="kcal-head">
     <h2 class="kcal-title" id="kcal-title" aria-live="polite">September 2026</h2>
     <div class="kcal-nav">
@@ -1744,7 +1798,7 @@ html.ksch-lock .fab{display:none;}
   <script id="kcal-data" type="application/json">[{"d":"2026-08-31","t":"WW: Tabling","time":"10:00 - 2:00 PM","loc":"The Y","cat":"special","track":"Public","term":"fall"},{"d":"2026-09-01","t":"WW: Picnic","time":"5:00 - 8:00 PM","loc":"Prince Frederick Lawn","cat":"special","track":"Public","term":"fall"},{"d":"2026-09-02","t":"WW: Game Night","time":"5:00 - 7:00 PM","loc":"Tawes 1310","cat":"special","track":"Public","term":"fall"},{"d":"2026-09-04","t":"WW: Praise & Prayer","time":"7:00 - 9:00 PM","loc":"Tawes 0130","cat":"special","track":"Public","term":"fall"},{"d":"2026-08-31","t":"First Day of Classes","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-09-02","t":"KCM Prayer Meeting #1","time":"7:30 - 8:30 AM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-09-07","t":"Labor Day","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-09-10","t":"First Look Fair","time":"10:00 - 3:00 PM","loc":"McKeldin Mall","cat":"special","track":"Public","term":"fall"},{"d":"2026-09-10","t":"LG #1","time":"7:00-10:00PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-09-09","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-09-08","t":"FF Team Pre-Study #1","time":"7:00-9:00 PM","loc":"Loc TBD","cat":"teams","track":"Focus Fam","term":"fall"},{"d":"2026-09-10","t":"MT Meeting #2","time":"4:30-5:30 PM","loc":"Loc TBD","cat":"teams","track":"Media","term":"fall"},{"d":"2026-09-15","t":"FF #1","time":"7:00 - 9:00 PM","loc":"JMZ 3120","cat":"regular","track":"Public","term":"fall"},{"d":"2026-09-16","t":"FF #1","time":"7:00 - 9:00 PM","loc":"JMZ 2120","cat":"regular","track":"Public","term":"fall"},{"d":"2026-09-17","t":"FF #1","time":"7:00 - 9:00 PM","loc":"JMZ 3120","cat":"regular","track":"Public","term":"fall"},{"d":"2026-09-16","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-09-24","t":"LG #2","time":"7:00-10:00PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-09-26","t":"Apple Picking","time":"10:00-4:00 PM","loc":"Tawes ?","cat":"special","track":"Public","term":"fall"},{"d":"2026-09-23","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-09-22","t":"FF Team Pre-Study #2","time":"7:00-9:00 PM","loc":"Loc TBD","cat":"teams","track":"Focus Fam","term":"fall"},{"d":"2026-09-27","t":"SG Interest Forms due","time":"","loc":"","cat":"teams","track":"Public","term":"fall"},{"d":"2026-09-29","t":"FF #2","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-09-30","t":"FF #2","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-10-01","t":"FF #2","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-10-02","t":"SG Assignments made","time":"","loc":"","cat":"teams","track":"Public","term":"fall"},{"d":"2026-10-03","t":"SG Assignments sent to Group Members","time":"","loc":"","cat":"teams","track":"Public","term":"fall"},{"d":"2026-09-30","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-10-04","t":"SGs Start Meeting","time":"","loc":"","cat":"teams","track":"Public","term":"fall"},{"d":"2026-10-05","t":"KCM Prayer Meeting #2","time":"8:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-10-09","t":"Lock-In","time":"Start Time TBD","loc":"Loc TBD","cat":"special","track":"Public","term":"fall"},{"d":"2026-10-10","t":"Lock-In","time":"End Time TBD","loc":"Loc TBD","cat":"special","track":"Public","term":"fall"},{"d":"2026-10-07","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-10-12","t":"Fall Break","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-10-13","t":"Fall Break","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-10-15","t":"LG #3","time":"7:00-10:00PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-10-14","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-10-13","t":"FF Team Pre-Study #3","time":"7:00-9:00 PM","loc":"Loc TBD","cat":"teams","track":"Focus Fam","term":"fall"},{"d":"2026-10-19","t":"Outreach Training #1","time":"8:15 - 10:00 PM","loc":"Loc TBD","cat":"special","track":"Public","term":"fall"},{"d":"2026-10-20","t":"FF #3","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-10-21","t":"FF #3","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-10-22","t":"FF #3","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-10-24","t":"DC Outreach #1","time":"10:00 AM - 2:00 PM","loc":"","cat":"special","track":"Public","term":"fall"},{"d":"2026-10-21","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-10-26","t":"Seminar \"What to Learn..\"","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"special","track":"Public","term":"fall"},{"d":"2026-10-29","t":"LG #4","time":"7:00-10:00PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-10-28","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-10-27","t":"FF Team Pre-Study #4","time":"7:00-9:00 PM","loc":"Loc TBD","cat":"teams","track":"Focus Fam","term":"fall"},{"d":"2026-11-02","t":"KCM Prayer Meeting #3","time":"7:30 - 8:30 AM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-11-03","t":"FF #4","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-11-04","t":"FF #4","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-11-05","t":"FF #4","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-11-06","t":"Outreach Training #2","time":"8:15 - 10:00 PM","loc":"Loc TBD","cat":"special","track":"Public","term":"fall"},{"d":"2026-11-04","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-11-09","t":"On Campus Outreach #1","time":"TBD","loc":"","cat":"special","track":"Public","term":"fall"},{"d":"2026-11-12","t":"LG #5","time":"7:00-10:00PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-11-11","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-11-10","t":"FF Team Pre-Study #5","time":"7:00-9:00 PM","loc":"Loc TBD","cat":"teams","track":"Focus Fam","term":"fall"},{"d":"2026-11-17","t":"FF #5","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-11-18","t":"FF #5","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-11-19","t":"FF #5","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-11-18","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-11-23","t":"KCM Thanksgiving Banquet","time":"6:00-9:30","loc":"CBCM","cat":"special","track":"Public","term":"fall"},{"d":"2026-11-25","t":"Thanksgiving Break","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-11-26","t":"Thanksgiving Break","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-11-27","t":"Thanksgiving Break","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-11-28","t":"Thanksgiving Break","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-11-24","t":"FF Team Pre-Study #6","time":"7:00-9:00 PM","loc":"Loc TBD","cat":"teams","track":"Focus Fam","term":"fall"},{"d":"2026-11-29","t":"Thanksgiving Break","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-11-30","t":"TBD: Bible Overview Seminar","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"special","track":"Public","term":"fall"},{"d":"2026-12-01","t":"FF #6","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-12-02","t":"FF #6","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-12-03","t":"FF #6","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-12-05","t":"Praise & Prayer","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"special","track":"Public","term":"fall"},{"d":"2026-12-02","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-12-07","t":"KCM Prayer Meeting #4","time":"8:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Public","term":"fall"},{"d":"2026-12-11","t":"Last Day of Classes","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-12-12","t":"Reading Day","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-12-09","t":"Officer Meeting","time":"7:30-9:30 PM","loc":"Loc TBD","cat":"officers","track":"Officers/Leaders","term":"fall"},{"d":"2026-12-14","t":"Finals","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-12-15","t":"Finals","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-12-16","t":"Finals","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-12-17","t":"Finals","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-12-18","t":"Finals","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-12-19","t":"Finals","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-12-20","t":"Finals","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2026-12-21","t":"Finals","time":"","loc":"","cat":"school","track":"Public","term":"fall"},{"d":"2027-01-27","t":"UMD First Day of Classes","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-01-30","t":"Ice Skating","time":"12:00 - 4:00 PM","loc":"Herbert Wells Ice Rink","cat":"special","track":"Master","term":"spring"},{"d":"2027-02-01","t":"KCM Prayer Meeting #1","time":"7:30 - 8:30 AM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-02-04","t":"Second Look Fair","time":"10 AM - 3 PM","loc":"Stamp","cat":"special","track":"Master","term":"spring"},{"d":"2027-02-04","t":"LG #1","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-02-09","t":"FF #1","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-02-10","t":"FF #1","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-02-11","t":"FF #1","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-02-18","t":"LG #2","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-02-23","t":"FF #2","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-02-24","t":"FF #2","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-02-25","t":"FF #2","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-03-01","t":"KCM Prayer Meeting #2","time":"7:30 - 8:30 AM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-03-04","t":"LG #3","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-03-12","t":"Retreat","time":"","loc":"Black Rock Retreat Center","cat":"special","track":"Master","term":"spring"},{"d":"2027-03-13","t":"Retreat","time":"","loc":"Black Rock Retreat Center","cat":"special","track":"Master","term":"spring"},{"d":"2027-03-14","t":"Retreat","time":"","loc":"Black Rock Retreat Center","cat":"special","track":"Master","term":"spring"},{"d":"2027-03-15","t":"Spring Break","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-03-16","t":"Spring Break","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-03-17","t":"Spring Break","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-03-18","t":"Spring Break","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-03-19","t":"Spring Break","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-03-20","t":"Spring Break","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-03-21","t":"Spring Break","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-03-23","t":"FF #3","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-03-24","t":"FF #3","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-03-25","t":"FF #3","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-03-27","t":"Praise & Prayer","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"special","track":"Master","term":"spring"},{"d":"2027-03-30","t":"Seminar","time":"7:00 PM - 9:00 PM","loc":"Loc TBD","cat":"special","track":"Master","term":"spring"},{"d":"2027-04-01","t":"LG #4 (Nominations)","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-04-05","t":"KCM Prayer Meeting #3","time":"7:30 - 8:30 AM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-04-06","t":"FF #4","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-04-07","t":"FF #4","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-04-08","t":"FF #4","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-04-10","t":"Coffeehouse","time":"12:00 PM - 3:00 PM","loc":"TBD","cat":"special","track":"Master","term":"spring"},{"d":"2027-04-15","t":"LG #5 (Elections)","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-04-20","t":"FF #5","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-04-21","t":"FF #5","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-04-22","t":"FF #5","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-04-29","t":"LG #6","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-05-01","t":"Praise & Prayer","time":"7:00 - 9:00 PM","loc":"Loc TBD","cat":"special","track":"Master","term":"spring"},{"d":"2027-05-03","t":"KCM Prayer Meeting #4","time":"7:30 - 8:30 AM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-05-04","t":"FF #6","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-05-05","t":"FF #6","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-05-06","t":"FF #6","time":"7:30 - 9:30 PM","loc":"Loc TBD","cat":"regular","track":"Master","term":"spring"},{"d":"2027-05-08","t":"Senior Banquet","time":"6:00 PM - 10:00 PM","loc":"CBCCP","cat":"special","track":"Master","term":"spring"},{"d":"2027-05-11","t":"Last Day of Classes","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-05-12","t":"Reading Day","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-05-13","t":"Finals","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-05-14","t":"Finals","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-05-15","t":"Finals","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-05-16","t":"Finals","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-05-17","t":"Finals","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-05-18","t":"Finals","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-05-19","t":"Finals","time":"","loc":"","cat":"school","track":"Master","term":"spring"},{"d":"2027-05-20","t":"Finals","time":"","loc":"","cat":"school","track":"Master","term":"spring"}]</script>
 </section>
 <!-- ksch:start -->
-<section class="ksch" id="scheduler" data-page="home" aria-label="Find a meeting time">
+<section class="ksch" id="scheduler" data-page="scheduler" data-title="Meeting Scheduler" aria-label="Find a meeting time">
   <div class="ksch-head">
     <h2 class="ksch-title" id="ksch-title">Find a time</h2>
     <div class="ksch-corner">
@@ -1804,6 +1858,61 @@ html.ksch-lock .fab{display:none;}
     <div class="toc-row"><span class="toc-rk">Reference</span><a href="#appendix"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></span>Appendix A</a><a href="#reading"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>Further Reading</a><a href="#pdf"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg></span>Printable PDF</a><a href="#example"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg></span>Example Pamphlet</a></div>
   </div>
 </nav>
+
+<!-- FAQ. Built from the old Warnings and Cautions list and the Who This Guide Is For page.
+     The colour of an item is what it is about: red for things that break the pamphlet,
+     amber for cautions, green for background. The colour fills in when it opens. -->
+<section class="faq" id="faq" data-page="home" aria-label="Frequently asked questions">
+  <div class="part-label">FAQ</div>
+  <h2 class="faq-title">Questions people ask first</h2>
+  <p class="faq-sub">The seven cautions are in here too, each one again in the step where it applies.</p>
+  <div class="faq-list">
+    <div class="faq-item faq-green">
+      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a0"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">Who is this guide for?</span><svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+      <div class="faq-a" id="faq-a0"><div class="faq-ai"><p>A new Focus Family Leader, probably appointed within the last few weeks, with a first pamphlet due sooner than feels comfortable. You already use <span class="tool">Google Docs</span> and <span class="tool">Discord</span> without thinking about it. You have most likely never opened <span class="tool">Adobe Acrobat</span>'s print settings, used Bible Hub's research tools, or run a campus print kiosk. Everything here assumes exactly that starting point.</p></div></div>
+    </div>
+    <div class="faq-item faq-green">
+      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a1"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">Do I need to be technical?</span><svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+      <div class="faq-a" id="faq-a1"><div class="faq-ai"><p>No. None of this requires it. If some part is not your strength, split it with your co-leader and take the other half. And ask when you get stuck, at any point and about anything. A question on Sunday beats a jammed printer on Monday morning, and no one here will think less of you for asking.</p></div></div>
+    </div>
+    <div class="faq-item faq-green">
+      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a2"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">What am I actually producing?</span><svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+      <div class="faq-a" id="faq-a2"><div class="faq-ai"><p>A four-page folded booklet, roughly eighty copies, in the room before your members arrive. Page 1 is the cover with your logistics, Pages 2 and 3 are the historical background and the reflection questions, and Page 4 carries general ministry info and space for notes. The layout is fixed and the page count cannot change, which is the single most important constraint in this guide.</p></div></div>
+    </div>
+    <div class="faq-item faq-green">
+      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a3"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">What matters most?</span><svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+      <div class="faq-a" id="faq-a3"><div class="faq-ai"><p><b>Accuracy</b>, because the pamphlet goes out under the ministry's name. <b>Warmth</b>, because the reflection questions are the point. <b>Reliability</b>, because a late pamphlet does not exist. And <b>talking early</b> with your team, because it is how the work gets finished and how you learn to trust each other.</p></div></div>
+    </div>
+    <div class="faq-item faq-red">
+      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a4"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">How long can the Google Doc be?</span><svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+      <div class="faq-a" id="faq-a4"><div class="faq-ai"><p><b class="lead">Layout is fragile, so watch the page count as you draft.</b> If your text pushes the <span class="tool">Google Doc</span> past four pages, the booklet fold breaks completely. There is no partial failure here; the imposition simply stops working.</p></div></div>
+    </div>
+    <div class="faq-item faq-amber">
+      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a5"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">Can I change the automated logistics email?</span><svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+      <div class="faq-a" id="faq-a5"><div class="faq-ai"><p><b class="lead">Treat the automated logistics email as read-only.</b> It carries other groups' room bookings and contact information. Copy your own group's data and leave the rest alone. If you ever need help with the script behind it, describe the problem instead of pasting its settings block, which holds folder identifiers and a personal email address.</p></div></div>
+    </div>
+    <div class="faq-item faq-amber">
+      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a6"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">Which Bible translation should I use?</span><svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+      <div class="faq-a" id="faq-a6"><div class="faq-ai"><p><b class="lead">Pick a translation your group can follow.</b> We lean on the ESV and NIV. Focus Families regularly include new Christians and people who are not Christians at all, and both versions read cleanly out loud without much explanation. This is not a rule. If your passage reads better in something else, use it, and say which translation you used on the pamphlet.</p></div></div>
+    </div>
+    <div class="faq-item faq-red">
+      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a7"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">Can I skip peer review if I am short on time?</span><svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+      <div class="faq-a" id="faq-a7"><div class="faq-ai"><p><b class="lead">Do not skip peer review to save time.</b> The pamphlet goes out under the ministry's name, not just yours, and unapproved background text or images can misrepresent KCM's position on a passage.</p></div></div>
+    </div>
+    <div class="faq-item faq-red">
+      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a8"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">What if I miss the Saturday feedback deadline?</span><svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+      <div class="faq-a" id="faq-a8"><div class="faq-ai"><p><b class="lead">Respect the Saturday feedback deadline.</b> Missing it squeezes your printing window and raises the odds you are troubleshooting a jammed printer the morning of Focus Family. If you are stuck on anything, ask your co-leader or your advisor early rather than working around it quietly. Nobody here minds the question.</p></div></div>
+    </div>
+    <div class="faq-item faq-amber">
+      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a9"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">Why print one test copy first?</span><svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+      <div class="faq-a" id="faq-a9"><div class="faq-ai"><p><b class="lead">Print one copy and fold it before you print the rest.</b> Check the ink and the print quality, then fold the sheet and open it like a book. Pages 2 and 3 should face you the same way the cover did. The mistake that catches people is skipping the page 2 rotation in Step 10 (or <span class="ui">Flip on Short Edge</span>, if you use <span class="tool">Adobe Acrobat</span>), which prints the inner pages upside down. The <a href="#instructions">Instructions page</a> has a figure of what the two sides have to look like.</p></div></div>
+    </div>
+    <div class="faq-item faq-amber">
+      <h3 class="faq-h"><button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a10"><span class="faq-dot" aria-hidden="true"></span><span class="faq-qt">When can I print the full run?</span><svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></h3>
+      <div class="faq-a" id="faq-a10"><div class="faq-ai"><p><b class="lead">Do not commit the full run until the test copy passes.</b> Eighty sheets is a lot of paper to throw away over a setting you could have caught on one.</p></div></div>
+    </div>
+  </div>
+</section>
 
 <!-- MEMO -->
 <section class="partpage" id="memo" data-page="memo" data-title="Memo: Welcome to the Prestudy Pamphlet">
@@ -1910,23 +2019,6 @@ html.ksch-lock .fab{display:none;}
     </svg>
     <figcaption><b>Figure 1.</b> The five-stage production pipeline, start to finish.</figcaption>
   </figure>
-
-  <h2>Warnings and Cautions</h2>
-  <p class="small" style="color:#5F5B6E;margin-bottom:9pt;">All seven at once, in the order you will run into them. Each one also reappears in the phase where it applies, so you do not have to memorize them now.</p>
-
-  <div class="warn"><div class="warn-mark"><span></span><b>!</b></div><p><b class="lead">Layout is fragile, so watch the page count as you draft.</b> If your text pushes the <span class="tool">Google Doc</span> past four pages, the booklet fold breaks completely. There is no partial failure here; the imposition simply stops working.</p></div>
-
-  <div class="warn"><div class="warn-mark"><span></span><b>!</b></div><p><b class="lead">Treat the automated logistics email as read-only.</b> It carries other groups' room bookings and contact information. Copy your own group's data and leave the rest alone. If you ever need help with the script behind it, describe the problem instead of pasting its settings block, which holds folder identifiers and a personal email address.</p></div>
-
-  <div class="warn"><div class="warn-mark"><span></span><b>!</b></div><p><b class="lead">Pick a translation your group can follow.</b> We lean on the ESV and NIV. Focus Families regularly include new Christians and people who are not Christians at all, and both versions read cleanly out loud without much explanation. This is not a rule. If your passage reads better in something else, use it, and say which translation you used on the pamphlet.</p></div>
-
-  <div class="warn"><div class="warn-mark"><span></span><b>!</b></div><p><b class="lead">Do not skip peer review to save time.</b> The pamphlet goes out under the ministry's name, not just yours, and unapproved background text or images can misrepresent KCM's position on a passage.</p></div>
-
-  <div class="warn red"><div class="warn-mark"><span></span><b>!</b></div><p><b class="lead">Respect the Saturday feedback deadline.</b> Missing it squeezes your printing window and raises the odds you are troubleshooting a jammed printer the morning of Focus Family. If you are stuck on anything, ask your co-leader or your advisor early rather than working around it quietly. Nobody here minds the question.</p></div>
-
-  <div class="warn"><div class="warn-mark"><span></span><b>!</b></div><p><b class="lead">Print one copy and fold it before you print the rest.</b> Check the ink and the print quality, then fold the sheet and open it like a book. Pages 2 and 3 should face you the same way the cover did. The mistake that catches people is skipping the page 2 rotation in Step 10 (or <span class="ui">Flip on Short Edge</span>, if you use <span class="tool">Adobe Acrobat</span>), which prints the inner pages upside down. Figure 2 shows what the two sides have to look like.</p></div>
-
-  <div class="warn"><div class="warn-mark"><span></span><b>!</b></div><p><b class="lead">Do not commit the full run until the test copy passes.</b> Eighty sheets is a lot of paper to throw away over a setting you could have caught on one.</p></div>
 
   <figure>
     <svg viewBox="0 0 580 262" width="96%" xmlns="http://www.w3.org/2000/svg">
@@ -4955,6 +5047,10 @@ var PAGES = [];
 var currentPage = null;
 var BASE_TITLE = document.title;
 
+// Pages reached from the top tabs. They stay out of the pager's Previous and
+// Next order, so turning pages through the guide never lands on them.
+var TOOL_PAGES = ["calendar", "scheduler"];
+
 function indexOfPage(name) {
   for (var i = 0; i < PAGES.length; i++) {
     if (PAGES[i].name === name) return i;
@@ -4989,16 +5085,22 @@ function setPagerLink(a, page, word) {
 function showPage() {
   currentPage = pageForHash();
   var i = indexOfPage(currentPage);
+  var isTool = TOOL_PAGES.indexOf(currentPage) !== -1;
   document.querySelectorAll("[data-page]").forEach(function (el) {
     el.classList.toggle("is-current", el.getAttribute("data-page") === currentPage);
   });
-  setPagerLink(document.querySelector(".pager-prev"), PAGES[i - 1], "Previous");
-  setPagerLink(document.querySelector(".pager-next"), PAGES[i + 1], "Next");
+  setPagerLink(document.querySelector(".pager-prev"), isTool ? null : PAGES[i - 1], "Previous");
+  setPagerLink(document.querySelector(".pager-next"), isTool ? null : PAGES[i + 1], "Next");
+  document.querySelectorAll(".tab").forEach(function (a) {
+    if (a.getAttribute("href") === "#/" + currentPage) a.setAttribute("aria-current", "page");
+    else a.removeAttribute("aria-current");
+  });
   document.querySelectorAll(".toc a").forEach(function (a) {
     if (a.getAttribute("href") === "#/" + currentPage) a.setAttribute("aria-current", "page");
     else a.removeAttribute("aria-current");
   });
-  document.title = i > 0 ? PAGES[i].title + " · " + BASE_TITLE : BASE_TITLE;
+  var cur = document.querySelector('[data-page="' + currentPage + '"]');
+  document.title = currentPage !== PAGES[0].name ? cur.getAttribute("data-title") + " · " + BASE_TITLE : BASE_TITLE;
   window.scrollTo(0, 0);
 }
 
@@ -5092,9 +5194,39 @@ document.addEventListener("click", function (e) {
   });
 })();
 
+// Tab glow. The CSS draws a magenta spot at --mx/--my inside each tab, so the
+// pointer's position inside the tab is all this has to report.
+document.addEventListener("pointermove", function (e) {
+  var t = e.target.closest && e.target.closest(".tab");
+  if (!t) return;
+  var r = t.getBoundingClientRect();
+  t.style.setProperty("--mx", e.clientX - r.left + "px");
+  t.style.setProperty("--my", e.clientY - r.top + "px");
+}, { passive: true });
+
+// On a scheduler link (?meet=<id>) the logo leaves the poll for the guide. The
+// link has to drop the query as well, or the page would stay in scheduler mode.
+document.addEventListener("click", function (e) {
+  var a = e.target.closest && e.target.closest(".brand");
+  if (!a || !document.documentElement.classList.contains("meet-only")) return;
+  e.preventDefault();
+  location.href = location.pathname + "#/home";
+});
+
+// FAQ accordion. The button flips aria-expanded; the .open class on the item
+// drives the colour fill and the height animation. Any number can be open.
+document.addEventListener("click", function (e) {
+  var q = e.target.closest(".faq-q");
+  if (!q) return;
+  var open = q.getAttribute("aria-expanded") !== "true";
+  q.setAttribute("aria-expanded", open ? "true" : "false");
+  q.closest(".faq-item").classList.toggle("open", open);
+});
+
 function initPages() {
   document.querySelectorAll("[data-page]").forEach(function (el) {
     var name = el.getAttribute("data-page");
+    if (TOOL_PAGES.indexOf(name) !== -1) return;
     if (indexOfPage(name) === -1) PAGES.push({ name: name, title: el.getAttribute("data-title") });
   });
   // The links in the file are plain anchors (#step-4), so they still work as
@@ -5177,13 +5309,12 @@ function setLens(on) {
   syncLensButton();
 }
 function syncLensButton() {
-  var btn = document.querySelector(".lensbtn");
   var on = !lensIsOff();
-  btn.setAttribute("aria-pressed", on ? "true" : "false");
-  btn.setAttribute("aria-label", on ? "Turn the magnifier off" : "Turn the magnifier on");
-  btn.title = on ? "Magnifier on" : "Magnifier off";
-  // Only pages with a screenshot have anything to magnify.
-  btn.hidden = !document.querySelector("[data-page].is-current figure img");
+  document.querySelectorAll(".lensbtn").forEach(function (btn) {
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+    btn.setAttribute("aria-label", on ? "Turn the magnifier off" : "Turn the magnifier on");
+    btn.title = on ? "Magnifier on" : "Magnifier off";
+  });
 }
 function initLensToggle() {
   if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
@@ -5192,12 +5323,22 @@ function initLensToggle() {
   } catch (e) {
     /* storage blocked: stay on */
   }
-  document.querySelector(".lensbtn").addEventListener("click", function () {
-    setLens(lensIsOff());
+  // Each screenshot gets its own switch in its top right corner (CSS shows it
+  // on hover). They all drive the one page-wide setting.
+  document.querySelectorAll("figure img").forEach(function (img) {
+    var wrap = document.createElement("span");
+    wrap.className = "lenswrap";
+    img.parentNode.insertBefore(wrap, img);
+    wrap.appendChild(img);
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn btn-icon lensbtn";
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path class="lens-plus" d="M11 8v6"/><path class="lens-plus" d="M8 11h6"/><path class="lens-slash" d="M4 4l14 14"/></svg>';
+    btn.addEventListener("click", function () {
+      setLens(lensIsOff());
+    });
+    wrap.appendChild(btn);
   });
-  // Registered after initPages, so this runs after showPage has marked the
-  // new page current.
-  window.addEventListener("hashchange", syncLensButton);
   syncLensButton();
 }
 
@@ -6573,6 +6714,10 @@ var KSCH = (function () {
 
   /* ---------- the grid ---------- */
 
+  // Small per-device preferences for the grid: days shown, others on or off.
+  function kpref(k, d) { try { var v = localStorage.getItem("ksch." + k); return v == null ? d : v; } catch (e) { return d; } }
+  function kset(k, v) { try { localStorage.setItem("ksch." + k, v); } catch (e) { /* storage blocked: lasts for the session */ } }
+
   function grid(o) {
     o = o || {};
     var id = "kschw" + (++uid);
@@ -6588,9 +6733,76 @@ var KSCH = (function () {
     var rectEl = h("div", { class: "ksch-w-rect", hidden: true });
     var pickEl = h("div", { class: "ksch-w-pick", hidden: true });
     var rings = [];
+    // View controls. Hiding days or layering other people's answers changes
+    // only what is drawn, never the slots, so the poll's times stay as they are.
+    var bar = h("div", { class: "ksch-w-bar" });
+    var heads = [];
+    var win = { span: kpref("span", window.matchMedia && window.matchMedia("(max-width:640px)").matches ? "3" : "7") === "3" ? 3 : 7, w0: 0 };
+    var showOthers = kpref("others", "0") === "1", theirsTop = kpref("layer", "mine") === "theirs";
     scroller.appendChild(tbl);
+    el.appendChild(bar);
     el.appendChild(scroller);
     el.appendChild(tag);
+
+    // The days on screen: the whole poll, or a window of 3 or 7 days.
+    function visRange() {
+      var S = win.span;
+      if (D <= S) return { a: 0, b: D - 1 };
+      win.w0 = clamp(win.w0, 0, D - S);
+      return { a: win.w0, b: win.w0 + S - 1 };
+    }
+    // Hidden days keep their grid tracks at 0px and their cells display:none, so
+    // every cell index and grid-area elsewhere stays valid.
+    function applyWindow() {
+      var v = visRange(), cols = [], dv = v.b - v.a + 1;
+      for (var d = 0; d < D; d++) cols.push(d >= v.a && d <= v.b ? "minmax(56px, 140px)" : "0px");
+      tbl.style.gridTemplateColumns = "44px " + cols.join(" ");
+      // The grid box must be as wide as its columns or the sticky time
+      // column would stop at the box edge while the days scroll past it.
+      tbl.style.minWidth = (44 + 56 * dv) + "px";
+      tbl.style.maxWidth = (44 + 140 * dv) + "px";
+      heads.forEach(function (x, d) { x.style.display = d >= v.a && d <= v.b ? "" : "none"; });
+      for (var i = 0; i < cells.length; i++) {
+        var di = Math.floor(i / n);
+        cells[i].style.display = di >= v.a && di <= v.b ? "" : "none";
+      }
+      renderBar();
+    }
+    function showDay(d) {
+      if (D <= win.span) return;
+      var v = visRange();
+      if (d < v.a) win.w0 = d; else if (d > v.b) win.w0 = d - win.span + 1;
+      applyWindow();
+    }
+    function setSpan(x) { win.span = x; kset("span", String(x)); applyWindow(); }
+    function shiftWin(by) { win.w0 += by * win.span; applyWindow(); }
+    function renderBar() {
+      bar.innerHTML = "";
+      function sb(label, on, fn) { return h("button", { type: "button", class: "btn", "aria-pressed": on ? "true" : "false", onclick: fn, text: label }); }
+      if (D > 3) {
+        bar.appendChild(h("div", { class: "ksch-seg", role: "group", "aria-label": "Days shown" },
+          sb("3 days", win.span === 3, function () { setSpan(3); }), sb("Full week", win.span === 7, function () { setSpan(7); })));
+        if (D > win.span) {
+          var v = visRange();
+          var prev = h("button", { type: "button", class: "btn btn-icon", "aria-label": "Earlier days", disabled: v.a === 0, onclick: function () { shiftWin(-1); } });
+          var next = h("button", { type: "button", class: "btn btn-icon", "aria-label": "Later days", disabled: v.b === D - 1, onclick: function () { shiftWin(1); } });
+          prev.innerHTML = K.icon("back"); next.innerHTML = K.icon("next");
+          bar.appendChild(h("div", { class: "ksch-w-nav" }, prev, h("span", { text: shortDay(cfg.days[v.a]) + (v.b > v.a ? " to " + shortDay(cfg.days[v.b]) : "") }), next));
+        }
+      }
+      if (o.others && o.others.max) {
+        bar.appendChild(h("div", { class: "ksch-seg", role: "group", "aria-label": "Other people's availability" },
+          sb("Hide others", !showOthers, function () { showOthers = false; kset("others", "0"); draw(); renderBar(); }),
+          sb("Show others", showOthers, function () { showOthers = true; kset("others", "1"); draw(); renderBar(); })));
+        if (showOthers) {
+          bar.appendChild(h("div", { class: "ksch-seg", role: "group", "aria-label": "Which layer is on top" },
+            sb("Mine on top", !theirsTop, function () { theirsTop = false; kset("layer", "mine"); draw(); renderBar(); }),
+            sb("Theirs on top", theirsTop, function () { theirsTop = true; kset("layer", "theirs"); draw(); renderBar(); })));
+          bar.appendChild(h("span", { class: "ksch-w-cap", text: "Green shade: how many others are free" }));
+        }
+      }
+      bar.style.display = bar.childNodes.length ? "" : "none";
+    }
 
     function build() {
       cfg = o.cfg;
@@ -6599,17 +6811,13 @@ var KSCH = (function () {
       cells = new Array(n * D); shown = new Array(n * D);
       var rh = rowHeight(cfg.step), today = K.todayKey();
       tbl.innerHTML = "";
-      tbl.style.gridTemplateColumns = "44px repeat(" + D + ", minmax(56px, 140px))";
+      heads = [];
       tbl.style.gridTemplateRows = "auto repeat(" + n + ", " + rh + "px)";
-      // The grid box must be as wide as its columns or the sticky time
-      // column would stop at the box edge while the days scroll past it.
-      tbl.style.minWidth = (44 + 56 * D) + "px";
-      tbl.style.maxWidth = (44 + 140 * D) + "px";
 
       var head = h("div", { class: "ksch-w-row", role: "row" }, h("div", { class: "ksch-w-corner", role: "columnheader", style: "grid-area:1/1" }));
       cfg.days.forEach(function (day, d) {
         var p = K.dayParts(day);
-        head.appendChild(h("div", { class: "ksch-w-dh" + (day === today ? " today" : ""), role: "columnheader", style: "grid-area:1/" + (d + 2), title: p.long },
+        head.appendChild(heads[d] = h("div", { class: "ksch-w-dh" + (day === today ? " today" : ""), role: "columnheader", style: "grid-area:1/" + (d + 2), title: p.long },
           p.top ? h("span", { text: p.top }) : null, h("b", { text: p.main })));
       });
       tbl.appendChild(head);
@@ -6634,6 +6842,7 @@ var KSCH = (function () {
       tbl.appendChild(pickEl);
       tbl.setAttribute("aria-label", o.label || (o.mode === "paint" ? "Your availability. Arrows move, Space marks, Shift and arrows select a block." : "Availability grid"));
       focus.d = clamp(focus.d, 0, D - 1); focus.r = clamp(focus.r, 0, n - 1);
+      applyWindow();
     }
 
     function norm(s) {
@@ -6675,8 +6884,9 @@ var KSCH = (function () {
     }
     function value(i) { return pv && pv.val != null && !dis[i] && inPv(i) ? pv.val : slots.charAt(i); }
 
-    function heatStyle(i) {
-      var c = o.heat.counts[i], max = o.heat.max;
+    function heatStyle(i, src) {
+      src = src || o.heat;
+      var c = src.counts[i], max = src.max;
       if (!c || !max) return "";
       var score = (c.yes || 0) + 0.5 * (c.maybe || 0);
       if (score <= 0) return "";
@@ -6695,8 +6905,15 @@ var KSCH = (function () {
           if (c._bg !== bg) { c.style.background = bg; c._bg = bg; }
           if (bg) k += " hot";
         } else {
-          var v = value(i);
+          var v = value(i), ob = "";
           k += v === "1" ? " y" : v === "2" ? " m" : o.review && !dis[i] ? " no" : "";
+          // Other people's answers sit under the cell when mine is on top (only
+          // unpainted cells show them) and over it when theirs is on top.
+          if (showOthers && o.others && o.others.max && !o.review && !dis[i] && (theirsTop || (v !== "1" && v !== "2"))) {
+            ob = heatStyle(i, o.others);
+            if (ob) k += " ov";
+          }
+          if (c._bg !== ob) { c.style.backgroundColor = ob; c._bg = ob; }
         }
         if (i === fi) k += " kf";
         if (shown[i] !== k) { c.className = k; shown[i] = k; }
@@ -6735,9 +6952,10 @@ var KSCH = (function () {
     // pointer capture on, the event target is always the grid, and it also
     // clamps a drag that wanders past the edge to the last row or column.
     function cellAt(x, y) {
-      var a = cells[0].getBoundingClientRect(), b = cells[cells.length - 1].getBoundingClientRect();
-      var cw = (b.right - a.left) / D, rh = (b.bottom - a.top) / n;
-      return { d: clamp(Math.floor((x - a.left) / cw), 0, D - 1), r: clamp(Math.floor((y - a.top) / rh), 0, n - 1) };
+      var v = visRange(), dv = v.b - v.a + 1;
+      var a = cells[v.a * n].getBoundingClientRect(), b = cells[v.b * n + n - 1].getBoundingClientRect();
+      var cw = (b.right - a.left) / dv, rh = (b.bottom - a.top) / n;
+      return { d: v.a + clamp(Math.floor((x - a.left) / cw), 0, dv - 1), r: clamp(Math.floor((y - a.top) / rh), 0, n - 1) };
     }
     function cellFromTarget(t) {
       var c = t && t.closest ? t.closest(".ksch-w-c") : null;
@@ -6884,6 +7102,7 @@ var KSCH = (function () {
         if (!e.shiftKey) anchor = null;
         kbActive = true;
         focus = { d: clamp(focus.d + mv[0], 0, D - 1), r: clamp(focus.r + mv[1], 0, n - 1) };
+        showDay(focus.d);
         var i = focus.d * n + focus.r;
         pv = anchor ? rectOf(anchor, focus, o.mode === "paint" ? strokeValue(anchor.d * n + anchor.r) : null) : null;
         announce(i);
@@ -7924,7 +8143,17 @@ var KSCH = (function () {
     P.pending = null;
     var editingOther = existing && K.isAdmin(P.id) && !K.tok(P.id).names[keyOf(name)] && keyOf(name) !== keyOf(K.me(P.id));
     var yesT = h("b"), mayT = h("b");
-    var grid = K.w.grid({ cfg: c, mode: "paint", slots: initial, brush: "1", onChange: tally });
+    // Everyone else's answers, for the grid's Show others switch.
+    var others = { counts: [], max: 0 };
+    var meKey = keyOf(name), want = K.slotCount(c);
+    var rest = responses().filter(function (r) { return keyOf(r.name) !== meKey && r.slots && r.slots.length === want; });
+    for (var oi = 0; oi < want; oi++) {
+      var oy = 0, om = 0;
+      rest.forEach(function (r) { var ch = r.slots.charAt(oi); if (ch === "1") oy++; else if (ch === "2") om++; });
+      others.counts.push({ yes: oy, maybe: om });
+    }
+    others.max = rest.length;
+    var grid = K.w.grid({ cfg: c, mode: "paint", slots: initial, brush: "1", onChange: tally, others: others });
     function tally() {
       var s = grid.get(), y = 0, m = 0;
       for (var i = 0; i < s.length; i++) { if (s.charAt(i) === "1") y++; else if (s.charAt(i) === "2") m++; }

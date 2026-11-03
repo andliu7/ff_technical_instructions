@@ -295,6 +295,25 @@ body{background:#ffffff;}
 
 /* Editor page: the editor in a window, the QR maker as a card, then numbered steps with screenshots. */
 .ed-lead{margin:0 0 var(--s4,24px);}
+/* Ready-made PDFs above the editor window, on the right, like files on a desk. */
+.ed-files-top{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:8px;margin:0 0 12px;}
+.ed-files-l{margin-right:auto;font-family:'Instr',sans-serif;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);}
+.ed-file{display:flex;align-items:center;gap:10px;padding:7px 14px 7px 8px;border:1px solid var(--line);border-radius:12px;background:var(--sheet);
+  color:var(--ink);font:inherit;text-align:left;cursor:pointer;box-shadow:0 2px 0 var(--line);transition:transform .15s,border-color .15s,box-shadow .15s;}
+.ed-file:hover{transform:translateY(-2px);border-color:var(--acc);box-shadow:0 4px 0 color-mix(in srgb,var(--acc) 30%,var(--line));}
+.ed-file:active{transform:translateY(1px);box-shadow:0 1px 0 var(--line);}
+.ed-file:focus-visible{outline:2px solid var(--acc);outline-offset:2px;}
+.ed-file[aria-pressed="true"]{border-color:var(--acc);background:var(--acc-soft);}
+.ed-file-ico{position:relative;flex:none;display:grid;place-items:center;width:34px;height:40px;color:var(--acc);}
+.ed-file-ico svg{width:34px;height:40px;stroke-width:1.5;}
+.ed-file-ico b{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);padding:0 3px;border-radius:3px;background:#D93025;color:#fff;
+  font-family:'Instr',sans-serif;font-size:8.5px;letter-spacing:.04em;line-height:13px;}
+.ed-file-t b{display:block;font-family:'Instr',sans-serif;font-size:14px;color:var(--deep);}
+.ed-file-t span{display:block;font-family:'Instr',sans-serif;font-size:12px;color:var(--mut);}
+/* The icon that flies into the window (made by the script). */
+.ed-fly{position:fixed;z-index:60;pointer-events:none;margin:0;}
+@media (max-width:640px){.ed-files-l{width:100%;}.ed-file{flex:1 1 100%;}}
+@media print{.ed-files-top{display:none;}}
 .ed-win{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--sheet);
   box-shadow:0 18px 40px rgba(16,32,64,.12),0 3px 0 color-mix(in srgb,var(--acc) 18%,var(--line));margin:0 0 var(--s5,32px);}
 .ed-win-bar{display:flex;align-items:center;gap:12px;padding:8px 10px 8px 14px;background:var(--soft);border-bottom:1px solid var(--line);}
@@ -1794,7 +1813,7 @@ html.ksch-lock .fab{display:none;}
 <div class="docbar">
   <span class="docbar-l">
     <button type="button" class="btn btn-icon burger" aria-label="Open contents" aria-expanded="false" aria-controls="sidebar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg></button>
-    <a class="brand" href="#home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect x=".5" y=".5" width="31" height="31" rx="8" fill="#F6EEDC" stroke="#E2D3AE"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(0 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(60 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(120 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(180 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(240 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(300 16 16)"/><circle cx="16" cy="16" r="3" fill="#E6AE4A" stroke="#B98322" stroke-width=".6"/></svg><span class="brand-txt"><span class="brand-t">Prestudy Pamphlet Guide</span><span class="brand-s">KCM &middot; Focus Family Leaders</span></span></a>
+    <a class="brand" href="#home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect x=".5" y=".5" width="31" height="31" rx="8" fill="#F6EEDC" stroke="#E2D3AE"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="0.6" transform="rotate(0 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="0.6" transform="rotate(60 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="0.6" transform="rotate(120 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="0.6" transform="rotate(180 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="0.6" transform="rotate(240 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="0.6" transform="rotate(300 16 16)"/><circle cx="16" cy="16" r="3" fill="#E6AE4A" stroke="#B98322" stroke-width=".6"/></svg><span class="brand-txt"><span class="brand-t">Prestudy Pamphlet Guide</span><span class="brand-s">KCM &middot; Focus Family Leaders</span></span></a>
     <button type="button" class="themebtn" aria-label="Switch to dark theme" aria-pressed="false" title="Switch to dark theme"><svg class="tt" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><mask id="tt-mask"><rect x="-8" y="-8" width="40" height="40" fill="white"/><circle class="tt-bite" cx="33" cy="0" r="9" fill="black"/></mask><g mask="url(#tt-mask)"><circle class="tt-body" cx="12" cy="12" r="9" fill="currentColor" stroke="none"/></g><g class="tt-rays"><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="5.64" y1="5.64" x2="4.22" y2="4.22"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/><line x1="5.64" y1="18.36" x2="4.22" y2="19.78"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/></g></svg></button>
   </span>
   <span class="acts">
@@ -1869,7 +1888,7 @@ html.ksch-lock .fab{display:none;}
   <rect x="5.5" y="9" width="154" height="198" rx="16" fill="#F6EEDC" stroke="#2B2B30" stroke-width="2.2"/>
   <path d="M114 86 C114 96 110 103 104 110" fill="none" stroke="#5E8B6B" stroke-width="3" stroke-linecap="round"/>
   <path d="M111 98 C118 89 128 88 133 91 C127 99 118 101 111 98Z" fill="#6E9E78"/>
-  <g><ellipse cx="116" cy="37" rx="10" ry="17" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="1.2" transform="rotate(0 116 54)"/><ellipse cx="116" cy="37" rx="10" ry="17" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="1.2" transform="rotate(60 116 54)"/><ellipse cx="116" cy="37" rx="10" ry="17" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="1.2" transform="rotate(120 116 54)"/><ellipse cx="116" cy="37" rx="10" ry="17" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="1.2" transform="rotate(180 116 54)"/><ellipse cx="116" cy="37" rx="10" ry="17" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="1.2" transform="rotate(240 116 54)"/><ellipse cx="116" cy="37" rx="10" ry="17" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="1.2" transform="rotate(300 116 54)"/><circle cx="116" cy="54" r="8" fill="#E6AE4A" stroke="#B98322" stroke-width="1"/></g>
+  <g><ellipse cx="116" cy="37" rx="10" ry="17" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="1.2" transform="rotate(0 116 54)"/><ellipse cx="116" cy="37" rx="10" ry="17" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="1.2" transform="rotate(60 116 54)"/><ellipse cx="116" cy="37" rx="10" ry="17" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="1.2" transform="rotate(120 116 54)"/><ellipse cx="116" cy="37" rx="10" ry="17" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="1.2" transform="rotate(180 116 54)"/><ellipse cx="116" cy="37" rx="10" ry="17" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="1.2" transform="rotate(240 116 54)"/><ellipse cx="116" cy="37" rx="10" ry="17" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="1.2" transform="rotate(300 116 54)"/><circle cx="116" cy="54" r="8" fill="#E6AE4A" stroke="#B98322" stroke-width="1"/></g>
   <g font-family="Libre, serif" font-size="26" fill="#1A1B22">
     <text x="15.5" y="134" textLength="82.5" lengthAdjust="spacingAndGlyphs">kharis</text>
     <text x="15.5" y="168" textLength="98" lengthAdjust="spacingAndGlyphs">campus</text>
@@ -2009,11 +2028,19 @@ html.ksch-lock .fab{display:none;}
   <h1>The PDF Editor</h1><div class="h1rule"></div>
   <p class="ed-lead">It runs in your browser. Nothing to install, and your PDF never leaves your computer.</p>
 
+  <!-- Ready-made PDFs. Clicking one sends its icon flying into the window and
+       reopens the editor on that file (pdf-editor.html?file=...). -->
+  <div class="ed-files-top" role="group" aria-label="Open a ready-made PDF in the editor">
+    <span class="ed-files-l">Open in the editor</span>
+    <button type="button" class="ed-file" data-ed-file="pamphlet-template.pdf" title="Open Blank template in the editor"><span class="ed-file-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg><b>PDF</b></span><span class="ed-file-t"><b>Blank template</b><span>Fill-in pamphlet</span></span></button>
+    <button type="button" class="ed-file" data-ed-file="example-pamphlet-pages.pdf" title="Open Example pamphlet in the editor"><span class="ed-file-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg><b>PDF</b></span><span class="ed-file-t"><b>Example pamphlet</b><span>Four pages in order</span></span></button>
+    <button type="button" class="ed-file" data-ed-file="example-pamphlet.pdf" title="Open Print-ready booklet in the editor"><span class="ed-file-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg><b>PDF</b></span><span class="ed-file-t"><b>Print-ready booklet</b><span>After Step 10</span></span></button>
+  </div>
   <div class="ed-win">
     <div class="ed-win-bar">
       <span class="ed-dots" aria-hidden="true"><i></i><i></i><i></i></span>
       <span class="ed-win-t">PDF editor</span>
-      <a class="btn ed-win-btn" href="pdf-editor.html" target="_blank" rel="noopener"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3"/></svg>Open full page</a>
+      <a class="btn ed-win-btn" data-ed-full href="pdf-editor.html" target="_blank" rel="noopener"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3"/></svg>Open full page</a>
     </div>
     <div class="ed-win-body" data-ed-frame><p class="ed-win-wait">Opening the editor&hellip;</p></div>
   </div>
@@ -2213,7 +2240,7 @@ html.ksch-lock .fab{display:none;}
   <rect x="5.5" y="9" width="154" height="198" rx="16" fill="#F6EEDC" stroke="#2B2B30" stroke-width="2.2"/>
   <path d="M114 86 C114 96 110 103 104 110" fill="none" stroke="#5E8B6B" stroke-width="3" stroke-linecap="round"/>
   <path d="M111 98 C118 89 128 88 133 91 C127 99 118 101 111 98Z" fill="#6E9E78"/>
-  <g><ellipse cx="116" cy="37" rx="10" ry="17" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="1.2" transform="rotate(0 116 54)"/><ellipse cx="116" cy="37" rx="10" ry="17" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="1.2" transform="rotate(60 116 54)"/><ellipse cx="116" cy="37" rx="10" ry="17" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="1.2" transform="rotate(120 116 54)"/><ellipse cx="116" cy="37" rx="10" ry="17" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="1.2" transform="rotate(180 116 54)"/><ellipse cx="116" cy="37" rx="10" ry="17" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="1.2" transform="rotate(240 116 54)"/><ellipse cx="116" cy="37" rx="10" ry="17" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="1.2" transform="rotate(300 116 54)"/><circle cx="116" cy="54" r="8" fill="#E6AE4A" stroke="#B98322" stroke-width="1"/></g>
+  <g><ellipse cx="116" cy="37" rx="10" ry="17" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="1.2" transform="rotate(0 116 54)"/><ellipse cx="116" cy="37" rx="10" ry="17" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="1.2" transform="rotate(60 116 54)"/><ellipse cx="116" cy="37" rx="10" ry="17" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="1.2" transform="rotate(120 116 54)"/><ellipse cx="116" cy="37" rx="10" ry="17" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="1.2" transform="rotate(180 116 54)"/><ellipse cx="116" cy="37" rx="10" ry="17" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="1.2" transform="rotate(240 116 54)"/><ellipse cx="116" cy="37" rx="10" ry="17" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="1.2" transform="rotate(300 116 54)"/><circle cx="116" cy="54" r="8" fill="#E6AE4A" stroke="#B98322" stroke-width="1"/></g>
   <g font-family="Libre, serif" font-size="26" fill="#1A1B22">
     <text x="15.5" y="134" textLength="82.5" lengthAdjust="spacingAndGlyphs">kharis</text>
     <text x="15.5" y="168" textLength="98" lengthAdjust="spacingAndGlyphs">campus</text>
@@ -2805,7 +2832,7 @@ html.ksch-lock .fab{display:none;}
     </ul>
   </div>
   <div class="foot-brand">
-    <a class="brand" href="#home" aria-label="Prestudy Pamphlet Guide, overview"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect x=".5" y=".5" width="31" height="31" rx="8" fill="#F6EEDC" stroke="#E2D3AE"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(0 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(60 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(120 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(180 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(240 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#9A7AD6" stroke="#6B4EA8" stroke-width="0.6" transform="rotate(300 16 16)"/><circle cx="16" cy="16" r="3" fill="#E6AE4A" stroke="#B98322" stroke-width=".6"/></svg></a>
+    <a class="brand" href="#home" aria-label="Prestudy Pamphlet Guide, overview"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect x=".5" y=".5" width="31" height="31" rx="8" fill="#F6EEDC" stroke="#E2D3AE"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="0.6" transform="rotate(0 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="0.6" transform="rotate(60 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="0.6" transform="rotate(120 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="0.6" transform="rotate(180 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="0.6" transform="rotate(240 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="0.6" transform="rotate(300 16 16)"/><circle cx="16" cy="16" r="3" fill="#E6AE4A" stroke="#B98322" stroke-width=".6"/></svg></a>
     <p class="foot-blurb">How Kharis Campus Ministry's Focus Family leaders make the bi-weekly Prestudy Pamphlet, written down by one of them.</p>
     <p class="foot-meta">&copy; 2026 Andrew Liu</p>
     <a class="btn xbtn" href="https://github.com/andliu7/ff_technical_instructions" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.37.5 0 5.87 0 12.5c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58 0-.28-.01-1.03-.02-2.02-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.33-1.76-1.33-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.11-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6.01 0c2.29-1.55 3.3-1.23 3.3-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.62-5.48 5.92.43.37.81 1.1.81 2.22 0 1.6-.01 2.89-.01 3.28 0 .32.21.7.83.58A12.01 12.01 0 0 0 24 12.5C24 5.87 18.63.5 12 .5Z"/></svg><span class="xlbl">GitHub</span></a>
@@ -5359,11 +5386,49 @@ function showPage() {
 // The Editor page opens the editor in its window the first time the page is
 // shown, not on every visit to the guide, so readers who never open it never
 // download it here (the idle preload below may still have cached it).
-function loadEditorFrame() {
+// With a file name it reopens the editor on that file instead. The window
+// title and the Open full page link follow whichever file is open.
+function loadEditorFrame(file) {
   var box = document.querySelector("[data-ed-frame]");
-  if (!box || box.querySelector("iframe")) return;
-  box.innerHTML = '<iframe src="pdf-editor.html" title="PDF editor" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>';
+  if (!box) return;
+  var frame = box.querySelector("iframe");
+  if (frame && !file) return;
+  var src = "pdf-editor.html" + (file ? "?file=" + encodeURIComponent(file) : "");
+  if (frame) frame.src = src;
+  else box.innerHTML = '<iframe src="' + src + '" title="PDF editor" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>';
+  document.querySelector(".ed-win-t").textContent = file || "PDF editor";
+  document.querySelector("[data-ed-full]").href = src;
+  document.querySelectorAll("[data-ed-file]").forEach(function (b) {
+    b.setAttribute("aria-pressed", b.getAttribute("data-ed-file") === file ? "true" : "false");
+  });
 }
+
+// A ready-made PDF button: a copy of its icon flies from the button into the
+// middle of the editor window and shrinks away, then the editor opens that
+// file. Reduced motion skips the flight.
+document.addEventListener("click", function (e) {
+  var b = e.target.closest("[data-ed-file]");
+  if (!b) return;
+  var file = b.getAttribute("data-ed-file");
+  var win = document.querySelector(".ed-win-body");
+  var ico = b.querySelector(".ed-file-ico");
+  if (!win.animate || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return loadEditorFrame(file);
+  var a = ico.getBoundingClientRect(), w = win.getBoundingClientRect();
+  var fly = ico.cloneNode(true);
+  fly.classList.add("ed-fly");
+  fly.style.left = a.left + "px"; fly.style.top = a.top + "px";
+  document.body.appendChild(fly);
+  var dx = w.left + w.width / 2 - (a.left + a.width / 2);
+  var dy = w.top + Math.min(w.height, window.innerHeight - w.top) / 2 - (a.top + a.height / 2);
+  fly.animate([
+    { transform: "translate(0,0) scale(1) rotate(0deg)", opacity: 1 },
+    { transform: "translate(" + dx * .5 + "px," + (dy * .5 - 60) + "px) scale(1.6) rotate(-8deg)", opacity: 1, offset: .55 },
+    { transform: "translate(" + dx + "px," + dy + "px) scale(.3) rotate(0deg)", opacity: 0 }
+  ], { duration: 650, easing: "cubic-bezier(.5,0,.3,1)" }).onfinish = function () {
+    fly.remove();
+    loadEditorFrame(file);
+  };
+});
 
 function turnPage(dir) {
   var page = PAGES[indexOfPage(currentPage) + dir];

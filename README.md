@@ -40,6 +40,7 @@ Then visit `http://localhost:8000`. A server is needed because the browser block
     example-pamphlet.pdf  a finished pamphlet, Spring FF #06, imposed for printing (after Step 10)
     example-pamphlet-pages.pdf  the same pamphlet's four pages in reading order (before Step 10)
     pamphlet-template.pdf the pamphlet as a fill-in PDF (Fall FF #02 with the weekly parts as form fields)
+    simplified-pamphlet.pdf  a plain-layout pamphlet for new leaders (Fall 2022, John 2:1-11); its Google Doc is linked from Step 1 with a /copy link
     tools/make_template.py rebuilds it: python tools/make_template.py <Doc exported as PDF> pamphlet-template.pdf
     tools/check_links.py  tests every link, the scheduler's health and the calendar's privacy: python tools/check_links.py
     pdf-editor.html       the PDF editor's page, with its loading curtain

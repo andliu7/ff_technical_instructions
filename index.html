@@ -106,7 +106,7 @@ p{margin:0 0 8pt 0;}
 .pam-pair .pdfframe{height:64vh;min-height:420px;}
 /* QR maker */
 .qr-tool{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:start;margin-top:10px;}
-.qr-tool label{display:block;font-family:'Instr';font-size:12px;font-weight:700;color:var(--deep);margin:0 0 6px;}
+.qr-tool label{display:block;font-family:'Instr';font-size:14px;font-weight:700;color:var(--deep);margin:0 0 6px;}
 .qr-tool input{width:100%;box-sizing:border-box;height:42px;padding:0 12px;border:1.5px solid var(--line);border-radius:8px;
   background:var(--btn-bg);color:var(--ink);font:inherit;font-size:14px;}
 .qr-tool input:focus{outline:2px solid var(--acc);outline-offset:1px;}
@@ -305,7 +305,7 @@ body{background:#ffffff;}
 .ed-proc ol.sub{margin-left:var(--s5,32px);}
 .ed-proc .qr-sec h2{display:none;}
 .ed-proc .qr-sec{margin-left:var(--s5,32px);}
-.ed-aside{margin:0 0 var(--s2,8px) var(--s5,32px);font-size:14px;color:var(--sub);}
+.ed-aside{margin:0 0 var(--s2,8px) var(--s5,32px);font-size:15px;color:var(--sub);}
 #editor > .ed-aside{margin-left:0;}
 /* Banner: a tinted card in the FAQ's style, for a block that deserves a colour of its own (green here). */
 .banner{--fc:var(--green);margin:var(--s4,24px) 0;padding:var(--s3,16px) var(--s4,24px);border:1px solid color-mix(in srgb,var(--fc) 45%,var(--line));
@@ -340,10 +340,12 @@ body{background:#ffffff;}
 .docbar .acts{display:flex;gap:8px;}
 
 .btn{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;border-radius:8px;
-  font-family:'Instr',sans-serif;font-size:13px;font-weight:700;transition:background-color .15s,color .15s,transform .12s,box-shadow .12s;
+  font-family:'Instr',sans-serif;font-size:14px;font-weight:700;transition:background-color .15s,color .15s,transform .12s,box-shadow .12s;
   outline-offset:2px;height:36px;padding:0 16px;border:1px solid var(--line);background:var(--btn-bg);
   color:var(--deep);box-shadow:0 1px 2px rgba(0,0,0,.05);cursor:pointer;text-decoration:none;gap:7px;}
 .btn:hover{background:var(--btn-hover);}
+/* Line icons for buttons and tabs (Lucide shapes, drawn inline). */
+.bi{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 /* Pressing sinks the button into the page, after Blueberry's buttons: the
    raised shadow goes and it drops a pixel. */
 .btn:active{transform:translateY(1px) scale(.97);box-shadow:inset 0 1px 2px rgba(0,0,0,.15);}
@@ -527,10 +529,13 @@ html.edge-prev,html.edge-prev *{cursor:var(--edge-prev,pointer) !important;}
    the page you are on. */
 .tabs{position:relative;display:flex;align-items:center;gap:2px;--tab-on:#C2189F;--tab-gray:#6B6880;}
 .dark .tabs{--tab-on:#FF6BE6;--tab-gray:#A1A1AA;}
-.tab{position:relative;z-index:1;font-family:'Instr';font-size:13px;font-weight:700;letter-spacing:.02em;text-decoration:none;color:var(--tab-gray);
+.tab{position:relative;z-index:1;display:inline-flex;align-items:center;gap:6px;font-family:'Instr';font-size:14px;font-weight:700;letter-spacing:.02em;text-decoration:none;color:var(--tab-gray);
   padding:7px 12px;border-radius:10px;transition:color .15s;}
 .tab:hover{color:var(--ink);}
+.tab .bi{width:15px;height:15px;}
 .tab-ico{display:inline-flex;align-items:center;}
+/* Phones: the four words only, so the row still fits one line. */
+@media (max-width:640px){.tab .bi{display:none;}}
 /* The current tab is magenta with a soft glow, so it reads at a glance. */
 .tab[aria-current="page"]{color:var(--tab-on);text-shadow:0 0 12px color-mix(in srgb,var(--tab-on) 55%,transparent);}
 /* The underline means the current tab is not shown by colour alone. */
@@ -1713,10 +1718,10 @@ html.ksch-lock .fab{display:none;}
   </span>
   <span class="acts">
     <nav class="tabs" aria-label="Tools">
-      <a class="tab" href="#memo">Memo</a>
-      <a class="tab" href="#editor">Editor</a>
-      <a class="tab" href="#scheduler">Scheduler</a>
-      <a class="tab" href="#calendar">Calendar</a>
+      <a class="tab" href="#memo"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>Memo</a>
+      <a class="tab" href="#editor"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.4 3.6a2.1 2.1 0 0 1 3 3L7.4 18.6a2 2 0 0 1-.9.5l-2.9.8a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9z"/></svg>Editor</a>
+      <a class="tab" href="#scheduler"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Scheduler</a>
+      <a class="tab" href="#calendar"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>Calendar</a>
       <a class="tab tab-ico" href="guide.pdf" download aria-label="Download PDF" title="Download PDF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg></a>
     </nav>
   </span>
@@ -1906,15 +1911,15 @@ html.ksch-lock .fab{display:none;}
   <p class="ed-lead">It runs in your browser. Nothing to install, and your PDF never leaves your computer.</p>
 
   <div class="ed-links"><b>Finished pamphlet</b>
-    <a class="btn" href="example-pamphlet.pdf" download>Print-ready PDF</a>
-    <a class="btn" href="example-pamphlet-pages.pdf" download>Pages in order</a>
-    <a class="btn" href="#example">See it on the site</a>
+    <a class="btn" href="example-pamphlet.pdf" download><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>Print-ready PDF</a>
+    <a class="btn" href="example-pamphlet-pages.pdf" download><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg>Pages in order</a>
+    <a class="btn" href="#example"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.1 12.3a1 1 0 0 1 0-.7 10.8 10.8 0 0 1 19.8 0 1 1 0 0 1 0 .7 10.8 10.8 0 0 1-19.8 0"/><circle cx="12" cy="12" r="3"/></svg>See it on the site</a>
   </div>
 
   <div class="tip pdftool"><span class="tl">The editor</span>
     <p class="pdftool-acts">
-      <button type="button" class="btn btn-primary" data-pdftool>Load it here (about 15 MB, once)</button>
-      <a class="btn" href="pdf-editor.html" target="_blank" rel="noopener">Open it as a full page &#8599;</a>
+      <button type="button" class="btn btn-primary" data-pdftool><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>Load it here (about 15 MB, once)</button>
+      <a class="btn" href="pdf-editor.html" target="_blank" rel="noopener"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3"/></svg>Open it as a full page</a>
     </p>
     <p class="pdftool-wait" hidden>A loading screen counts up to 100%. After the first time it opens much faster.</p>
     <div class="pdftool-frame" hidden></div>
@@ -1982,8 +1987,8 @@ html.ksch-lock .fab{display:none;}
         <label for="qr-in">Link or text</label>
         <input id="qr-in" type="text" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://forms.gle/...">
         <p class="pam-acts" style="margin-top:12px;">
-          <button type="button" class="btn btn-primary" data-qr="copy" disabled>Copy image</button>
-          <button type="button" class="btn" data-qr="save" disabled>Save as PNG</button>
+          <button type="button" class="btn btn-primary" data-qr="copy" disabled><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>Copy image</button>
+          <button type="button" class="btn" data-qr="save" disabled><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg>Save as PNG</button>
         </p>
         <p class="qr-note" aria-live="polite"></p>
       </div>
@@ -2521,8 +2526,8 @@ html.ksch-lock .fab{display:none;}
   <div class="tip pdftool" id="pdf-tool"><span class="tl">The PDF editor</span>
     <p>Open it here or as a full page. Besides the booklet, it can add text and images, highlight, draw, and rotate or reorder pages.</p>
     <p class="pdftool-acts">
-      <button type="button" class="btn btn-primary" data-pdftool>Load the PDF editor here (about 15 MB, once)</button>
-      <a class="btn" href="pdf-editor.html" target="_blank" rel="noopener">Open it as a full page &#8599;</a>
+      <button type="button" class="btn btn-primary" data-pdftool><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>Load the PDF editor here (about 15 MB, once)</button>
+      <a class="btn" href="pdf-editor.html" target="_blank" rel="noopener"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3"/></svg>Open it as a full page</a>
     </p>
     <p class="pdftool-wait" hidden>A loading screen counts up to 100% while the editor downloads; after the first time it opens much faster.</p>
     <div class="pdftool-frame" hidden></div>

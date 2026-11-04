@@ -241,9 +241,6 @@ a,.url{color:var(--link);text-decoration:underline;}
   text-transform:uppercase;color:#6E6B7B;}
 .signoff .kcmlogo{width:0.6in;height:auto;display:inline-block;margin-top:13pt;}
 .inline-warn{margin:11pt 0 11pt 0;}
-.copybtn{position:absolute;right:8pt;top:7pt;background:var(--chip-bg);border:.9pt solid var(--acc);
-  border-radius:3pt;padding:4pt 5pt 2pt 5pt;cursor:pointer;}
-.copybtn.copied{background:var(--acc);}
 .reslist td.k{width:30%;}
 .reslist td.k .u{font-family:'Libre';font-weight:400;font-size:8.4pt;color:var(--link);}
 
@@ -419,13 +416,29 @@ body{background:#ffffff;}
 .icon-swap.off{transform:scale(0);opacity:0;}
 .check-ico{stroke:#10b981;}
 
+/* Phase summary written as a flow: place, then when, then the deadline. */
+.pd-flow{display:flex;flex-wrap:wrap;align-items:center;gap:2px 0;}
+.pd-arrow{width:14px;height:14px;margin:0 8px;color:var(--acc);flex:none;}
+/* Copy card: the whole message box is the button. */
+.copycard{cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .12s;}
+.copycard:hover{border-color:var(--acc);box-shadow:0 2px 0 color-mix(in srgb,var(--acc) 25%,var(--line));}
+.copycard:active{transform:translateY(1px);}
+.copycard:focus-visible{outline:2px solid var(--acc);outline-offset:2px;}
+.cc-ico{position:absolute;right:12px;top:50%;width:20px;height:20px;margin-top:-10px;color:var(--acc);}
+.cc-ico svg{position:absolute;inset:0;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+  transition:opacity .15s,transform .2s;}
+.cc-ring,.cc-check{opacity:0;}
+.cc-ring circle{stroke-dasharray:100;stroke-dashoffset:100;transform:rotate(-90deg);transform-origin:center;}
+.cc-check{stroke:#10b981;transform:scale(.4);}
+.copycard.loading .cc-copy,.copycard.done .cc-copy{opacity:0;transform:scale(.5);}
+.copycard.loading .cc-ring{opacity:1;}
+.copycard.loading .cc-ring circle{animation:cc-draw .5s ease-out forwards;}
+@keyframes cc-draw{to{stroke-dashoffset:0;}}
+.copycard.done .cc-check{opacity:1;transform:scale(1);}
+.cc-live{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+@media (prefers-reduced-motion:reduce){.copycard.loading .cc-ring circle{animation:none;stroke-dashoffset:0;}}
+@media print{.cc-ico{display:none;}}
 .tip{position:relative;}
-.tip-bubble{position:absolute;top:calc(100% + 6px);right:0;z-index:50;white-space:nowrap;
-  border-radius:8px;border:1px solid var(--line);background:var(--sheet);color:var(--deep);
-  padding:5px 9px;font-family:'Instr';font-size:11px;box-shadow:0 4px 14px rgba(0,0,0,.08);
-  opacity:0;transform:scale(.95);transition:opacity .12s,transform .12s;pointer-events:none;}
-.tip:hover .tip-bubble,.tip:focus-within .tip-bubble{opacity:1;transform:scale(1);}
-
 .pdfsection{margin-top:64px;padding-top:40px;border-top:.6pt solid var(--line);}
 .pdfframe{width:100%;height:78vh;min-height:520px;border:1px solid var(--line);border-radius:8px;
   background:var(--soft);}
@@ -1193,7 +1206,35 @@ html:not(.meet-only) .ksch:not(.pop){display:none !important;}
 .ksch-scrim[hidden]{display:none;}
 @media (max-width:640px){.ksch.pop:not(.full){top:0;max-height:100vh;height:100vh;width:100vw;border-radius:0;padding:16px;}}
 
-/* The one-page new-poll form. */
+/* Setup tracker: a bar, a count and the six steps with a tick or an empty
+   circle. Beside the form on wide screens; just the bar on phones. */
+.ksch-c-wrap{display:grid;grid-template-columns:190px minmax(0,1fr);gap:24px;align-items:start;}
+.ksch-prog{display:grid;gap:10px;}
+.ksch-prog-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;}
+.ksch-prog-h b{font-size:13px;color:var(--deep);}
+.ksch-prog-h span{font-size:11.5px;color:var(--mut);}
+.ksch-prog-bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;}
+.ksch-prog-bar i{display:block;height:100%;border-radius:99px;background:var(--acc);transition:width .4s ease;}
+.ksch-prog-list{list-style:none;margin:0;padding:0;display:grid;gap:8px;}
+.ksch-prog-list li{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut);}
+.ksch-prog-list li svg{flex:none;width:16px;height:16px;}
+.ksch-prog-list li.done{color:var(--ink);}
+.ksch-prog-list li.done svg{color:var(--ks-yes);}
+.ksch-prog-list li.now{color:var(--deep);font-weight:700;}
+.ksch-prog-list li.now:not(.done) svg{color:var(--acc);}
+.ksch-prog.compact{grid-template-columns:auto minmax(80px,1fr) auto;align-items:center;gap:6px 12px;margin:0 0 12px;
+  padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--soft);}
+.ksch-prog.compact .ksch-prog-h{display:contents;}
+.ksch-prog.compact .ksch-prog-h span{order:3;}
+.ksch-prog.compact .ksch-prog-bar{order:2;}
+.ksch-prog-next{grid-column:1/-1;margin:0;font-size:12.5px;color:var(--sub);}
+@media (max-width:640px){.ksch-c-wrap{grid-template-columns:1fr;gap:12px;}.ksch-prog-list{display:none;}}
+@media (prefers-reduced-motion:reduce){.ksch-prog-bar i{transition:none;}}
+/* The new-poll form. Required fields carry a red asterisk, the rest a grey tag. */
+.ksch-req{color:#D93025;font-weight:700;}
+.dark .ksch-req{color:#FF8A80;}
+.ksch-optional{margin-left:8px;padding:1px 7px;border-radius:99px;background:var(--soft);border:1px solid var(--line);
+  font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:none;color:var(--mut);vertical-align:1px;}
 .ksch-c{display:grid;gap:14px;max-width:560px;}
 .ksch-c .ksch-lbl{font-size:13px;}
 .ksch-c .ksch-w-people{min-height:44px;}
@@ -1938,7 +1979,7 @@ html.ksch-lock .fab{display:none;}
     <text x="15.5" y="200" textLength="108" lengthAdjust="spacingAndGlyphs">ministry</text>
   </g>
 </svg></div>
-  <div class="cv-foot">Contains: Memo &nbsp;&middot;&nbsp; Who This Is For &nbsp;&middot;&nbsp; Instructions &nbsp;&middot;&nbsp; Appendix A &nbsp;&middot;&nbsp; Further Reading &nbsp;&middot;&nbsp; Example Pamphlet</div>
+  <div class="cv-foot">Contains: Memo &nbsp;&middot;&nbsp; Who This Is For &nbsp;&middot;&nbsp; Instructions &nbsp;&middot;&nbsp; Further Reading &nbsp;&middot;&nbsp; Example Pamphlet</div>
 </section>
 
 <!-- Meeting scheduler launcher. The scheduler itself opens over the page as a
@@ -2189,7 +2230,6 @@ html.ksch-lock .fab{display:none;}
       </ul></div>
       <div class="toc-sec toc-sec-ref"><span class="toc-ph">Reference</span>
       <ul>
-        <li><a href="#appendix"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></span><span class="toc-n"></span>Appendix A</a></li>
         <li><a href="#reading"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span><span class="toc-n"></span>Further Reading</a></li>
         <li><a href="#pdf"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg></span><span class="toc-n"></span>Printable PDF</a></li>
         <li><a href="#example"><span class="toc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg></span><span class="toc-n"></span>Example Pamphlet</a></li>
@@ -2324,7 +2364,7 @@ html.ksch-lock .fab{display:none;}
   <h1>Instructions</h1><div class="h1rule"></div>
 
   <p class="dropcap">What follows is the complete path from a blank template to a stack of folded, print-ready booklets, organized into four phases: <b>(1) Drafting</b>, <b>(2) Research</b>, <b>(3) Peer Review</b>, and <b>(4) Production</b>. Follow it in order the first few times. Once the rhythm is familiar you will move through it without thinking about each click, but until then this document is your reference.</p>
-  <p>Nothing here requires a programming background. Appendix A explains the one piece of automation you will run into, and you are never expected to run or edit any of it.</p>
+  <p>Nothing here requires a programming background.</p>
 
   <figure>
     <svg viewBox="0 0 700 108" width="100%" xmlns="http://www.w3.org/2000/svg">
@@ -2405,7 +2445,7 @@ html.ksch-lock .fab{display:none;}
     <tr class="grp"><td colspan="2">Phase 1 &nbsp;&middot;&nbsp; Drafting</td></tr>
     <tr><td class="k">Computer and browser</td><td>Any current browser with internet access. Chrome is recommended for consistent Docs behavior.</td></tr>
     <tr><td class="k">KCM Google Drive access</td><td>To the shared "Focus Family Pamphlets" folder and the KCM master calendar.</td></tr>
-    <tr><td class="k">Apps Script logistics email <i>(optional)</i></td><td>An automated summary of the next two weeks. Useful as a cross-check, not as your only source. See Appendix A.</td></tr>
+    <tr><td class="k">Apps Script logistics email <i>(optional)</i></td><td>An automated summary of the next two weeks. Useful as a cross-check, not as your only source.</td></tr>
     <tr class="grp"><td colspan="2">Phase 2 &nbsp;&middot;&nbsp; Research</td></tr>
     <tr><td class="k">Bible Hub</td><td>Free at biblehub.com. An optional free account removes ads. Nothing in this guide needs one.</td></tr>
     <tr><td class="k">Bible Project and GotQuestions</td><td>Free, no account. Book overviews and plain-language answers to specific questions. See Step 5.</td></tr>
@@ -2518,7 +2558,7 @@ html.ksch-lock .fab{display:none;}
       <li>Cross-check against the automated logistics email if you have it. The two should agree. If they do not, trust the calendar and tell KCM's technical team.</li>
     </ol>
     <div class="warn inline-warn"><div class="warn-mark"><span></span><b>!</b></div><p><b class="lead">Treat the automated logistics email as read-only.</b> It carries other groups' room bookings and contact information. Copy your own group's data and leave the rest alone.</p></div>
-    <div class="note"><b>On the automated email.</b> An Apps Script sends a digest of the next two weeks pulled from that same calendar. It saves a little time, but it is a convenience, not the source. Appendix A explains how it works if you are curious. You never need to run or edit it.</div>
+    <div class="note"><b>On the automated email.</b> An Apps Script sends a digest of the next two weeks pulled from that same calendar. It saves a little time, but it is a convenience, not the source. You never need to run or edit it.</div>
   </div>
 </section>
 
@@ -2629,7 +2669,7 @@ html.ksch-lock .fab{display:none;}
 <section class="page" data-page="step-8" data-title="Step 8: Submit the draft for approval">
   <div class="page-head"><div class="part-label">Phase 3 &nbsp;&middot;&nbsp; Peer Review</div><div class="page-tools"><a class="tool-ico" href="https://discord.com/app" target="_blank" rel="noopener" style="--tile:#5865F2" title="Open Discord" aria-label="Open Discord"><svg aria-hidden="true"><use href="#i-discord"/></svg></a></div></div>
   <div class="phase" id="phase-3"><span class="pn">Phase 3</span><span class="pt">Peer Review</span>
-    <div class="pd">Discord. Start midweek. Final approval is due Saturday.</div></div>
+    <div class="pd pd-flow"><span>Discord</span><svg class="pd-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg><span>start midweek</span><svg class="pd-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg><span>final approval by Saturday</span></div></div>
 
   <div class="warn inline-warn"><div class="warn-mark"><span></span><b>!</b></div><p><b class="lead">Do not skip peer review to save time.</b> The pamphlet goes out under the ministry's name, not just yours, and unapproved background text or images can misrepresent KCM's position on a passage.</p></div>
 
@@ -2640,15 +2680,10 @@ html.ksch-lock .fab{display:none;}
       <li>Send your background text and your proposed cover image as <b>two separate messages</b>, so reviewers can approve them independently.</li>
       <li>Ask for approval in a way that says exactly what you want confirmed. Something like this works:</li>
     </ol>
-    <div class="msgbox">
-      <span class="tip">
-        <button class="btn btn-icon copybtn" type="button" aria-label="Copy to clipboard">
-          <span class="icon-swap check off"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="check-ico"><path d="M20 6 9 17l-5-5"/></svg></span>
-          <span class="icon-swap copy on"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg></span>
-        </button>
-        <span class="tip-bubble">Click to copy</span>
-      </span>
+    <div class="msgbox copycard" role="button" tabindex="0" title="Click to copy" aria-label="Copy this message">
       <span class="msgtext">Please approve the following background and image with a thumbs-up reaction!</span><svg viewBox="0 0 24 24" width="13" height="13" style="vertical-align:-1.5px;margin-left:5px;" xmlns="http://www.w3.org/2000/svg"><path d="M6.2 10.4h2.3V21H6.2a1.5 1.5 0 0 1-1.5-1.5v-7.6a1.5 1.5 0 0 1 1.5-1.5z" fill="#1F5FD1"/><path d="M10.1 10.1 13.6 3.2a1.6 1.6 0 0 1 3 .7v4.4h3.7a1.8 1.8 0 0 1 1.75 2.25l-1.7 7.2A2.2 2.2 0 0 1 18.2 19.5h-8.1z" fill="none" stroke="#1F5FD1" stroke-width="1.7" stroke-linejoin="round"/></svg>
+      <span class="cc-ico" aria-hidden="true"><svg class="cc-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><svg class="cc-ring" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" pathLength="100"/></svg><svg class="cc-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>
+      <span class="cc-live" aria-live="polite"></span>
     </div>
     <p>Word it however you like. The point is that reviewers know what they are confirming and how to confirm it. Specific requests get faster answers than "thoughts?", which will sit unanswered for two days.</p>
   </div>
@@ -2781,25 +2816,6 @@ html.ksch-lock .fab{display:none;}
     <li>Print <b>one</b> test copy again before committing to the run.</li>
   </ul>
   <p>Treat this as recovery, not routine. Getting Step 10 right the first time is faster and leaves you with a cleaner file.</p>
-</section>
-
-<!-- APPENDIX -->
-<section class="partpage" id="appendix" data-page="appendix" data-title="Appendix A: The Automated Logistics Email">
-  <div class="part-label">Appendix A</div>
-  <h1>The Automated Logistics Email</h1><div class="h1rule"></div>
-
-  <p>Step 2 mentions an automated email. A Google Apps Script reads the KCM master calendar spreadsheet each Sunday afternoon, picks out the rows for Focus Families, leader meetings, and public events, and sends a digest of what is coming up. It looks two weeks ahead, so your Focus Family usually appears one cycle before you need it.</p>
-
-  <div class="note"><b>You never need to run, edit, or understand this to produce a pamphlet.</b> Treat the email as a convenience and the calendar as the source. If the email stops arriving or looks wrong, tell KCM's technical team rather than trying to fix it.</div>
-
-  <p>The scheduling is the whole of it:</p>
-  <pre>ScriptApp.newTrigger('sendWeeklyDigest')
-  .timeBased()
-  .onWeekDay(ScriptApp.WeekDay.SUNDAY)
-  .atHour(15)
-  .create();</pre>
-
-  <p>Right now the digest only reaches one inbox, which is most of why it has not helped anyone else yet. Adding the other Focus Family Leaders to the recipient list is a one-line change, and posting it to the Focus Family Team Chat instead would put it where we already are. If either sounds useful, raise it with the technical team.</p>
 </section>
 
 <!-- FURTHER READING -->
@@ -5217,30 +5233,42 @@ var qrcode = function() {
 
 </script>
 <script>
+// Copy cards: click (or Enter/Space on) anywhere on the card to copy its
+// message. The copy icon turns into a ring that draws itself round, then a
+// green tick; it resets after a moment so it can be copied again.
 function initCopyButtons() {
-  document.querySelectorAll(".copybtn").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      var box = btn.closest(".msgbox");
-      var text = box.querySelector(".msgtext").innerText.trim();
-      var done = function () {
-        btn.disabled = true;
-        btn.setAttribute("aria-label", "Copied");
-        btn.querySelector(".check").className = "icon-swap check on";
-        btn.querySelector(".copy").className = "icon-swap copy off";
+  document.querySelectorAll(".copycard").forEach(function (card) {
+    var live = card.querySelector(".cc-live");
+    var busy = false;
+    function copy() {
+      if (busy) return;
+      busy = true;
+      var text = card.querySelector(".msgtext").innerText.trim();
+      card.classList.remove("done");
+      card.classList.add("loading");
+      var started = Date.now();
+      function finish(ok) {
+        // Let the ring finish drawing even when the copy is instant.
         setTimeout(function () {
-          btn.disabled = false;
-          btn.setAttribute("aria-label", "Copy to clipboard");
-          btn.querySelector(".check").className = "icon-swap check off";
-          btn.querySelector(".copy").className = "icon-swap copy on";
-        }, 1500);
-      };
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(done, function () {
-          fallbackCopy(text, done);
-        });
-      } else {
-        fallbackCopy(text, done);
+          card.classList.remove("loading");
+          if (ok) { card.classList.add("done"); live.textContent = "Copied"; }
+          else live.textContent = "Couldn't copy. Select the text and copy it instead.";
+          setTimeout(function () { card.classList.remove("done"); live.textContent = ""; busy = false; }, 1600);
+        }, Math.max(0, 500 - (Date.now() - started)));
       }
+      // Settle once: the clipboard answer, its failure, or (if the browser
+      // never answers) the old copy command after a second.
+      var settled = false;
+      function settle(ok) { if (!settled) { settled = true; finish(ok); } }
+      function fallback() { if (!settled) settle(fallbackCopy(text, function () {})); }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { settle(true); }, fallback);
+        setTimeout(fallback, 1000);
+      } else fallback();
+    }
+    card.addEventListener("click", function (e) { if (!window.getSelection().toString()) copy(); });
+    card.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); copy(); }
     });
   });
 }
@@ -5252,11 +5280,10 @@ function fallbackCopy(text, done) {
   area.style.opacity = "0";
   document.body.appendChild(area);
   area.select();
-  try {
-    document.execCommand("copy");
-    done();
-  } catch (e) {}
+  var ok = false;
+  try { ok = document.execCommand("copy"); if (ok) done(); } catch (e) { ok = false; }
   document.body.removeChild(area);
+  return ok;
 }
 
 // Theme wiring. The class goes on <html> so the pre-paint script and this agree
@@ -8203,7 +8230,14 @@ var KSCH = (function () {
     var inp = h("input", { class: "ksch-input", readonly: true, value: url, "aria-label": "Link", onfocus: function () { inp.select(); } });
     return h("div", { class: "ksch-link" }, inp, button("Copy", { icon: "copy", onClick: function () { K.copy(url); } }));
   }
-  function inviteText(title) { return "Hi! Please mark when you're free for " + title + ": "; }
+  // "Hi! Please mark when you're free for FF Fun Hangout (1 hour, at Jimenez
+  // 2117): " - the length and place go in when the poll has them.
+  function inviteText(title, cfg) {
+    var bits = [];
+    if (cfg && cfg.duration) bits.push(fmtLen(cfg.duration));
+    if (cfg && cfg.location) bits.push("at " + cfg.location);
+    return "Hi! Please mark when you're free for " + title + (bits.length ? " (" + bits.join(", ") + ")" : "") + ": ";
+  }
 
   /* ---------- G0: start ---------- */
 
@@ -8212,51 +8246,136 @@ var KSCH = (function () {
   function start() {
     stopRefresh();
     P = null; W = null;
-    createPage();
+    createPage(1);
   }
 
   /* ---------- the new-poll form ----------
-     One page: an optional name, your name, who it is with (a list of names or
-     emails, typed like email recipients) and the dates. The time zone is the
-     pill in the head. The hours default to 9 AM to 11 PM in 30 minute slots;
-     length, location and a note are optional and come after the poll exists. */
+     Two pages with a setup tracker beside them. Page 1: an optional name,
+     your name and who's coming (names or emails, typed like email
+     recipients). Page 2: the dates. The time zone is the chip in the head.
+     Page 2 also asks how long it is. The hours are 9 AM to 11 PM in 30 minute
+     slots; location and a note are optional and come after the poll exists. */
+
+  // The six steps of a poll, from naming it to picking the time. The tracker
+  // shows the whole path on the form, the share screen and the organizer's
+  // poll screen, ticking each one off as it happens.
+  var STEPS = ["Set a name", "Who's coming?", "When is it?", "Send the link!", "Wait for responses", "Pick a time!"];
+  // The bar is weighted: the first three steps are the organizer's real work,
+  // so they fill 90% between them; the rest shows they are nearly there.
+  var WEIGHTS = [30, 30, 30, 4, 3, 3];
+  var ICO_DONE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>';
+  var ICO_TODO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/></svg>';
+  // done: array of 6 booleans. now: index of the step being worked on.
+  // compact: just the bar and the next step, for screens with less room.
+  function tracker(done, now, compact) {
+    var n = done.filter(Boolean).length;
+    var pct = done.reduce(function (t, d, i) { return t + (d ? WEIGHTS[i] : 0); }, 0);
+    var bar = h("i", { style: "width:" + pct + "%" });
+    var el = h("div", { class: "ksch-prog" + (compact ? " compact" : ""), role: "group", "aria-label": "Setup progress" },
+      h("div", { class: "ksch-prog-h" }, h("b", { text: "Setup progress" }), h("span", { text: n + " of " + STEPS.length + " steps" })),
+      h("div", { class: "ksch-prog-bar", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": String(pct) }, bar));
+    if (compact) {
+      var next = done.indexOf(false);
+      el.appendChild(h("p", { class: "ksch-prog-next", text: next === -1 ? "All done." : "Next: " + STEPS[next] }));
+      return el;
+    }
+    var ol = h("ol", { class: "ksch-prog-list" });
+    STEPS.forEach(function (label, i) {
+      ol.appendChild(h("li", { class: (done[i] ? "done" : "") + (i === now ? " now" : ""), "aria-current": i === now ? "step" : null,
+        html: (done[i] ? ICO_DONE : ICO_TODO) + "<span>" + K.esc(label) + "</span>" }));
+    });
+    el.appendChild(ol);
+    return el;
+  }
+
+  // A field label that says up front whether the field is needed: a red
+  // asterisk for required, a grey "optional" tag for the rest.
+  function need(text, required) {
+    var l = h("span", { class: "ksch-lbl", text: text });
+    l.appendChild(required ? h("span", { class: "ksch-req", text: " *", title: "Required" }) : h("span", { class: "ksch-optional", text: "optional" }));
+    return l;
+  }
 
   var W = null;
-  function createPage() {
-    if (!W) W = { title: "", organizer: ls("ksch:name", ""), dates: [], people: [] };
+  function createPage(page) {
+    if (!W) W = { title: "", organizer: ls("ksch:name", ""), dates: [], people: [], length: 60, page: 1 };
+    if (page) W.page = page;
     K.tzEdit();
     var why = h("span", { class: "ksch-help ksch-g-why", "aria-live": "polite" });
-    var go = button("Create poll", { primary: true, icon: "check", onClick: create });
-    var title = h("input", { class: "ksch-input big", maxlength: "120", placeholder: "e.g. FF Fun Hangout", value: W.title,
-      oninput: function () { W.title = title.value; } });
-    var who = h("input", { class: "ksch-input", maxlength: "60", placeholder: "So people know who's asking", value: W.organizer, autocomplete: "name",
-      required: true, "aria-required": "true", oninput: function () { W.organizer = who.value; check(); } });
-    var people = K.w.peopleInput({ names: W.people, label: "Add a name or email", placeholder: "Type a name or email, then Enter",
-      onChange: function () { setTimeout(sync, 0); } });
-    var dp = K.w.datePicker({ selected: W.dates, min: K.todayKey(), multiple: true, onChange: function () { setTimeout(sync, 0); } });
+    var side = h("div", { class: "ksch-c-side" });
+    function track() {
+      side.innerHTML = "";
+      // Who's coming is optional, so it counts as done once you move past it.
+      side.appendChild(tracker([!!W.organizer.trim(), W.people.length > 0 || W.page === 2, W.dates.length > 0, false, false, false], W.page === 1 ? (W.organizer.trim() ? 1 : 0) : 2));
+    }
+    var main, go;
+
+    if (W.page === 1) {
+      go = button("Next", { primary: true, icon: "next", onClick: function () { sync1(); if (!check1()) createPage(2); } });
+      var title = h("input", { class: "ksch-input big", maxlength: "120", placeholder: "e.g. FF Fun Hangout", value: W.title,
+        oninput: function () { W.title = title.value; } });
+      var who = h("input", { class: "ksch-input", maxlength: "60", placeholder: "So people know who's asking", value: W.organizer, autocomplete: "name",
+        required: true, "aria-required": "true", oninput: function () { W.organizer = who.value; check1(); track(); } });
+      var people = K.w.peopleInput({ names: W.people, label: "Add a name or email", placeholder: "Type a name or email, then Enter",
+        onChange: function () { setTimeout(function () { sync1(); track(); }, 0); } });
+      var pin = people.el.querySelector("input");
+      var sync1 = function () { W.people = people.get().slice(); };
+      var check1 = function () { var r = W.organizer.trim() ? "" : "Add your name"; go.disabled = !!r; why.textContent = r; return r; };
+      // Enter moves down the page; in the names box it adds the name, and on
+      // an empty names box it goes on to the dates.
+      title.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); who.focus(); } });
+      who.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); pin.focus(); } });
+      pin.addEventListener("keydown", function (e) {
+        // The names box handles Enter first: it adds the typed name and marks
+        // the event handled. Only an Enter on an empty box moves on.
+        if (e.key !== "Enter" || e.defaultPrevented) return;
+        e.preventDefault();
+        if (!pin.value.trim()) { sync1(); if (!check1()) createPage(2); }
+      });
+      main = h("div", { class: "ksch-c" },
+        h("label", { class: "ksch-field" }, need("Give it a name", false), title),
+        h("label", { class: "ksch-field" }, need("Your name", true), who),
+        h("div", { class: "ksch-field" }, need("Who's it with?", false), people.el,
+          h("p", { class: "ksch-help ksch-c-hint", text: "Write a list, or press Enter after each name or email. Click × to take one out." })));
+      K.render(screen(h("div", { class: "ksch-c-wrap" }, side, main), actions(null, [why, go])), "Find a time");
+      check1(); track();
+      setTimeout(function () { (W.organizer ? title : who).focus({ preventScroll: true }); }, 0);
+      return;
+    }
+
+    // Page 2: the dates.
+    go = button("Create poll", { primary: true, icon: "check", onClick: create });
+    var dp = K.w.datePicker({ selected: W.dates, min: K.todayKey(), multiple: true, onChange: function () { setTimeout(sync2, 0); } });
     var dateHost = h("div", { class: "ksch-c-dates" }, dp.el);
     var summary = h("p", { class: "ksch-help ksch-c-sum", "aria-live": "polite" });
-    ["click", "keyup", "change", "pointerup"].forEach(function (ev) { dateHost.addEventListener(ev, function () { setTimeout(sync, 0); }); });
-    function sync() {
+    ["click", "keyup", "change", "pointerup"].forEach(function (ev) { dateHost.addEventListener(ev, function () { setTimeout(sync2, 0); }); });
+    var lens = h("div", { class: "ksch-chips", role: "group", "aria-label": "How long is it?" });
+    LENGTHS.forEach(function (m) {
+      lens.appendChild(h("button", { type: "button", class: "ksch-chip", "aria-pressed": W.length === m ? "true" : "false", text: fmtLen(m),
+        onclick: function (e) {
+          W.length = m;
+          lens.querySelectorAll(".ksch-chip").forEach(function (c) { c.setAttribute("aria-pressed", c === e.currentTarget ? "true" : "false"); });
+        } }));
+    });
+    function sync2() {
       W.dates = dp.get().slice().sort();
-      W.people = people.get().slice();
       summary.textContent = W.dates.length ? "People mark their free times between 9 AM and 11 PM on " + (W.dates.length === 1 ? "that day." : "those days.") : "";
-      check();
+      check2(); track();
     }
-    function check() {
-      var r = !W.organizer.trim() ? "Add your name" : !W.dates.length ? "Pick at least one date" : W.dates.length > 31 ? "Pick 31 dates or fewer" : "";
+    function check2() {
+      var r = !W.dates.length ? "Pick at least one date" : W.dates.length > 31 ? "Pick 31 dates or fewer" : "";
       go.disabled = !!r; why.textContent = r;
       return r;
     }
     function create() {
-      sync();
-      if (check()) return;
+      sync2();
+      if (check2()) return;
       go.disabled = true; go.lastChild.textContent = "Creating...";
       var names = W.people.slice();
       var t = W.title.trim() || (names.length
         ? "Meeting with " + (names.length > 3 ? names.slice(0, 3).join(", ") + " and " + (names.length - 3) + " more" : listNames(names))
         : W.organizer.trim() + "'s meeting");
-      var cfg = { days: W.dates.slice(), startMin: 540, endMin: 1380, step: 30, duration: 60, organizer: W.organizer.trim(),
+      var cfg = { days: W.dates.slice(), startMin: 540, endMin: 1380, step: 30, duration: W.length, organizer: W.organizer.trim(),
         location: "", note: "", invitees: names };
       try { localStorage.setItem("ksch:name", JSON.stringify(cfg.organizer)); } catch (e) { /* storage blocked */ }
       K.store.create("group", t, cfg, "").then(function (r) {
@@ -8268,29 +8387,22 @@ var KSCH = (function () {
         K.toast("Couldn't create the poll: " + err.message);
       });
     }
-    // Enter moves down the form; in the names box it adds the name instead.
-    title.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); who.focus(); } });
-    who.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); people.el.querySelector("input").focus(); } });
-    people.el.querySelector("input").addEventListener("keydown", function (e) { if (e.key === "Enter") e.preventDefault(); });
-    K.render(screen(
-      h("div", { class: "ksch-c" },
-        field("Give it a name (optional)", title),
-        field("Your name", who),
-        h("div", { class: "ksch-field" }, h("span", { class: "ksch-lbl", text: "Who's it with?" }), people.el,
-          h("p", { class: "ksch-help ksch-c-hint", text: "Write a list, or press Enter after each name or email. Click × to take one out." })),
-        h("div", { class: "ksch-field" }, h("span", { class: "ksch-lbl", text: "Which dates could work?" }), dateHost, summary)),
-      actions(null, [why, go])), "Find a time");
-    sync();
-    setTimeout(function () { (W.organizer ? title : who).focus({ preventScroll: true }); }, 0);
+    main = h("div", { class: "ksch-c" },
+      h("div", { class: "ksch-field" }, h("span", { class: "ksch-lbl", text: "How long is it?" }), lens),
+      h("div", { class: "ksch-field" }, need("When could it be? Pick the dates", true), dateHost, summary));
+    K.render(screen(h("div", { class: "ksch-c-wrap" }, side, main),
+      actions(button("Back", { icon: "back", onClick: function () { createPage(1); } }), [why, go])), "Find a time");
+    sync2();
   }
 
   /* ---------- sharing ---------- */
 
-  function shareBlock(id, title, admin) {
+  function shareBlock(id, title, admin, getCfg) {
     var url = K.shareUrl(id);
+    function msg() { return inviteText(title, getCfg ? getCfg() : null); }
     var tools = h("div", { class: "ksch-g-sharetools" },
-      button("Copy invite message", { icon: "mail", onClick: function () { K.copy(inviteText(title) + url); } }),
-      navigator.share ? button("Share", { icon: "share", onClick: function () { K.nativeShare(title, inviteText(title), url); } }) : null);
+      button("Copy invite message", { icon: "mail", onClick: function () { K.copy(msg() + url); } }),
+      navigator.share ? button("Share", { icon: "share", onClick: function () { K.nativeShare(title, msg(), url); } }) : null);
     var el = h("div", { class: "ksch-g-share" },
       h("div", { class: "ksch-field" }, h("span", { class: "ksch-lbl", text: "Link for everyone" }), linkBox(url)), tools);
     if (admin) el.appendChild(h("div", { class: "ksch-g-orgbox" },
@@ -8301,35 +8413,30 @@ var KSCH = (function () {
 
   // Optional details, saved onto the poll once it exists: how long it is,
   // where, and a note. Nothing here is needed to share the link.
-  function detailsBox(id, cfg) {
-    var len = cfg.duration || 60;
-    var lens = h("div", { class: "ksch-chips", role: "group", "aria-label": "How long is it?" });
-    LENGTHS.forEach(function (m) {
-      lens.appendChild(h("button", { type: "button", class: "ksch-chip", "aria-pressed": len === m ? "true" : "false", text: fmtLen(m),
-        onclick: function (e) {
-          len = m;
-          lens.querySelectorAll(".ksch-chip").forEach(function (c) { c.setAttribute("aria-pressed", c === e.currentTarget ? "true" : "false"); });
-        } }));
-    });
+  // live.cfg is shared with the share block, so a saved place shows up in
+  // the copied invite message at once.
+  function detailsBox(id, live) {
     var loc = h("input", { class: "ksch-input", maxlength: "200", placeholder: "Room, address or video link" });
     var note = h("textarea", { maxlength: "500", placeholder: "Anything people should know" });
     var save = button("Save details", { icon: "check", onClick: function () {
       save.disabled = true;
-      var nc = Object.assign({}, cfg, { duration: len, location: loc.value.trim(), note: note.value.trim() });
-      K.store.update(id, { config: nc }).then(function () { cfg = nc; save.disabled = false; K.toast("Details saved"); },
+      var nc = Object.assign({}, live.cfg, { location: loc.value.trim(), note: note.value.trim() });
+      K.store.update(id, { config: nc }).then(function () { live.cfg = nc; save.disabled = false; K.toast("Details saved. The invite message now says where."); },
         function (err) { save.disabled = false; K.toast("Couldn't save: " + err.message); });
     } });
     return h("details", { class: "ksch-c-more" },
-      h("summary", null, "Add details (optional): how long, where, a note"),
-      field("How long is it?", lens), field("Location", loc), field("Note", note), h("div", { class: "ksch-c-save" }, save));
+      h("summary", null, "Add details (optional): where, a note"),
+      field("Location", loc), field("Note", note), h("div", { class: "ksch-c-save" }, save));
   }
 
   function shareScreen(id, admin, title, cfg) {
+    var live = { cfg: cfg || null };
     var banner = h("div", { class: "ksch-banner ok", role: "status" });
     banner.innerHTML = K.icon("check") + "<span><b>Poll created.</b> Send the link to everyone. Nobody needs an account.</span>";
     K.render(screen(
+      tracker([true, true, true, false, false, false], 3, true),
       toolbar(title, "Share it however your team talks: group chat, email, text."),
-      banner, shareBlock(id, title, admin), cfg ? detailsBox(id, cfg) : null,
+      banner, shareBlock(id, title, admin, function () { return live.cfg; }), cfg ? detailsBox(id, live) : null,
       actions(button("View results", { icon: "grid", onClick: function () { nextView = "group"; K.openPoll(id); } }),
         button("Add my availability", { primary: true, icon: "brush", onClick: function () { nextView = "mine"; K.openPoll(id); } }))), "Find a time");
     var p = K.root.querySelector(".ksch-g .ksch-actions .btn-primary"); if (p) p.focus({ preventScroll: true });
@@ -8337,7 +8444,7 @@ var KSCH = (function () {
 
   function shareDialog() {
     var poll = P.data.poll;
-    K.dialog({ title: "Share " + poll.title, body: shareBlock(poll.id, poll.title, K.tok(poll.id).admin), wide: true, actions: [{ label: "Done" }] });
+    K.dialog({ title: "Share " + poll.title, body: shareBlock(poll.id, poll.title, K.tok(poll.id).admin, function () { return poll.config; }), wide: true, actions: [{ label: "Done" }] });
   }
 
   /* ---------- the poll screen ---------- */
@@ -8392,7 +8499,8 @@ var KSCH = (function () {
            { value: "group", label: "Group", icon: "users" }], P.view, function (v) { if (v !== P.view) { P.view = v; draw(); } }, "View"),
       admin ? orgMenu() : null);
 
-    var el = screen(finalBanner(), isClosed() ? closedBanner() : null, toolbar(poll.title, sub, right, "ksch-g-polltop"));
+    var prog = admin ? tracker([true, true, true, true, n > 0, !!poll.final], n > 0 ? 5 : 4, true) : null;
+    var el = screen(prog, finalBanner(), isClosed() ? closedBanner() : null, toolbar(poll.title, sub, right, "ksch-g-polltop"));
     if (P.view === "mine") mineView(el); else groupView(el);
     P.root = el;
     K.render(el, "Find a time");

@@ -1193,23 +1193,26 @@ html:not(.meet-only) .ksch:not(.pop){display:none !important;}
 .ksch-scrim[hidden]{display:none;}
 @media (max-width:640px){.ksch.pop:not(.full){top:0;max-height:100vh;height:100vh;width:100vw;border-radius:0;padding:16px;}}
 
-/* The opening quiz: one question a screen, big answer cards, three dots. */
-.ksch-q-n{margin:2px 0 6px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);}
-.ksch-q-dots{display:flex;gap:6px;margin:0 0 14px;}
-.ksch-q-dots i{width:32px;height:6px;border-radius:99px;background:var(--line);}
-.ksch-q-dots i.done{background:color-mix(in srgb,var(--acc) 45%,var(--line));}
-.ksch-q-dots i.on{background:var(--acc);}
-.ksch-quiz .ksch-q-h{font-size:23px;margin:0 0 18px;}
-.ksch .ksch-q-opts{grid-template-columns:1fr;gap:10px;}
-.ksch .ksch-q-opt{align-items:center;padding:18px 20px;border-radius:12px;border-width:1.5px;box-shadow:0 2px 0 var(--line);}
-.ksch .ksch-q-opt:hover{border-color:var(--acc);background:var(--acc-soft);}
-.ksch .ksch-q-opt svg{width:26px;height:26px;margin:0;}
-.ksch .ksch-q-opt b{font-size:16px;}
-.ksch .ksch-q-opt span{font-size:14px;margin-top:2px;}
-.ksch-q-tz{display:grid;gap:10px;margin-bottom:16px;}
-.ksch .ksch-q-tz select{width:100%;height:46px;font-size:15px;padding:0 12px;}
-.ksch-q-note{margin:0;font-size:14px;color:var(--sub);}
-
+/* The one-page new-poll form. */
+.ksch-c{display:grid;gap:14px;max-width:560px;}
+.ksch-c .ksch-lbl{font-size:13px;}
+.ksch-c .ksch-w-people{min-height:44px;}
+.ksch-c-hint{margin:4px 0 0;font-size:12px;color:var(--mut);}
+.ksch-c-sum{margin:6px 0 0;font-size:12.5px;}
+.ksch-c-dates{max-width:340px;}
+/* After creating: the optional details, folded away. */
+.ksch-c-more{margin:14px 0 0;border:1px solid var(--line);border-radius:10px;padding:10px 14px;}
+.ksch-c-more summary{cursor:pointer;font-weight:700;color:var(--deep);font-size:13.5px;}
+.ksch-c-more[open] summary{margin-bottom:10px;}
+.ksch-c-more .ksch-field{margin:0 0 10px;}
+.ksch-c-save{display:flex;justify-content:flex-end;}
+/* On the form the time zone pill is a dropdown: grey on hover, and an
+   invisible select over it opens the list. */
+.ksch-tz.edit{position:relative;cursor:pointer;transition:background-color .15s;}
+.ksch-tz.edit:hover,.ksch-tz.edit:focus-within{background:color-mix(in srgb,var(--mut) 22%,var(--soft));}
+.ksch-tz.edit:focus-within{outline:2px solid var(--acc);outline-offset:1px;}
+.ksch-tz-chev{flex:none;width:13px;height:13px;}
+.ksch-tz-sel{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:14px;}
 /* Time zone pill beside the title. Amber when it is not the reader's zone. */
 .ksch-head .ksch-title{margin-right:0;}
 .ksch-head .ksch-corner{margin-left:auto;}
@@ -1944,7 +1947,7 @@ html.ksch-lock .fab{display:none;}
   <div class="ksch-launch-main">
     <span class="ksch-launch-k">Meeting scheduler</span>
     <h2>Find a time that works for everyone</h2>
-    <p>Answer three quick questions and share one link. Everyone taps the times they're free, and the best time shows up on its own.</p>
+    <p>Pick some dates, add who it's with, and share one link. Everyone taps the times they're free, and the best time shows up on its own.</p>
     <div class="ksch-launch-acts">
       <button type="button" class="btn btn-primary ksch-launch-go" data-ksch-open="start"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Find a time</button>
       <button type="button" class="btn" data-ksch-open="recent">Your polls</button>
@@ -7092,59 +7095,9 @@ var KSCH = (function () {
     modes[name].start(opts || {});
   }
 
-  // The first screens are a short quiz, one question a screen: who it is with,
-  // how the time gets chosen, then the time zone the times are in. Picking an
-  // answer moves on by itself; Back goes one question up. Offering your own
-  // free times only makes sense for one person, so that answer shows only then.
-  var HOW = [
-    { id: "collect", icon: "users", title: "Everyone marks when they're free", sub: "You pick the time that suits the most people." },
-    { id: "propose", icon: "clock", title: "I already have a time", sub: "They say yes or no to it." },
-    { id: "offer", icon: "cal", title: "I offer times, they book one", sub: "Like office hours.", one: true }
-  ];
-  function chooser() {
-    var ans = { who: "", how: "", tz: pickedTz || deviceTz() };
-    setTzPill(ans.tz, null);
-    function card(o, on, pick) {
-      var b = h("button", { type: "button", class: "ksch-opt ksch-q-opt", role: "radio", "aria-checked": on ? "true" : "false", onclick: pick });
-      b.innerHTML = icon(o.icon) + "<div><b>" + esc(o.title) + "</b>" + (o.sub ? "<span>" + esc(o.sub) + "</span>" : "") + "</div>";
-      return b;
-    }
-    function frame(n, question, body, foot) {
-      var dots = h("div", { class: "ksch-q-dots", "aria-hidden": "true" });
-      for (var i = 1; i <= 3; i++) dots.appendChild(h("i", { class: i < n ? "done" : i === n ? "on" : null }));
-      render(h("div", { class: "ksch-screen ksch-start ksch-quiz" },
-        h("p", { class: "ksch-q-n", text: "Question " + n + " of 3" }), dots,
-        h("h3", { class: "ksch-h ksch-q-h", text: question }), body,
-        h("div", { class: "ksch-actions" }, n > 1 ? button("Back", { icon: "back", onClick: function () { step(n - 1); } }) : null,
-          h("div", { class: "end" }, foot || null))), "Find a time");
-    }
-    function step(n) {
-      if (n === 1) {
-        var w = h("div", { class: "ksch-opts ksch-q-opts", role: "radiogroup", "aria-label": "Who is it with?" });
-        [{ id: "one", icon: "user", title: "One person" }, { id: "group", icon: "users", title: "A group" }].forEach(function (o) {
-          w.appendChild(card(o, ans.who === o.id, function () { ans.who = o.id; if (ans.who === "group" && ans.how === "offer") ans.how = ""; step(2); }));
-        });
-        frame(1, "Who is the meeting with?", w);
-      } else if (n === 2) {
-        var hw = h("div", { class: "ksch-opts ksch-q-opts", role: "radiogroup", "aria-label": "How do you want to find a time?" });
-        HOW.forEach(function (o) {
-          if (o.one && ans.who !== "one") return;
-          hw.appendChild(card(o, ans.how === o.id, function () { ans.how = o.id; step(3); }));
-        });
-        frame(2, "How should the time get picked?", hw);
-      } else {
-        var note = h("p", { class: "ksch-q-note", text: tzNote(ans.tz) });
-        var sel = tzSelect(ans.tz, function (v) { ans.tz = v; setTzPill(v, null); note.textContent = tzNote(v); });
-        var go = button("Continue", { primary: true, icon: "next", onClick: function () {
-          pickedTz = ans.tz;
-          if (ans.who === "one") start("one", { mode: ans.how });
-          else start("group", { propose: ans.how === "propose" });
-        } });
-        frame(3, "What time zone are the times in?", h("div", { class: "ksch-q-tz" }, sel, note), go);
-      }
-    }
-    step(1);
-  }
+  // No questions before the form: start() opens the one-page group poll form.
+  // Who it is with is read from the names typed there, not asked.
+  function chooser() { start("group", {}); }
 
   /* ---------- time zones ----------
      A poll's times are wall-clock minutes. The zone they belong to is saved
@@ -7195,17 +7148,27 @@ var KSCH = (function () {
     return sel;
   }
   // The pill beside the title: the zone the times are in, and how far that is
-  // from the reader when it is not their own.
-  function setTzPill(tz, poll) {
+  // from the reader when it is not their own. On the new-poll form it is also
+  // the way to change the zone: an invisible dropdown covers it, so a click
+  // opens the browser's own list.
+  function setTzPill(tz, poll, editable) {
     activeTz = tz || "";
     var pill = root.querySelector(".ksch-tz");
     if (!pill) return;
     if (!tz) { pill.hidden = true; return; }
     var g = tzGap(tz);
     pill.hidden = false;
-    pill.innerHTML = icon("globe") + "<span>" + esc((poll ? "Times in " : "") + tzLabel(tz)) + (g ? " · <b>" + esc(g) + "</b>" : "") + "</span>";
+    pill.innerHTML = icon("globe") + "<span>" + esc((poll ? "Times in " : "") + tzLabel(tz)) + (g ? " \u00b7 <b>" + esc(g) + "</b>" : "") + "</span>";
     pill.classList.toggle("away", !!g);
-    pill.title = tz.replace(/_/g, " ");
+    pill.classList.toggle("edit", !!editable);
+    pill.title = editable ? "Change the time zone" : tz.replace(/_/g, " ");
+    if (editable) {
+      pill.insertAdjacentHTML("beforeend", '<svg class="ksch-tz-chev" ' + P + '><path d="m6 9 6 6 6-6"/></svg>');
+      var sel = tzSelect(tz, function (v) { pickedTz = v; setTzPill(v, null, true); });
+      sel.className = "ksch-tz-sel";
+      sel.setAttribute("aria-label", "Time zone: " + tzLabel(tz) + ". Change it");
+      pill.appendChild(sel);
+    }
   }
 
   function openPoll(id) {
@@ -7260,6 +7223,7 @@ var KSCH = (function () {
 
   return {
     root: root, h: h, esc: esc, icon: icon, button: button, render: render, toast: toast, dialog: dialog,
+    tzEdit: function () { pickedTz = pickedTz || deviceTz(); setTzPill(pickedTz, null, true); },
     store: store, modes: modes, start: start, openPoll: openPoll, setFull: setFull, deletePoll: deletePoll, validEmail: validEmail,
     isAdmin: isAdmin, me: me, setMe: setMe, tok: tok, keepTokens: keepTokens, remember: remember, forget: forget,
     shareUrl: shareUrl, copy: copy, recent: recent, nativeShare: nativeShare, gcalUrl: gcalUrl, downloadIcs: downloadIcs,
@@ -8245,209 +8209,79 @@ var KSCH = (function () {
 
   // From the start screen: a fresh wizard. propose: one fixed time that
   // everyone says yes, maybe or no to, instead of a range of days.
-  function start(opts) {
+  function start() {
     stopRefresh();
     P = null; W = null;
-    wizard(1, !!opts.propose);
+    createPage();
   }
 
-  /* ---------- create wizard ---------- */
+  /* ---------- the new-poll form ----------
+     One page: an optional name, your name, who it is with (a list of names or
+     emails, typed like email recipients) and the dates. The time zone is the
+     pill in the head. The hours default to 9 AM to 11 PM in 30 minute slots;
+     length, location and a note are optional and come after the poll exists. */
 
   var W = null;
-  function wizard(step, propose) {
-    if (!W) W = { propose: !!propose, title: "", organizer: ls("ksch:name", ""), email: ls("ksch:email", ""), length: 60, location: "", note: "", details: false,
-      dayMode: "dates", dates: [], dows: [], startMin: 540, endMin: 1260, step: 30, people: [] };
-    var prev = W.page || step;
-    W.page = step;
-    ({ 1: stepWhat, 2: W.propose ? stepTime : stepDays, 3: stepWho })[step](prev);
-  }
-
-  // One wizard page: progress bar, question, content, Back and the primary.
-  // check() returns the reason the primary is disabled, or "" when it can go.
-  function wizPage(prevStep, title, sub, content, primaryLabel, check, onNext) {
-    var bar = h("i", { style: "width:" + (prevStep / 3 * 100) + "%" });
+  function createPage() {
+    if (!W) W = { title: "", organizer: ls("ksch:name", ""), dates: [], people: [] };
+    K.tzEdit();
     var why = h("span", { class: "ksch-help ksch-g-why", "aria-live": "polite" });
-    var next = button(typeof primaryLabel === "function" ? primaryLabel() : primaryLabel, { primary: true, icon: W.page < 3 ? null : "check", onClick: go });
-    function update() {
-      var r = check();
-      next.disabled = !!r;
-      why.textContent = r;
-      if (typeof primaryLabel === "function") next.lastChild.textContent = primaryLabel();
-    }
-    function go() { if (!check()) onNext(next); }
-    var el = screen(
-      h("div", { class: "ksch-steps" }, h("span", { text: "Step " + W.page + " of 3" }), h("div", { class: "bar" }, bar)),
-      toolbar(title, sub),
-      h("div", { class: "ksch-g-wiz" }, content),
-      actions(button("Back", { icon: "back", onClick: function () { W.page === 1 ? K.start() : wizard(W.page - 1); } }), [why, next]));
-    el.addEventListener("keydown", function (e) {
-      var t = e.target;
-      if (e.key !== "Enter" || e.defaultPrevented || e.shiftKey || t.tagName === "TEXTAREA" || t.tagName === "BUTTON" || t.closest(".ksch-g-noenter")) return;
-      e.preventDefault(); go();
-    });
-    K.render(el, "Find a time");
-    update();
-    // Animate the bar from the previous step's width.
-    requestAnimationFrame(function () { bar.style.width = (W.page / 3 * 100) + "%"; });
-    return update;
-  }
-
-  function stepWhat(prev) {
-    var update;
-    var title = h("input", { class: "ksch-input big", maxlength: "120", autofocus: true, placeholder: "e.g. Leaders meeting", value: W.title,
-      oninput: function () { W.title = title.value; update(); } });
+    var go = button("Create poll", { primary: true, icon: "check", onClick: create });
+    var title = h("input", { class: "ksch-input big", maxlength: "120", placeholder: "e.g. FF Fun Hangout", value: W.title,
+      oninput: function () { W.title = title.value; } });
     var who = h("input", { class: "ksch-input", maxlength: "60", placeholder: "So people know who's asking", value: W.organizer, autocomplete: "name",
-      oninput: function () { W.organizer = who.value; update(); } });
-    var mail = h("input", { class: "ksch-input", type: "email", maxlength: "200", placeholder: "you@example.com", value: W.email, autocomplete: "email",
-      oninput: function () { W.email = mail.value; update(); } });
-    var lens = h("div", { class: "ksch-chips", role: "group", "aria-label": "Meeting length" });
-    LENGTHS.forEach(function (m) {
-      lens.appendChild(h("button", { type: "button", class: "ksch-chip", "aria-pressed": W.length === m ? "true" : "false", text: fmtLen(m),
-        onclick: function (e) {
-          W.length = m;
-          lens.querySelectorAll(".ksch-chip").forEach(function (c) { c.setAttribute("aria-pressed", c === e.currentTarget ? "true" : "false"); });
-        } }));
-    });
-    var loc = h("input", { class: "ksch-input", maxlength: "200", placeholder: "Room, address or video link", value: W.location, oninput: function () { W.location = loc.value; } });
-    var note = h("textarea", { maxlength: "500", placeholder: "Anything people should know", oninput: function () { W.note = note.value; } });
-    note.value = W.note;
-    var more = h("div", { class: "ksch-g-details", hidden: !W.details }, h("div", { class: "ksch-row" }, field("Location (optional)", loc)), field("Note (optional)", note));
-    var toggle = h("button", { type: "button", class: "ksch-g-textbtn", "aria-expanded": W.details ? "true" : "false",
-      onclick: function () {
-        W.details = !W.details; more.hidden = !W.details;
-        toggle.setAttribute("aria-expanded", W.details ? "true" : "false");
-        if (W.details) loc.focus();
-      } });
-    toggle.innerHTML = K.icon("plus") + "Add details: location, note";
-    update = wizPage(prev, "What's it for?", "Give it a name people will recognise.",
-      [field("Meeting name", title), h("div", { class: "ksch-row" }, field("Your name", who),
-        field("Your email (optional)", mail, "A short email on days people answer.")), field("How long is the meeting?", lens), toggle, more],
-      "Continue", function () {
-        if (!W.title.trim()) return "Name the meeting to continue";
-        if (!W.organizer.trim()) return "Add your name to continue";
-        if (!K.validEmail(W.email)) return "Check the email address";
-        return "";
-      }, function () { wizard(2); });
-  }
-
-  // The "time in mind" page: one day and a start time; the length came from page 1.
-  function stepTime(prev) {
-    var update;
-    var dp = K.w.datePicker({ selected: W.dates.slice(0, 1), min: K.todayKey(), multiple: false, onChange: function () { setTimeout(sync, 0); } });
-    var tp = K.w.timePicker({ value: W.startMin, minutes: W.startMin, onChange: function () { setTimeout(sync, 0); } });
-    var summary = h("p", { class: "ksch-g-summary", "aria-live": "polite" });
-    var host = h("div", null, field("Day", dp.el), field("Start time", tp.el), summary);
+      required: true, "aria-required": "true", oninput: function () { W.organizer = who.value; check(); } });
+    var people = K.w.peopleInput({ names: W.people, label: "Add a name or email", placeholder: "Type a name or email, then Enter",
+      onChange: function () { setTimeout(sync, 0); } });
+    var dp = K.w.datePicker({ selected: W.dates, min: K.todayKey(), multiple: true, onChange: function () { setTimeout(sync, 0); } });
+    var dateHost = h("div", { class: "ksch-c-dates" }, dp.el);
+    var summary = h("p", { class: "ksch-help ksch-c-sum", "aria-live": "polite" });
+    ["click", "keyup", "change", "pointerup"].forEach(function (ev) { dateHost.addEventListener(ev, function () { setTimeout(sync, 0); }); });
     function sync() {
-      var k = dp.get(), m = tp.get();
-      W.dates = k.length ? [k[k.length - 1]] : [];
-      if (m != null) W.startMin = m;
-      summary.textContent = W.dates.length ? K.fmtDay(W.dates[0]) + ", " + K.fmtRange(W.startMin, W.startMin + W.length) : "";
-      update && update();
+      W.dates = dp.get().slice().sort();
+      W.people = people.get().slice();
+      summary.textContent = W.dates.length ? "People mark their free times between 9 AM and 11 PM on " + (W.dates.length === 1 ? "that day." : "those days.") : "";
+      check();
     }
-    ["click", "change", "input", "pointerup", "keyup"].forEach(function (ev) { host.addEventListener(ev, function () { setTimeout(sync, 0); }); });
-    update = wizPage(prev, "When is it?", "Everyone says whether they can make it. You confirm it after.", [host],
-      "Continue", function () {
-        if (!W.dates.length) return "Pick the day";
-        if (W.startMin + W.length > 1440) return "That runs past midnight";
-        return "";
-      }, function () { wizard(3); });
-    sync();
-  }
-
-  function stepDays(prev) {
-    var update, picker, range;
-    function days() { return W.dayMode === "dates" ? W.dates.slice().sort() : W.dows.slice().sort(); }
-    var summary = h("p", { class: "ksch-g-summary", "aria-live": "polite" });
-    var pickHost = h("div", { class: "ksch-g-pick" });
-    function drawPicker() {
-      pickHost.innerHTML = "";
-      picker = W.dayMode === "dates"
-        ? K.w.datePicker({ selected: W.dates, min: K.todayKey(), multiple: true, onChange: function (k) { W.dates = k.slice(); sync(); } })
-        : K.w.dowPicker({ selected: W.dows, onChange: function (k) { W.dows = k.slice(); sync(); } });
-      pickHost.appendChild(picker.el);
+    function check() {
+      var r = !W.organizer.trim() ? "Add your name" : !W.dates.length ? "Pick at least one date" : W.dates.length > 31 ? "Pick 31 dates or fewer" : "";
+      go.disabled = !!r; why.textContent = r;
+      return r;
     }
-    // Widgets may or may not call onChange for every kind of edit; reading
-    // get() after any interaction keeps the summary honest either way.
-    function sync() {
-      if (picker) { if (W.dayMode === "dates") W.dates = picker.get().slice(); else W.dows = picker.get().slice(); }
-      if (range) { var r = range.get(); W.startMin = r.startMin; W.endMin = r.endMin; }
-      var d = days(), span = W.endMin - W.startMin;
-      summary.textContent = d.length && span > 0
-        ? d.length + (d.length === 1 ? " day" : " days") + MID + K.fmtRange(W.startMin, W.endMin) + MID + (d.length * Math.floor(span / W.step)) + " slots"
-        : "Pick some days to see the grid size.";
-      update && update();
-    }
-    function later() { setTimeout(sync, 0); }
-    ["click", "change", "input", "pointerup", "keyup"].forEach(function (ev) { pickHost.addEventListener(ev, later); });
-
-    var modeSeg = h("div");
-    function drawMode() {
-      modeSeg.innerHTML = "";
-      modeSeg.appendChild(seg([{ value: "dates", label: "Specific dates", icon: "cal" }, { value: "dow", label: "Days of the week", icon: "list" }], W.dayMode,
-        function (v) { if (v === W.dayMode) return; W.dayMode = v; drawMode(); drawPicker(); sync(); }, "Kind of days"));
-    }
-    drawMode(); drawPicker();
-    range = K.w.timeRange({ startMin: W.startMin, endMin: W.endMin, onChange: function () { later(); } });
-    var rangeHost = h("div", { class: "ksch-g-range" }, range.el);
-    ["click", "change", "input"].forEach(function (ev) { rangeHost.addEventListener(ev, later); });
-    var stepSeg = h("div");
-    function drawStep() {
-      stepSeg.innerHTML = "";
-      stepSeg.appendChild(seg([15, 30, 60].map(function (m) { return { value: m, label: m + " min" }; }), W.step,
-        function (v) { W.step = v; drawStep(); sync(); }, "Slot size"));
-    }
-    drawStep();
-
-    update = wizPage(prev, "Which days?", "Pick the days people can choose from, then the hours to show.",
-      h("div", { class: "ksch-g-days" },
-        h("div", { class: "ksch-g-days-l" }, modeSeg, pickHost),
-        h("div", { class: "ksch-g-days-r" },
-          h("div", { class: "ksch-field" }, h("span", { class: "ksch-lbl", text: "Between" }), rangeHost),
-          h("div", { class: "ksch-field" }, h("span", { class: "ksch-lbl", text: "Slot size" }), stepSeg),
-          summary)),
-      "Continue", function () {
-        var d = days(), span = W.endMin - W.startMin;
-        if (!d.length) return "Pick at least one day";
-        if (d.length > 31) return "Pick 31 days or fewer";
-        if (!(span > 0)) return "The end time must be after the start";
-        if (span % W.step) return "The hours must divide into " + W.step + " min slots";
-        if (span < W.length) return "The hours are shorter than the " + fmtLen(W.length) + " meeting";
-        return "";
-      }, function () { wizard(3); });
-    sync();
-  }
-
-  function stepWho(prev) {
-    var update, people;
-    var host = h("div");
-    people = K.w.peopleInput({ names: W.people, value: W.people, placeholder: "Names, separated by commas", onChange: function () { setTimeout(sync, 0); } });
-    host.appendChild(people.el);
-    function sync() { W.people = people.get().slice(); update && update(); }
-    ["click", "keyup", "input", "change", "paste"].forEach(function (ev) { host.addEventListener(ev, function () { setTimeout(sync, 0); }); });
-    update = wizPage(prev, "Who's invited?", "Optional.",
-      [host, h("p", { class: "ksch-help", text: "Add names to see who hasn't answered yet. You can skip this." })],
-      function () { return W.people.length ? "Create poll" : "Create without a list"; },
-      function () { return ""; },
-      function (btn) {
-        btn.disabled = true; btn.lastChild.textContent = "Creating...";
-        var cfg = W.propose
-          ? { days: W.dates.slice(0, 1), startMin: W.startMin, endMin: W.startMin + W.length, step: 30, proposed: true,
-              duration: W.length, organizer: W.organizer.trim(), location: W.location.trim(), note: W.note.trim(), invitees: W.people.slice() }
-          : { days: W.dayMode === "dates" ? W.dates.slice().sort() : W.dows.slice().sort(), startMin: W.startMin, endMin: W.endMin, step: W.step,
-          duration: W.length, organizer: W.organizer.trim(), location: W.location.trim(), note: W.note.trim(), invitees: W.people.slice() };
-        var title = W.title.trim();
-        var email = W.email.trim();
-        try { localStorage.setItem("ksch:email", JSON.stringify(email)); } catch (e) { /* storage blocked */ }
-        K.store.create("group", title, cfg, email).then(function (r) {
-          K.setMe(r.id, cfg.organizer);
-          W = null;
-          shareScreen(r.id, r.admin, title);
-        }, function (err) {
-          btn.disabled = false; btn.lastChild.textContent = W.people.length ? "Create poll" : "Create without a list";
-          K.toast("Couldn't create the poll: " + err.message);
-        });
+    function create() {
+      sync();
+      if (check()) return;
+      go.disabled = true; go.lastChild.textContent = "Creating...";
+      var names = W.people.slice();
+      var t = W.title.trim() || (names.length
+        ? "Meeting with " + (names.length > 3 ? names.slice(0, 3).join(", ") + " and " + (names.length - 3) + " more" : listNames(names))
+        : W.organizer.trim() + "'s meeting");
+      var cfg = { days: W.dates.slice(), startMin: 540, endMin: 1380, step: 30, duration: 60, organizer: W.organizer.trim(),
+        location: "", note: "", invitees: names };
+      try { localStorage.setItem("ksch:name", JSON.stringify(cfg.organizer)); } catch (e) { /* storage blocked */ }
+      K.store.create("group", t, cfg, "").then(function (r) {
+        K.setMe(r.id, cfg.organizer);
+        W = null;
+        shareScreen(r.id, r.admin, t, cfg);
+      }, function (err) {
+        go.disabled = false; go.lastChild.textContent = "Create poll";
+        K.toast("Couldn't create the poll: " + err.message);
       });
-    setTimeout(function () { var i = host.querySelector("input"); if (i) i.focus(); }, 0);
+    }
+    // Enter moves down the form; in the names box it adds the name instead.
+    title.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); who.focus(); } });
+    who.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); people.el.querySelector("input").focus(); } });
+    people.el.querySelector("input").addEventListener("keydown", function (e) { if (e.key === "Enter") e.preventDefault(); });
+    K.render(screen(
+      h("div", { class: "ksch-c" },
+        field("Give it a name (optional)", title),
+        field("Your name", who),
+        h("div", { class: "ksch-field" }, h("span", { class: "ksch-lbl", text: "Who's it with?" }), people.el,
+          h("p", { class: "ksch-help ksch-c-hint", text: "Write a list, or press Enter after each name or email. Click × to take one out." })),
+        h("div", { class: "ksch-field" }, h("span", { class: "ksch-lbl", text: "Which dates could work?" }), dateHost, summary)),
+      actions(null, [why, go])), "Find a time");
+    sync();
+    setTimeout(function () { (W.organizer ? title : who).focus({ preventScroll: true }); }, 0);
   }
 
   /* ---------- sharing ---------- */
@@ -8465,12 +8299,37 @@ var KSCH = (function () {
     return el;
   }
 
-  function shareScreen(id, admin, title) {
+  // Optional details, saved onto the poll once it exists: how long it is,
+  // where, and a note. Nothing here is needed to share the link.
+  function detailsBox(id, cfg) {
+    var len = cfg.duration || 60;
+    var lens = h("div", { class: "ksch-chips", role: "group", "aria-label": "How long is it?" });
+    LENGTHS.forEach(function (m) {
+      lens.appendChild(h("button", { type: "button", class: "ksch-chip", "aria-pressed": len === m ? "true" : "false", text: fmtLen(m),
+        onclick: function (e) {
+          len = m;
+          lens.querySelectorAll(".ksch-chip").forEach(function (c) { c.setAttribute("aria-pressed", c === e.currentTarget ? "true" : "false"); });
+        } }));
+    });
+    var loc = h("input", { class: "ksch-input", maxlength: "200", placeholder: "Room, address or video link" });
+    var note = h("textarea", { maxlength: "500", placeholder: "Anything people should know" });
+    var save = button("Save details", { icon: "check", onClick: function () {
+      save.disabled = true;
+      var nc = Object.assign({}, cfg, { duration: len, location: loc.value.trim(), note: note.value.trim() });
+      K.store.update(id, { config: nc }).then(function () { cfg = nc; save.disabled = false; K.toast("Details saved"); },
+        function (err) { save.disabled = false; K.toast("Couldn't save: " + err.message); });
+    } });
+    return h("details", { class: "ksch-c-more" },
+      h("summary", null, "Add details (optional): how long, where, a note"),
+      field("How long is it?", lens), field("Location", loc), field("Note", note), h("div", { class: "ksch-c-save" }, save));
+  }
+
+  function shareScreen(id, admin, title, cfg) {
     var banner = h("div", { class: "ksch-banner ok", role: "status" });
     banner.innerHTML = K.icon("check") + "<span><b>Poll created.</b> Send the link to everyone. Nobody needs an account.</span>";
     K.render(screen(
       toolbar(title, "Share it however your team talks: group chat, email, text."),
-      banner, shareBlock(id, title, admin),
+      banner, shareBlock(id, title, admin), cfg ? detailsBox(id, cfg) : null,
       actions(button("View results", { icon: "grid", onClick: function () { nextView = "group"; K.openPoll(id); } }),
         button("Add my availability", { primary: true, icon: "brush", onClick: function () { nextView = "mine"; K.openPoll(id); } }))), "Find a time");
     var p = K.root.querySelector(".ksch-g .ksch-actions .btn-primary"); if (p) p.focus({ preventScroll: true });

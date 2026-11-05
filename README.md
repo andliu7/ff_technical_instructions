@@ -26,8 +26,12 @@ Kharis Campus Ministry
 ## Read it
 
 Open `index.html` in a browser. It reads one page at a time: the tabs at the top go to the
-Memo, the Editor and the Calendar, and the contents sit in a sidebar on the left on wide
-screens (the menu button opens them on smaller ones). `guide.pdf` is the printable version,
+Memo, the Editor and the Calendar. From 1024px wide the contents are a 60px column of
+icons on the left that opens to 300px with labels on hover or focus, stops at the footer,
+and shows a progress bar instead of a scrollbar; on smaller screens the menu button opens
+them as a full-screen panel. The theme button swaps a sun and moon over a day or night
+sky. The footer is a garden scene (a sunny day in light mode, a moonlit dusk in dark mode)
+that grows once when it comes into view and is still under reduced motion. `guide.pdf` is the printable version,
 last made on 2026-09-09, so it lags the web guide: regenerate it after content changes.
 
 Step 1 opens with the **simplified pamphlet** for new leaders: a plain layout with nothing

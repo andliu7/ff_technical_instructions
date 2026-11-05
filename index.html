@@ -550,55 +550,146 @@ body{background:#ffffff;}
 /* Contents sidebar, opened from the burger in the docbar. It reuses the .toc
    link styles; .toc-side only strips the card border. */
 .docbar-l{display:flex;align-items:center;gap:10px;}
-.sidebar{position:fixed;top:0;bottom:0;left:0;z-index:40;width:min(340px,86vw);overflow-y:auto;
-  background:var(--sheet);border-right:1px solid var(--line);box-shadow:4px 0 28px rgba(0,0,0,.14);
-  padding:14px 20px 32px 20px;transform:translateX(-100%);visibility:hidden;
-  transition:transform .28s ease,visibility 0s .28s;}
-.sidebar.open{transform:none;visibility:visible;transition:transform .28s ease,visibility 0s;}
-.side-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
-.side-head .part-label{margin:0;}
-.toc-side{border:0;padding:0;}
-.scrim{position:fixed;inset:0;z-index:35;background:rgba(15,17,30,.35);opacity:0;visibility:hidden;
-  transition:opacity .28s,visibility 0s .28s;}
-.scrim.open{opacity:1;visibility:visible;transition:opacity .28s,visibility 0s;}
-@media (prefers-reduced-motion:reduce){.sidebar,.scrim{transition:none;}}
-/* Wide screens have room either side of the page, so the contents stay open
-   as a rail on the left: no burger, no close button, no overlay, and the
-   contents card on the home page goes because the rail already shows it. */
-@media screen and (min-width:1440px){
-  .sidebar{transform:none;visibility:visible;box-shadow:none;width:310px;background:transparent;transition:none;}
-  .sidebar [data-close-side],.burger,.scrim{display:none;}
-  #contents{display:none !important;}
+/* Two shapes. Below 1024px: a full-screen panel that slides in from the left,
+   opened by the burger and closed by its X, Escape or a link. From 1024px up
+   the 830px sheet leaves at least 97px either side, so the contents sit in a
+   60px icon rail that widens to 300px over the page on hover or keyboard
+   focus (overlaying, never pushing the page). The brand row sits at the foot
+   of the rail and at the top of the panel. */
+.sidebar{position:fixed;top:0;bottom:0;left:0;z-index:40;display:flex;flex-direction:column;
+  background:var(--sheet);overflow:hidden;}
+.side-head{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.side-head .part-label{margin:0;white-space:nowrap;}
+.toc-side{border:0;padding:0;flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;}
+.toc-side::-webkit-scrollbar{display:none;}
+/* Scroll progress for the contents list, in place of its hidden scrollbar. */
+.side-prog{position:absolute;top:0;left:0;right:0;z-index:2;height:3px;background:var(--acc);
+  transform:scaleX(0);transform-origin:left;pointer-events:none;}
+.side-prog.none{display:none;}
+.side-brand{display:flex;align-items:center;gap:10px;min-width:0;padding:6px;border-radius:10px;
+  text-decoration:none;color:var(--deep);}
+.side-brand:hover{background:var(--btn-hover);}
+.side-brand:focus-visible{outline:2px solid var(--acc);outline-offset:1px;}
+.side-brand-mark{flex:0 0 32px;width:32px;height:32px;display:block;}
+.side-brand-mark svg{width:32px;height:32px;display:block;}
+.side-brand-txt{display:flex;flex-direction:column;min-width:0;line-height:1.2;white-space:nowrap;}
+.side-brand-t{font-family:'Libre',serif;font-size:14.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;}
+.side-brand-s{font-family:'Instr';font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--mut);overflow:hidden;text-overflow:ellipsis;}
+.toc-lbl{min-width:0;}
+.scrim{display:none;}
+@media screen and (max-width:1023.98px){
+  .sidebar{right:0;width:100%;padding:12px 16px 0 16px;opacity:0;visibility:hidden;transform:translateX(-100%);
+    transition:transform .3s ease-in-out,opacity .3s ease-in-out,visibility 0s .3s;}
+  .sidebar.open{transform:none;opacity:1;visibility:visible;
+    transition:transform .3s ease-in-out,opacity .3s ease-in-out,visibility 0s;}
+  .side-head{width:100%;max-width:560px;margin:0 auto;padding-bottom:10px;border-bottom:1px solid var(--line);}
+  .side-head .part-label{display:none;}
+  .toc-side{width:100%;max-width:560px;margin:0 auto;padding:14px 0 32px 0;}
+  html.side-lock,html.side-lock body{overflow:hidden;}
+}
+@media screen and (min-width:1024px){
+  .sidebar{width:60px;padding:12px 8px;border-right:1px solid var(--line);box-shadow:none;
+    transition:width .22s ease,box-shadow .22s ease;}
+  .sidebar:hover,.sidebar:has(:focus-visible){width:300px;box-shadow:6px 0 30px rgba(0,0,0,.16);}
+  .burger,.sidebar [data-close-side]{display:none;}
+  /* The head's children join the rail's column: label on top, brand at the foot. */
+  .side-head{display:contents;}
+  .side-head .part-label{order:0;flex:none;margin:0 0 6px;padding-left:7px;opacity:0;overflow:hidden;transition:opacity .15s ease;}
+  .toc-side{order:1;}
+  .side-brand{order:2;flex:none;margin-top:8px;}
+  .side-brand-txt,.sidebar .toc-lbl{opacity:0;transition:opacity .15s ease,transform .15s ease;}
+  .sidebar:hover :is(.side-brand-txt,.toc-lbl,.part-label),
+  .sidebar:has(:focus-visible) :is(.side-brand-txt,.toc-lbl,.part-label){opacity:1;}
+  /* Sections: a 3px stripe when collapsed, the full frame when open. */
+  .sidebar .toc-sec{margin:0 0 8px;border-color:transparent;border-left:3px solid var(--sc);border-radius:8px;
+    background:transparent;transition:border-color .2s ease,background-color .2s ease;}
+  .sidebar:hover .toc-sec,.sidebar:has(:focus-visible) .toc-sec{border-color:var(--line);border-left-color:var(--sc);background:var(--sheet);}
+  .toc.toc-side .toc-sec .toc-ph{position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:5px 10px;
+    color:transparent;background:transparent;border-bottom-color:transparent;
+    transition:color .15s ease,background-color .15s ease;}
+  .toc.toc-side .toc-sec .toc-ph::before{content:"";position:absolute;left:8px;top:50%;width:24px;height:2px;margin-top:-1px;
+    border-radius:2px;background:var(--sc);opacity:.55;transition:opacity .15s ease;}
+  .sidebar:hover .toc-sec .toc-ph,.sidebar:has(:focus-visible) .toc-sec .toc-ph{color:var(--deep);
+    background:color-mix(in srgb,var(--sc) 14%,var(--sheet));border-bottom-color:var(--line);}
+  .sidebar:hover .toc-sec .toc-ph::before,.sidebar:has(:focus-visible) .toc-sec .toc-ph::before{opacity:0;}
+  .toc.toc-side .toc-sec ul{padding:2px 0;}
+  .toc.toc-side .toc-sec li+li{border-top-color:transparent;}
+  .sidebar:hover .toc-sec li+li,.sidebar:has(:focus-visible) .toc-sec li+li{border-top-color:var(--line);}
+  .toc.toc-side .toc-sec li a{margin:1px 0;padding:5px 7px;gap:10px;white-space:nowrap;}
+  .toc.toc-side li a:hover,.toc.toc-side li a:focus-visible{transform:none;}
+  .sidebar .toc-lbl{overflow:hidden;text-overflow:ellipsis;}
+  .sidebar a:hover .toc-lbl,.sidebar a:focus-visible .toc-lbl{transform:translateX(4px);}
+  /* Steps show their number in a round badge; other rows keep their icon. */
+  .sidebar a.is-step .toc-ico,.sidebar a:not(.is-step) .toc-n{display:none;}
+  /* Step 10's icon sits inside the flame effect's wrapper: hide the wrapper too, or it leaves a gap. */
+  .sidebar a.is-step .flame-host{display:none;}
+  .sidebar:not(:hover):not(:has(:focus-visible)) a.is-step .flame-host{display:revert;}
+  .sidebar a.is-step .toc-n{flex:0 0 26px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
+    text-align:center;font-size:12px;background:color-mix(in srgb,var(--sc) 14%,var(--sheet));color:var(--sc);
+    transition:background-color .15s ease,color .15s ease;}
+  .sidebar a.is-step:is(:hover,:focus-visible,[aria-current="page"]) .toc-n{background:var(--sc);color:var(--sheet);}
+  /* Collapsed: just a column of coloured icons, no stripes or section bars.
+     The frames, headings and step numbers come back when it opens. */
+  .sidebar:not(:hover):not(:has(:focus-visible)) .toc-sec{border-color:transparent;margin-bottom:0;}
+  .sidebar:not(:hover):not(:has(:focus-visible)) .toc-sec .toc-ph{display:none;}
+  .sidebar:not(:hover):not(:has(:focus-visible)) a.is-step .toc-ico{display:grid;}
+  .sidebar:not(:hover):not(:has(:focus-visible)) a.is-step .toc-n{display:none;}
+  .sidebar:not(:hover):not(:has(:focus-visible)) .toc-sec li a{padding:3px 9px;}
+}
+@supports not selector(:has(a)){
+  @media screen and (min-width:1024px){
+    .sidebar:focus-within{width:300px;box-shadow:6px 0 30px rgba(0,0,0,.16);}
+    .sidebar:focus-within :is(.side-brand-txt,.toc-lbl,.part-label){opacity:1;}
+    .sidebar:focus-within .toc-sec{border-color:var(--line);border-left-color:var(--sc);background:var(--sheet);}
+    .sidebar:focus-within .toc-sec .toc-ph{color:var(--deep);}
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .sidebar,.sidebar.open,.sidebar *,.sidebar *::before{transition:none !important;}
+  .sidebar a:hover .toc-lbl,.sidebar a:focus-visible .toc-lbl{transform:none;}
 }
 @media print{.sidebar,.scrim,.burger{display:none;}}
 
-/* Theme toggle, Blueberry's animated sun and moon
-   (grignard-app-source/src/components/ui/animated-theme-toggler.tsx) with CSS
-   transitions standing in for its springs. The rays shrink and spin away, the
-   centre swells into the moon, and a masked circle slides in to carve the
-   crescent. Every state is keyed off .dark on <html>, so there is no JS state. */
-.themebtn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;padding:0;
-  border:0;border-radius:999px;background:none;color:var(--deep);cursor:pointer;
-  transition:transform .25s cubic-bezier(.34,1.56,.64,1);}
-.themebtn:hover{transform:scale(1.1);}
-.themebtn:active{transform:scale(.86);}
+/* Theme toggle: the moon sets and the sun rises (or back) along one arc
+   below the button, over a night or day sky that cross-fades. Ported from
+   the sun-moon-theme-toggle React component (CCgather) to plain CSS and the
+   Web Animations API, since this guide has no build step. The resting state is
+   keyed off .dark on <html>, so it is right before any script runs; the script
+   only plays the swap. */
+.themebtn{position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;flex:none;
+  width:36px;height:36px;padding:0;overflow:hidden;border:1px solid var(--line);border-radius:999px;background:none;
+  cursor:pointer;transition:filter .15s;}
+.themebtn:hover{filter:brightness(1.1);}
 .themebtn:focus-visible{outline:2px solid var(--acc);outline-offset:2px;}
-.tt{overflow:visible;transition:transform .5s cubic-bezier(.34,1.56,.64,1);}
-.tt-body,.tt-bite,.tt-rays{transform-origin:12px 12px;
-  transition:transform .5s cubic-bezier(.34,1.56,.64,1),opacity .35s ease;}
-.tt-body{transform:scale(.5556);}
-.dark .tt{transform:rotate(270deg);}
-.dark .tt-body{transform:scale(1);}
-.dark .tt-bite{transform:translate(-16px,8px);}
-.dark .tt-rays{opacity:0;transform:rotate(-30deg) scale(0);}
-/* Added for the length of a swap so every themed surface crossfades together,
-   copied from Blueberry's index.css. The toggle keeps its own transform
-   transitions through it, or the morph would snap. */
-.theme-transition,.theme-transition *,.theme-transition *::before,.theme-transition *::after{
-  transition-property:background-color,border-color,color,fill,stroke,box-shadow !important;
-  transition-duration:220ms !important;transition-timing-function:ease !important;transition-delay:0s !important;}
-.theme-transition .themebtn *{transition-property:transform,opacity !important;transition-duration:.5s !important;
-  transition-timing-function:cubic-bezier(.34,1.56,.64,1) !important;}
+.sm-sky{position:absolute;inset:0;z-index:-1;pointer-events:none;}
+.sm-night{background:linear-gradient(180deg,#090f2a 0%,#16204b 60%,#2a2f66 100%);opacity:0;}
+.sm-day{background:linear-gradient(180deg,#4ea8ff 0%,#9fd3ff 60%,#e3f3ff 100%);}
+.dark .sm-night{opacity:1;}
+.dark .sm-day{opacity:0;}
+.sm-night i{position:absolute;border-radius:50%;background:#fff;opacity:.6;animation:sm-twinkle 2.4s ease-in-out infinite;}
+@keyframes sm-twinkle{0%,100%{opacity:.35;}50%{opacity:1;}}
+.sm-body{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.sm-body svg{width:50%;height:50%;}
+.sm-moon{color:#fde68a;filter:drop-shadow(0 0 4px rgba(252,211,77,.6));transform:translate(-115%,115%);opacity:0;}
+.sm-sun{color:#fb923c;filter:drop-shadow(0 0 5px rgba(251,146,60,.7));}
+.dark .sm-moon{transform:none;opacity:1;}
+.dark .sm-sun{transform:translate(115%,115%);opacity:0;}
+@media (prefers-reduced-motion:reduce){.sm-night i{animation:none;}}
+@media print{.themebtn{display:none;}}
+/* The page fade. Fading every element's colours with CSS transitions stalled
+   the page (about 2,500 elements), so where the browser has View Transitions
+   the whole page cross-fades as one snapshot instead. The button gets its own
+   layer that is shown live, so its sun and moon keep moving over the fade.
+   Without View Transitions it falls back to a short colour fade. */
+::view-transition-old(root),::view-transition-new(root){animation-duration:.55s;animation-timing-function:cubic-bezier(.65,0,.35,1);}
+.themebtn{view-transition-name:themebtn;}
+::view-transition-old(themebtn){display:none;}
+::view-transition-new(themebtn){animation:none;}
+.theme-transition body,.theme-transition .page,.theme-transition header,.theme-transition .sidebar,.theme-transition .foot{
+  transition:background-color .25s ease,color .25s ease,border-color .25s ease !important;}
+/* The stars only twinkle while the night sky can be seen. */
+html:not(.dark) .sm-night i{animation-play-state:paused;}
 
 /* Icon buttons that widen into a labelled pill on hover: Download PDF in the
    header, GitHub in the footer. */
@@ -1891,6 +1982,129 @@ html.ksch-lock .fab{display:none;}
 }
 
 /* ksch:end */
+/* Footer garden: a sunny day (light) or a moonlit dusk (dark) filling the footer. */
+/* Footer garden. The footer becomes a small landscape: a sunny day in light
+   mode, a moonlit dusk in dark mode, with grass and flowers along its bottom
+   edge and a thin band of soil under them. The footer's text sits on the sky,
+   over a soft scrim. Geometry is ported from the Ember Petal Preloader (see
+   garden.js); everything loud in it is left out.
+
+   Everything is .ffg- and nothing applies until garden.js adds .ffg-on to the
+   footer, so the footer is unchanged if the script never runs. The scene is
+   absolutely positioned inside the footer, so it works with the sticky reveal
+   footer (a strip hung above it would sit under the page and never show). */
+.ffg{display:none;}
+@media screen{
+  .foot.ffg-on{
+    --ffg-g:108px; --ffg-soil-off:12px;
+    background:#E4ECF2;border-top-color:#C9D5E3;isolation:isolate;
+  }
+  .dark .foot.ffg-on{background:#171A40;border-top-color:#2A2F5C;}
+  .foot.ffg-on .foot-in{position:relative;z-index:1;padding-bottom:calc(var(--ffg-g) + 6px);}
+
+  /* Light mode: ink on the day sky. Dark mode keeps the footer's own light
+     stone greys, which already clear 4.5:1 on the night sky. */
+  :root:not(.dark) .foot.ffg-on .foot-h{color:#1E2B45;}
+  :root:not(.dark) .foot.ffg-on .foot-note{color:#44495A;}
+  :root:not(.dark) .foot.ffg-on .foot-q{color:#1A1B22;}
+  :root:not(.dark) .foot.ffg-on .foot-a{color:#1A4FB0;}
+  :root:not(.dark) .foot.ffg-on .foot-blurb{color:#2B3040;}
+  :root:not(.dark) .foot.ffg-on .foot-meta{color:#4F5566;}
+  :root:not(.dark) .foot.ffg-on .toc-ico{background:rgba(31,95,209,.1);color:#1F5FD1;}
+  :root:not(.dark) .foot.ffg-on .foot-links a:hover,
+  :root:not(.dark) .foot.ffg-on .foot-links a:focus-visible{background:rgba(31,95,209,.08);}
+  :root:not(.dark) .foot.ffg-on .foot-links a:hover .toc-ico,
+  :root:not(.dark) .foot.ffg-on .foot-links a:focus-visible .toc-ico{background:#1F5FD1;color:#FFFFFF;}
+  :root:not(.dark) .foot.ffg-on .foot-links a:focus-visible{outline-color:#1F5FD1;}
+  :root:not(.dark) .foot.ffg-on .xbtn{background:rgba(255,255,255,.6);border-color:rgba(31,95,209,.25);color:#1A1B22;}
+  :root:not(.dark) .foot.ffg-on .xbtn:hover{background:rgba(255,255,255,.9);}
+  .dark .foot.ffg-on .foot-note,.dark .foot.ffg-on .foot-meta{color:#B4B0C8;}
+
+  .ffg{
+    display:block;position:absolute;inset:0;z-index:0;
+    overflow:hidden;pointer-events:none;contain:layout paint;
+    /* Petal inks: d(eep) at the base, m(id), l(ight) at the tip.
+       b = KCM blue, p = periwinkle, l = lilac, g = soft gold. */
+    --ffg-b-d:#1A4BAA; --ffg-b-m:#2F6FE4; --ffg-b-l:#7FA8F5;
+    --ffg-p-d:#3F64C4; --ffg-p-m:#6E9BF0; --ffg-p-l:#B9D0FF;
+    --ffg-l-d:#6A52AD; --ffg-l-m:#9A86DC; --ffg-l-l:#D3C8F4;
+    --ffg-g-d:#A87228; --ffg-g-m:#D9A54E; --ffg-g-l:#F2D998;
+    --ffg-stem:#3E8C70; --ffg-leaf-d:#2E7A61; --ffg-leaf-l:#5DB08F;
+    --ffg-stamen:#2A2333; --ffg-lip:rgba(255,255,255,.4);
+    /* Grass, back to front: lighter behind, deeper in front. */
+    --ffg-grass-1:#B4D8A8; --ffg-grass-2:#74B48A; --ffg-grass-3:#3B8A69;
+    --ffg-soil:#6B5038; --ffg-soil-2:#4A3626;
+    --ffg-scrim:rgba(250,247,238,.55);
+  }
+  .dark .ffg{
+    /* Moonlit: the same hues, cooler and dimmer. */
+    --ffg-b-d:#1B356E; --ffg-b-m:#2F5AAE; --ffg-b-l:#6587C9;
+    --ffg-p-d:#2D4683; --ffg-p-m:#4C6DB3; --ffg-p-l:#8EA6DA;
+    --ffg-l-d:#3E3470; --ffg-l-m:#6A5CA6; --ffg-l-l:#A59BD0;
+    --ffg-g-d:#6B5534; --ffg-g-m:#9C8156; --ffg-g-l:#C8B48A;
+    --ffg-stem:#2A5A55; --ffg-leaf-d:#22484A; --ffg-leaf-l:#3D6E68;
+    --ffg-stamen:#0E0C16; --ffg-lip:rgba(210,220,255,.22);
+    --ffg-grass-1:#3A5068; --ffg-grass-2:#2F4D58; --ffg-grass-3:#234441;
+    --ffg-soil:#2A2321; --ffg-soil-2:#1B1615;
+    --ffg-scrim:rgba(14,16,44,.5);
+  }
+
+  /* Skies. Both are always there; the theme crossfades them. */
+  .ffg-sky{position:absolute;inset:0;transition:opacity .7s ease;}
+  .ffg-day{opacity:1;
+    background:
+      radial-gradient(circle at 93% 0,rgba(255,247,224,.95) 0,rgba(255,238,200,.5) 70px,rgba(255,232,190,.16) 190px,rgba(255,232,190,0) 340px),
+      linear-gradient(to bottom,#D6E5F2 0,#E6EDF0 50%,#F4EDDC 100%);}
+  .ffg-night{opacity:0;
+    background:linear-gradient(to bottom,#10153A 0,#1C1C47 55%,#30264E 100%);}
+  .dark .ffg-day{opacity:0;}
+  .dark .ffg-night{opacity:1;}
+  .ffg-moon{position:absolute;right:7%;top:34px;width:15px;height:15px;border-radius:50%;
+    background:radial-gradient(circle at 38% 38%,#F4F1E2,#D9D5C2);
+    box-shadow:0 0 10px 3px rgba(220,226,255,.2),0 0 34px 14px rgba(190,200,255,.07);}
+  .ffg-stars{position:absolute;left:0;top:0;overflow:visible;}
+  .ffg-stars circle{fill:#E6EAFF;}
+  .ffg-tw{animation:ffg-twinkle var(--ffg-d,7s) ease-in-out var(--ffg-dl,0s) infinite alternate;}
+  .ffg-paused .ffg-tw,:root:not(.dark) .ffg-tw{animation-play-state:paused;}
+  .ffg-still .ffg-tw{animation:none;}
+  /* Behind the text block only: lifts the day sky toward cream, deepens the
+     night sky, so contrast never depends on where a star or the sun is. */
+  .ffg-scrim{position:absolute;left:50%;top:0;bottom:var(--ffg-g);width:min(1000px,100%);transform:translateX(-50%);
+    background:radial-gradient(ellipse 58% 62% at 50% 50%,var(--ffg-scrim),rgba(0,0,0,0) 100%);}
+
+  .ffg-defs{position:absolute;width:0;height:0;overflow:hidden;}
+  .ffg-layer{position:absolute;inset:0;}
+  .ffg-far{opacity:.55;}
+  .dark .ffg-far{opacity:.45;}
+  .ffg-plant,.ffg-grass,.ffg-ground{position:absolute;top:0;overflow:visible;}
+  .ffg-ground{left:0;}
+  /* The wind. Every tuft and plant runs the same 7s cycle; garden.js sets each
+     one's delay from its x so the crest travels left to right. Transform-only
+     animations, so they run on the compositor with no script per frame. */
+  .ffg-tuft{position:absolute;overflow:visible;transform-origin:50% 94%;
+    animation:ffg-grass 7s ease-in-out infinite;}
+  .ffg-plant{transform-origin:50% calc(100% - var(--ffg-soil-off,12px));
+    animation:ffg-sway 7s ease-in-out infinite;}
+  .ffg-plant svg,.ffg-tuft svg{display:block;overflow:visible;}
+  .ffg-paused .ffg-tuft,.ffg-paused .ffg-plant{animation-play-state:paused;}
+  .ffg-still .ffg-tuft,.ffg-still .ffg-plant{animation:none;}
+  .ffg-g1{fill:var(--ffg-grass-1);}
+  .ffg-g2{fill:var(--ffg-grass-2);}
+  .ffg-g3{fill:var(--ffg-grass-3);}
+  .ffg-stem{fill:none;stroke:var(--ffg-stem);stroke-linecap:round;}
+  .ffg-leaf{fill:url(#ffg-leaf);}
+  .ffg-lip{stroke:var(--ffg-lip);stroke-width:.5;}
+  .ffg-stamens circle{fill:var(--ffg-stamen);}
+  .ffg-mound{fill:url(#ffg-soil);}
+}
+@keyframes ffg-twinkle{from{opacity:.2;}to{opacity:.85;}}
+@keyframes ffg-grass{0%,100%{transform:skewX(-3deg);}50%{transform:skewX(9deg);}}
+@keyframes ffg-sway{0%,100%{transform:rotate(calc(var(--ffg-a,1.2deg) * -.4));}50%{transform:rotate(var(--ffg-a,1.2deg));}}
+@media screen and (max-width:640px){
+  .foot.ffg-on{--ffg-g:96px; --ffg-soil-off:10px;}
+}
+@media (prefers-reduced-motion:reduce){.ffg-tw,.ffg-tuft,.ffg-plant{animation:none;}.ffg-sky{transition:none;}}
+@media print{.ffg{display:none !important;}}
 </style>
 </head>
 <body>
@@ -1910,7 +2124,7 @@ html.ksch-lock .fab{display:none;}
   <span class="docbar-l">
     <button type="button" class="btn btn-icon burger" aria-label="Open contents" aria-expanded="false" aria-controls="sidebar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg></button>
     <a class="brand" href="#home"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect x=".5" y=".5" width="31" height="31" rx="8" fill="#F6EEDC" stroke="#E2D3AE"/><g class="petals"><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="0.6" transform="rotate(0 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="0.6" transform="rotate(60 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="0.6" transform="rotate(120 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="0.6" transform="rotate(180 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="0.6" transform="rotate(240 16 16)"/><ellipse cx="16" cy="10.4" rx="3.4" ry="5.6" fill="#6E9BF0" stroke="#1F5FD1" stroke-width="0.6" transform="rotate(300 16 16)"/><circle cx="16" cy="16" r="3" fill="#E6AE4A" stroke="#B98322" stroke-width=".6"/></g></svg><span class="brand-txt"><span class="brand-t">Prestudy Pamphlet Guide</span><span class="brand-s">KCM &middot; Focus Family Leaders</span></span></a>
-    <button type="button" class="themebtn" aria-label="Switch to dark theme" aria-pressed="false" title="Switch to dark theme"><svg class="tt" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><mask id="tt-mask"><rect x="-8" y="-8" width="40" height="40" fill="white"/><circle class="tt-bite" cx="33" cy="0" r="9" fill="black"/></mask><g mask="url(#tt-mask)"><circle class="tt-body" cx="12" cy="12" r="9" fill="currentColor" stroke="none"/></g><g class="tt-rays"><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="5.64" y1="5.64" x2="4.22" y2="4.22"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/><line x1="5.64" y1="18.36" x2="4.22" y2="19.78"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/></g></svg></button>
+    <button type="button" class="themebtn" aria-label="Switch to dark theme" aria-pressed="false" title="Switch to dark theme"><span class="sm-sky sm-night" aria-hidden="true"><i style="left:24%;top:22%;width:3.2px;height:3.2px;animation-duration:2100ms;animation-delay:-0ms"></i><i style="left:66%;top:16%;width:2.4px;height:2.4px;animation-duration:2600ms;animation-delay:-530ms"></i><i style="left:80%;top:42%;width:3.6px;height:3.6px;animation-duration:1900ms;animation-delay:-1060ms"></i><i style="left:38%;top:58%;width:2.2px;height:2.2px;animation-duration:2900ms;animation-delay:-1590ms"></i><i style="left:58%;top:74%;width:2.8px;height:2.8px;animation-duration:2300ms;animation-delay:-2120ms"></i><i style="left:14%;top:72%;width:2.4px;height:2.4px;animation-duration:2500ms;animation-delay:-2650ms"></i></span><span class="sm-sky sm-day" aria-hidden="true"></span><span class="sm-body sm-moon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span><span class="sm-body sm-sun" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></span></button>
   </span>
   <span class="acts">
     <nav class="tabs" aria-label="Tools">
@@ -2925,6 +3139,484 @@ html.ksch-lock .fab{display:none;}
     <a class="btn xbtn" href="https://github.com/andliu7/ff_technical_instructions" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.37.5 0 5.87 0 12.5c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58 0-.28-.01-1.03-.02-2.02-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.33-1.76-1.33-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.11-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6.01 0c2.29-1.55 3.3-1.23 3.3-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.62-5.48 5.92.43.37.81 1.1.81 2.22 0 1.6-.01 2.89-.01 3.28 0 .32.21.7.83.58A12.01 12.01 0 0 0 24 12.5C24 5.87 18.63.5 12 .5Z"/></svg><span class="xlbl">GitHub</span></a>
   </div>
 </div></footer>
+<script>
+// Footer garden. The footer becomes a small landscape (sunny day in light mode,
+// moonlit dusk in dark mode) with grass and flowers along its bottom edge,
+// ported from the Ember Petal Preloader: its geometry helpers (emb*) are kept
+// as plain math; everything loud (gusts, sparks, flare, word, counter, camera
+// dive) is left out. Flowers grow once, the first time the footer is
+// uncovered; after that only a slow wind wave moves the grass and flowers.
+// The wave is CSS (garden.css): each grass tuft and each plant runs the same
+// slow keyframes with a delay set from its x, so the wave travels across the
+// footer on the compositor with no script per frame. The script's animation
+// frame loop runs only while the flowers grow or a pointer bends them, sleeps
+// when the springs settle, and never runs while the footer is covered or off
+// screen. Reduced motion gets one still frame.
+(function () {
+  "use strict";
+  var foot = document.querySelector("footer.foot");
+  if (!foot || !document.createElementNS || foot.querySelector(".ffg")) return;
+
+  var NS = "http://www.w3.org/2000/svg";
+  var GROW_MS = 2800, DENSITY = 0.6;
+  var reduced = window.FFG_REDUCED === true ||
+    (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+  // ---- Geometry, ported from the component -------------------------------
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+  function embSmooth(x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); }
+  function embHash(x) { var s = Math.sin(x * 12.9898 + 78.233) * 43758.5453; return s - Math.floor(s); }
+  function embRng(seed) {
+    var a = (Math.floor(seed * 7919) + 1013904223) >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) >>> 0;
+      var t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function embMix(a, b, t) { return a + (b - a) * t; }
+  function r1(v) { return Math.round(v * 10) / 10; }
+  // Moving geometry (stems, transforms) keeps two decimals, so slow motion
+  // glides instead of stepping in tenth-pixel jumps.
+  function r2(v) { return Math.round(v * 100) / 100; }
+
+  function embPetal(L, w, curl, tip, ruffle) {
+    var tw = w * (0.16 + 0.26 * curl), bulge = w * (0.9 + 0.35 * curl);
+    var by = -L * (0.56 - 0.12 * curl), dip = L * 0.12 * tip;
+    var rl = 1 + ruffle * 0.14, rr = 1 - ruffle * 0.14;
+    return "M0 0 C" + r1(-w * 0.42 * rl) + " " + r1(-L * 0.08) + " " + r1(-bulge * rl) + " " + r1(by) + " " + r1(-tw) + " " + r1(-L) +
+      " C" + r1(-tw * 0.6) + " " + r1(-L - dip) + " " + r1(-tw * 0.15) + " " + r1(-L - dip * 0.4) + " 0 " + r1(-L - dip * 0.55) +
+      " C" + r1(tw * 0.15) + " " + r1(-L - dip * 0.4) + " " + r1(tw * 0.6) + " " + r1(-L - dip) + " " + r1(tw) + " " + r1(-L) +
+      " C" + r1(bulge * rr) + " " + r1(by) + " " + r1(w * 0.42 * rr) + " " + r1(-L * 0.08) + " 0 0 Z";
+  }
+  function embBlade(L, w, droop) {
+    var tx = droop * L * 0.3;
+    return "M0 0 C" + r1(-w * 0.95) + " " + r1(-L * 0.22) + " " + r1(-w * 0.75 + tx * 0.5) + " " + r1(-L * 0.72) + " " + r1(tx) + " " + r1(-L) +
+      " C" + r1(w * 0.8 + tx * 0.6) + " " + r1(-L * 0.7) + " " + r1(w * 0.95) + " " + r1(-L * 0.22) + " 0 0 Z";
+  }
+  function embBez(a, b, c, t) { var u = 1 - t; return u * u * a + 2 * u * t * b + t * t * c; }
+  function embBezTan(a, b, c, t) { return 2 * (1 - t) * (b - a) + 2 * t * (c - b); }
+  // Stems. The component fills an outline offset along the curve's normal;
+  // here the same quadratic (root g, control c, tip t) is stroked instead, a
+  // thin stroke the full length and a wider one over the lower third for the
+  // taper. A stroke cannot twist or self-intersect at any bend or tiny grow.
+  function embStem(gx, gy, cx, cy, tx, ty, u) {
+    var ax = embMix(gx, cx, u), ay = embMix(gy, cy, u);
+    var bx = embMix(cx, tx, u), by = embMix(cy, ty, u);
+    return {
+      full: "M" + r2(gx) + " " + r2(gy) + "Q" + r2(cx) + " " + r2(cy) + " " + r2(tx) + " " + r2(ty),
+      base: "M" + r2(gx) + " " + r2(gy) + "Q" + r2(ax) + " " + r2(ay) + " " + r2(embMix(ax, bx, u)) + " " + r2(embMix(ay, by, u))
+    };
+  }
+  // Petals of one head: [{d, rot, k}] in paint order. k 0 = back, 1 = side
+  // front, 2 = front lip.
+  function embFlower(kind, open, size, seed) {
+    var e = clamp(open, 0, 1.3), u = Math.min(e, 1), x = e - u, out = [], i, s, L, w, A, Lb, wb;
+    function n(j) { return embHash(seed + j * 3.7) - 0.5; }
+    if (kind === "poppy") {
+      L = 40 * size * (1 + 0.14 * u + 0.08 * x); w = 13 * size * (1 + 0.8 * u + 0.45 * x); A = 10 + 30 * u + 26 * x;
+      for (i = 0; i < 3; i++) { s = i - 1;
+        out.push({ d: embPetal(L * (1 - 0.1 * Math.abs(s)), w, u, 0.7, n(i) * 0.7), rot: s * A + n(i + 7) * 5, k: 0 }); }
+      Lb = 36 * size * (1 - 0.04 * u + 0.05 * x); wb = 15 * size * (1 + 0.6 * u + 0.35 * x); A = 8 + 20 * u + 20 * x;
+      var bs = [-1, 1, 0];
+      for (i = 0; i < 3; i++) { s = bs[i];
+        out.push({ d: embPetal(s ? Lb : Lb * 0.9, wb, u, 0.95, n(i + 3) * 0.5), rot: s * A + n(i + 11) * 3, k: s ? 1 : 2 }); }
+    } else if (kind === "tulip") {
+      L = 38 * size * (1 + 0.04 * u); w = 11 * size * (1 + 0.6 * u + 0.35 * x); A = 7 + 20 * u + 22 * x;
+      for (i = 0; i < 3; i++) { s = i - 1;
+        out.push({ d: embPetal(L * (1 - 0.06 * Math.abs(s)), w, u * 0.7, -0.35, n(i) * 0.4), rot: s * A + n(i + 7) * 3, k: 0 }); }
+      for (i = 0; i < 2; i++) { s = i ? 1 : -1;
+        out.push({ d: embPetal(L * 0.92, w * 1.2, u * 0.6, -0.2, n(i + 3) * 0.4), rot: s * (5 + 11 * u + 16 * x) + n(i + 11) * 2, k: i ? 2 : 1 }); }
+    } else {
+      L = 24 * size * (1 + 0.05 * u); w = 8 * size * (1 + 0.5 * u + 0.3 * x);
+      var ds = [-1, 1, 0];
+      for (i = 0; i < 3; i++) { s = ds[i];
+        out.push({ d: embPetal(s ? L * 0.94 : L, w, u * 0.5, 0.45, n(i) * 0.4), rot: s * (6 + 12 * u + 14 * x) + n(i + 5) * 3, k: s ? 0 : 2 }); }
+    }
+    return out;
+  }
+
+  // Layout: far, mid and near layers of plants standing on the ground line gy,
+  // fitted to a garden band G tall rather than the component's full screen.
+  function pick(r, table) { var v = r(), i; for (i = 0; i < table.length; i += 2) { v -= table[i + 1]; if (v <= 0) return table[i]; } return table[0]; }
+  function embGarden(W, G, gy, density, seed) {
+    var r = embRng(seed), g = { far: [], mid: [], near: [] };
+    var PALS = ["b", 0.34, "p", 0.34, "l", 0.2, "g", 0.12];
+    var spec = {
+      far:  { per: 64,  cap: 16,  size: [0.36, 0.48], h: [0.36, 0.52], kinds: ["tulip", 0.4, "bud", 0.6], delay: [0.04, 0.2] },
+      mid:  { per: 92,  cap: 12, size: [0.46, 0.62], h: [0.44, 0.6],  kinds: ["poppy", 0.35, "tulip", 0.35, "bud", 0.3], delay: [0.1, 0.3] },
+      near: { per: 140, cap: 9, size: [0.58, 0.78], h: [0.52, 0.64], kinds: ["poppy", 0.45, "tulip", 0.35, "bud", 0.2], delay: [0.14, 0.36] }
+    };
+    ["far", "mid", "near"].forEach(function (layer) {
+      var sp = spec[layer], n = clamp(Math.round(W / sp.per * density), 2, sp.cap), i, j, p, kind, nl;
+      for (i = 0; i < n; i++) {
+        kind = pick(r, sp.kinds);
+        p = {
+          layer: layer, kind: kind, pal: pick(r, PALS), seed: Math.floor(r() * 1000) + 1,
+          gx: clamp((i + 0.5 + (r() - 0.5) * 0.85) * W / n, 14, W - 14), gy: gy,
+          size: embMix(sp.size[0], sp.size[1], r()),
+          hh: G * embMix(sp.h[0], sp.h[1], r()),
+          delay: embMix(sp.delay[0], sp.delay[1], r()),
+          a: 0, va: 0, leaves: []
+        };
+        if (kind === "bud") p.size *= 1.15;
+        p.bend = (r() - 0.5) * p.hh * 0.28;
+        p.tilt = (r() - 0.5) * 14;
+        p.open = kind === "bud" ? embMix(0.25, 0.55, r()) : kind === "tulip" ? embMix(0.75, 1.0, r()) : embMix(0.95, 1.15, r());
+        p.openAt = p.delay + 0.24 + r() * 0.1;
+        p.openSpan = 0.28 + r() * 0.06;
+        nl = r() < 0.6 ? 2 : 1;
+        for (j = 0; j < nl; j++) {
+          p.leaves.push({ t: embMix(0.14, 0.42, r()) + j * 0.12, side: (j % 2 ? -1 : 1) * (r() < 0.5 ? -1 : 1),
+            L: p.hh * embMix(0.2, 0.3, r()), w: 0, droop: embMix(0.2, 0.6, r()), spread: embMix(38, 58, r()) });
+          p.leaves[j].w = p.leaves[j].L * 0.26;
+        }
+        p.k = 26 / Math.sqrt(p.size); p.c = 2 * Math.sqrt(p.k) * 0.3;
+        p.R = 90 + 36 * p.size;
+        g[layer].push(p);
+      }
+    });
+    return g;
+  }
+  // Grass: three layers of thin tapered blades, back (taller, lighter) to front
+  // (shorter, deeper), grouped into tufts TW px wide so each tuft sways as one
+  // composited element.
+  var TW = 96, WAVE = 640, WAVE_S = 7;
+  function embGrass(W, seed) {
+    var r = embRng(seed), out = [], specs = [[3.6, 16, 30], [5, 11, 22], [7, 7, 15]], s, x, list, tuft, b, h, w, tx;
+    for (s = 0; s < specs.length; s++) {
+      list = [];
+      for (x = -TW / 2 + r() * TW * 0.5; x < W + TW / 2; x += TW) {
+        tuft = { x: x, d: "" };
+        for (b = r() * specs[s][0]; b < TW; b += specs[s][0] * embMix(0.6, 1.4, r())) {
+          h = embMix(specs[s][1], specs[s][2], r()); w = embMix(1.6, 2.8, r()) + s * 0.3; tx = h * (r() - 0.5) * 0.5;
+          tuft.d += "M" + r1(b - w / 2) + " 0Q" + r1(b - w * 0.3 + tx * 0.35) + " " + r1(-h * 0.55) + " " + r1(b + tx) + " " + r1(-h + Math.abs(tx) * 0.2) +
+            "Q" + r1(b + w * 0.3 + tx * 0.35) + " " + r1(-h * 0.55) + " " + r1(b + w / 2) + " 0Z";
+        }
+        list.push(tuft);
+      }
+      out.push(list);
+    }
+    return out;
+  }
+  // Phase delay for the CSS wave at x: later phase further right, so the wave
+  // travels left to right. Negative so every element starts mid-cycle.
+  function waveDelay(x, jitter) {
+    var f = x / WAVE; f -= Math.floor(f);
+    return "-" + r1(WAVE_S * (1 - f) + jitter) + "s";
+  }
+
+  // ---- DOM ---------------------------------------------------------------
+  function el(name, attrs, parent) {
+    var e = document.createElementNS(NS, name), k;
+    for (k in attrs) if (attrs.hasOwnProperty(k)) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function div(cls, parent) { var d = document.createElement("div"); d.className = cls; parent.appendChild(d); return d; }
+  var root = document.createElement("div");
+  root.className = "ffg";
+  root.setAttribute("aria-hidden", "true");
+  var defs = el("svg", { "class": "ffg-defs", width: "0", height: "0", focusable: "false" }, root);
+  var dg = el("defs", {}, defs);
+  function grad(id, a, b) {
+    var lg = el("linearGradient", { id: id, x1: "0", y1: "1", x2: "0", y2: "0" }, dg);
+    el("stop", { offset: "0", style: "stop-color:var(" + a + ")" }, lg);
+    el("stop", { offset: "1", style: "stop-color:var(" + b + ")" }, lg);
+  }
+  ["b", "p", "l", "g"].forEach(function (c) {
+    grad("ffg-" + c + "-0", "--ffg-" + c + "-d", "--ffg-" + c + "-m");
+    grad("ffg-" + c + "-1", "--ffg-" + c + "-m", "--ffg-" + c + "-l");
+    grad("ffg-" + c + "-2", "--ffg-" + c + "-m", "--ffg-" + c + "-l");
+  });
+  grad("ffg-leaf", "--ffg-leaf-d", "--ffg-leaf-l");
+  grad("ffg-soil", "--ffg-soil-2", "--ffg-soil");
+  div("ffg-sky ffg-day", root);
+  var night = div("ffg-sky ffg-night", root);
+  var stars = el("svg", { "class": "ffg-stars", focusable: "false" }, night);
+  div("ffg-moon", night);
+  div("ffg-scrim", root);
+  var layers = {}, grassEls = [];
+  // Paint order: far plants, back grass, mid plants, middle grass, near
+  // plants, front grass, soil.
+  layers.far = div("ffg-layer ffg-far", root);
+  grassEls[0] = div("ffg-layer ffg-grass ffg-g1", root);
+  layers.mid = div("ffg-layer ffg-mid", root);
+  grassEls[1] = div("ffg-layer ffg-grass ffg-g2", root);
+  layers.near = div("ffg-layer ffg-near", root);
+  grassEls[2] = div("ffg-layer ffg-grass ffg-g3", root);
+  var ground = el("svg", { "class": "ffg-ground", focusable: "false" }, root);
+  foot.insertBefore(root, foot.firstChild);
+  foot.classList.add("ffg-on");
+  if (reduced) root.classList.add("ffg-still");
+
+  var W = 0, H = 0, G = 0, GY = 0, garden = null, plants = [], springy = [], grass = [];
+
+  function buildPlant(p) {
+    var bw = Math.ceil(2 * (Math.abs(p.bend) + p.hh * 0.3 + 46 * p.size));
+    // The sway runs on an HTML wrapper: Chrome composites transform animations
+    // on boxes like this, but repaints them on the main thread for <svg>.
+    var wrap = document.createElement("div");
+    wrap.className = "ffg-plant";
+    wrap.style.left = r1(p.gx - bw / 2) + "px";
+    wrap.style.width = bw + "px";
+    wrap.style.height = H + "px";
+    wrap.style.setProperty("--ffg-a", r2((p.layer === "far" ? 0.8 : 1.4) * (0.75 + embHash(p.seed) * 0.5)) + "deg");
+    wrap.style.animationDelay = waveDelay(p.gx, 0.15);
+    var svg = el("svg", { width: bw, height: H, viewBox: "0 0 " + bw + " " + H, focusable: "false" }, wrap);
+    p.bx = bw / 2;
+    p.svg = wrap;
+    p.stemBase = el("path", { "class": "ffg-stem", "stroke-width": r2(2.6 * p.size) }, svg);
+    p.stem = el("path", { "class": "ffg-stem", "stroke-width": r2(1.5 * p.size) }, svg);
+    p.leafEls = p.leaves.map(function (lf) {
+      return el("path", { "class": "ffg-leaf", d: embBlade(lf.L, lf.w, lf.droop * lf.side) }, svg);
+    });
+    p.head = el("g", {}, svg);
+    var count = p.kind === "poppy" ? 6 : p.kind === "tulip" ? 5 : 3, i, j;
+    p.petals = [];
+    for (i = 0; i < count; i++) {
+      if (p.kind === "poppy" && i === 3) {
+        p.stam = el("g", { "class": "ffg-stamens" }, p.head);
+        for (j = 0; j < 5; j++) {
+          el("circle", { cx: r1((j - 2) * 3.4 * p.size), cy: r1(-34 * p.size * (0.86 + embHash(p.seed + j) * 0.08)), r: r1(1.3 * p.size + 0.3) }, p.stam);
+        }
+      }
+      p.petals.push(el("path", {}, p.head));
+    }
+    // Fill and lip class depend only on the petal's slot, so set them once.
+    var f0 = embFlower(p.kind, 0, p.size, p.seed);
+    for (i = 0; i < f0.length; i++) {
+      p.petals[i].setAttribute("fill", "url(#ffg-" + p.pal + "-" + f0[i].k + ")");
+      if (f0[i].k === 2) p.petals[i].setAttribute("class", "ffg-lip");
+    }
+    p.lastOpen = -1;
+    layers[p.layer].appendChild(wrap);
+  }
+
+  function build() {
+    var w = root.clientWidth, h = root.clientHeight, cs = getComputedStyle(foot);
+    if (!w || !h) return false;
+    W = w; H = h;
+    G = parseFloat(cs.getPropertyValue("--ffg-g")) || 108;
+    GY = H - (parseFloat(cs.getPropertyValue("--ffg-soil-off")) || 12);
+    ["far", "mid", "near"].forEach(function (n) { layers[n].textContent = ""; });
+    while (ground.firstChild) ground.removeChild(ground.firstChild);
+    while (stars.firstChild) stars.removeChild(stars.firstChild);
+    garden = embGarden(W, G, GY, DENSITY, 7.3);
+    plants = garden.far.concat(garden.mid, garden.near);
+    springy = garden.mid.concat(garden.near);
+    plants.forEach(buildPlant);
+    grass = embGrass(W, 5.9);
+    grassEls.forEach(function (layer, s) {
+      layer.textContent = "";
+      layer.style.transformOrigin = "0 " + (GY + 2) + "px";
+      grass[s].forEach(function (t) {
+        var tuft = document.createElement("div");
+        tuft.className = "ffg-tuft";
+        tuft.style.left = r1(t.x) + "px";
+        tuft.style.top = r1(GY + 2 - 32) + "px";
+        tuft.style.animationDelay = waveDelay(t.x + TW / 2, s * 0.25);
+        layer.appendChild(tuft);
+        el("path", { d: t.d }, el("svg", { width: TW, height: 34, viewBox: "0 -32 " + TW + " 34", focusable: "false" }, tuft));
+      });
+    });
+    // Soil: a slightly uneven band under the ground line, burying the roots.
+    ground.setAttribute("width", W); ground.setAttribute("height", H);
+    var rg = embRng(3.1), x, top = [];
+    for (x = 0; x <= W + 30; x += 30) top.push(r1(x) + " " + r1(GY - 1 - rg() * 2.4));
+    el("path", { "class": "ffg-mound", d: "M0 " + H + " L" + top.join(" L") + " L" + r1(W + 30) + " " + H + " Z" }, ground);
+    // Stars: only in the sky above the garden band; some twinkle, slowly.
+    var sky = Math.max(0, GY - G - 10), rs = embRng(9.7), n = Math.round(W * sky / 7000), i, c;
+    stars.setAttribute("width", W); stars.setAttribute("height", sky);
+    for (i = 0; i < n; i++) {
+      c = el("circle", { cx: r1(rs() * W), cy: r1(4 + rs() * (sky - 4)), r: r1(embMix(0.45, 1.05, rs() * rs())), opacity: r1(embMix(0.35, 0.8, rs())) }, stars);
+      if (rs() < 0.45) {
+        c.setAttribute("class", "ffg-tw");
+        c.style.setProperty("--ffg-d", r1(5 + rs() * 6) + "s");
+        c.style.setProperty("--ffg-dl", "-" + r1(rs() * 10) + "s");
+      }
+    }
+    return true;
+  }
+
+  // Draw every plant at progress `shown` (0..1) with its spring lean.
+  function drawPlant(p, shown) {
+    var grow = embSmooth((shown - p.delay) / 0.32);
+    if (grow <= 0.001) { if (p.svg.style.visibility !== "hidden") p.svg.style.visibility = "hidden"; return; }
+    if (p.svg.style.visibility) p.svg.style.visibility = "";
+    var lean = clamp(p.a, -0.3, 0.3), bx = p.bx, gy = GY;
+    var tx = bx + p.bend * grow + lean * p.hh;
+    var ty = gy - p.hh * grow * (1 - 0.12 * Math.abs(lean));
+    var cx = bx + p.bend * 0.3 * grow + lean * p.hh * 0.15;
+    var cy = gy - p.hh * grow * 0.55;
+    var st = embStem(bx, gy, cx, cy, tx, ty, 0.34);
+    p.stem.setAttribute("d", st.full);
+    p.stemBase.setAttribute("d", st.base);
+    var i, lf, s, u, lx, ly, ang;
+    for (i = 0; i < p.leaves.length; i++) {
+      lf = p.leaves[i];
+      s = embSmooth((grow - lf.t) / 0.2);
+      if (s <= 0.001) { p.leafEls[i].setAttribute("transform", "scale(0)"); continue; }
+      u = clamp(lf.t / grow, 0, 1);
+      lx = embBez(bx, cx, tx, u); ly = embBez(gy, cy, ty, u);
+      ang = Math.atan2(embBezTan(gy, cy, ty, u), embBezTan(bx, cx, tx, u)) * 180 / Math.PI + 90 + lf.side * lf.spread;
+      p.leafEls[i].setAttribute("transform", "translate(" + r2(lx) + " " + r2(ly) + ") rotate(" + r2(ang) + ") scale(" + r2(s) + ")");
+    }
+    var hs = 0.2 + 0.8 * embSmooth((grow - 0.08) / 0.92);
+    if (grow < 0.05) hs *= grow / 0.05;
+    var tipAng = Math.atan2(embBezTan(gy, cy, ty, 1), embBezTan(bx, cx, tx, 1)) * 180 / Math.PI + 90;
+    p.head.setAttribute("transform", "translate(" + r2(tx) + " " + r2(ty) + ") rotate(" + r2(tipAng * 0.5 + lean * 70 + p.tilt) + ") scale(" + r2(hs) + ")");
+    var open = embSmooth((shown - p.openAt) / p.openSpan) * p.open;
+    if (Math.abs(open - p.lastOpen) > 0.0015) {
+      p.lastOpen = open;
+      var f = embFlower(p.kind, open, p.size, p.seed);
+      for (i = 0; i < f.length; i++) {
+        p.petals[i].setAttribute("d", f[i].d);
+        p.petals[i].setAttribute("transform", "rotate(" + r2(f[i].rot) + ")");
+      }
+      if (p.stam) p.stam.setAttribute("transform", "scale(" + (Math.round(embSmooth((open - 0.55) / 0.35) * 100) / 100) + ")");
+    }
+  }
+  var lastGrass = -1;
+  function drawGrass(shown) {
+    var gg = Math.round(embSmooth(shown / 0.4) * 100) / 100, s;
+    if (gg === lastGrass) return;
+    lastGrass = gg;
+    for (s = 0; s < grassEls.length; s++) grassEls[s].style.transform = gg >= 1 ? "" : "scaleY(" + gg + ")";
+  }
+  function drawAll(shown) {
+    var i, p, rest;
+    for (i = 0; i < plants.length; i++) {
+      p = plants[i];
+      rest = shown >= 1 && Math.abs(p.a) < 1e-4;
+      if (rest && p.restDrawn) continue;
+      drawPlant(p, shown);
+      p.restDrawn = rest;
+    }
+    drawGrass(shown);
+  }
+
+  // ---- Motion ------------------------------------------------------------
+  // The loop runs only while some of the garden is painted on screen, and then
+  // only while growing or while the springs move.
+  var shown = reduced ? 1 : 0, started = reduced, visible = false, ioIn = false;
+  var running = false, last = 0, settled = true, ptr = null;
+  var api = { ticks: 0, ms: 0 };
+
+  // Covered or uncovered. The footer sits under the page and is revealed from
+  // behind it, so plain geometry (and IntersectionObserver) says "on screen"
+  // long before it is. Ask what is actually painted at a height in the footer.
+  function painted(yIn) {
+    if (!ioIn) return false;
+    var r = root.getBoundingClientRect(), vh = window.innerHeight || document.documentElement.clientHeight;
+    var y = r.top + yIn, xs = [0.08, 0.5, 0.92], i, hit;
+    if (r.width === 0 || y < 0 || y >= vh) return false;
+    for (i = 0; i < xs.length; i++) {
+      hit = document.elementFromPoint(r.left + r.width * xs[i], y);
+      if (hit && (hit === foot || foot.contains(hit))) return true;
+    }
+    return false;
+  }
+  function check() {
+    if (reduced) return;
+    // Visible: the ground line or the flower band is uncovered.
+    visible = painted(GY - 4) || painted(GY - G * 0.6) || painted(Math.max(0, GY - G - 40));
+    root.classList.toggle("ffg-paused", !visible);
+    // Start growing once most of the flower band is uncovered.
+    if (!started && painted(GY - G * 0.7)) started = true;
+    if (visible && started && (shown < 1 || !settled)) wake();
+  }
+  function wake() {
+    if (running || reduced || !visible || !plants.length) return;
+    running = true; last = 0;
+    requestAnimationFrame(tick);
+  }
+  function step(dt) {
+    var moving = false, i, p, F, x2, y2, dx, dy, t, qx, qy, d, f;
+    for (i = 0; i < springy.length; i++) {
+      p = springy[i];
+      F = 0;
+      if (ptr) {
+        // Distance from the pointer to the stem, taken as the line root to tip.
+        x2 = p.gx + p.bend + p.a * p.hh; y2 = p.gy - p.hh;
+        dx = x2 - p.gx; dy = y2 - p.gy;
+        t = clamp(((ptr.x - p.gx) * dx + (ptr.y - p.gy) * dy) / (dx * dx + dy * dy), 0, 1);
+        qx = p.gx + dx * t; qy = p.gy + dy * t;
+        d = Math.sqrt((ptr.x - qx) * (ptr.x - qx) + (ptr.y - qy) * (ptr.y - qy));
+        if (d < p.R) {
+          f = 1 - d / p.R;
+          F = clamp((qx - ptr.x) / 14, -1, 1) * 2.4 * f * f + ptr.vx * 0.05 * f;
+        }
+      }
+      p.va += (-p.k * p.a - p.c * p.va + F) * dt;
+      p.a += p.va * dt;
+      if (Math.abs(p.va) > 0.0015 || (!ptr && Math.abs(p.a) > 0.0015)) moving = true;
+    }
+    if (ptr) ptr.vx *= 0.85;
+    if (!ptr && !moving) for (i = 0; i < springy.length; i++) { springy[i].a = 0; springy[i].va = 0; }
+    return moving;
+  }
+  function tick(now) {
+    api.ticks++;
+    if (!visible) { running = false; return; }
+    var t0 = performance.now();
+    var dt = last ? Math.min((now - last) / 1000, 0.05) : 1 / 60;
+    last = now;
+    if (started && shown < 1) shown = Math.min(1, shown + dt * 1000 / GROW_MS);
+    var moving = step(dt / 2);
+    moving = step(dt / 2) || moving;
+    settled = !moving;
+    drawAll(shown);
+    api.ms = api.ms * 0.9 + (performance.now() - t0) * 0.1;
+    if (shown >= 1 && settled) { running = false; return; }
+    requestAnimationFrame(tick);
+  }
+
+  if (!build()) return;
+  drawAll(shown);
+
+  function relayout() {
+    if (root.clientWidth === W && root.clientHeight === H) return;
+    if (build()) { lastGrass = -1; drawAll(shown); check(); }
+  }
+  var resizeT = 0;
+  function onResize() { clearTimeout(resizeT); resizeT = setTimeout(relayout, 200); }
+  window.addEventListener("resize", onResize);
+  if ("ResizeObserver" in window) new ResizeObserver(onResize).observe(foot);
+  if (reduced) return;
+
+  var scrollQueued = false;
+  window.addEventListener("scroll", function () {
+    if (scrollQueued || !ioIn) return;
+    scrollQueued = true;
+    setTimeout(function () { scrollQueued = false; check(); }, 90);
+  }, { passive: true });
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function (entries) {
+      ioIn = entries[entries.length - 1].isIntersecting;
+      check();
+    }, { threshold: [0, 0.2] }).observe(foot);
+  } else { ioIn = true; check(); }
+
+  // Hover is wind: listen on the footer (the scene never takes the pointer, so
+  // footer links stay clickable). Only a pointer near the flower band counts.
+  // Touch is ignored, since a finger there is scrolling.
+  foot.addEventListener("pointermove", function (e) {
+    if (e.pointerType === "touch") return;
+    var r = root.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+    if (y < GY - G - 60) { if (ptr) { ptr = null; settled = false; wake(); } return; }
+    ptr = { x: x, y: y, vx: ptr ? clamp(x - ptr.x, -40, 40) : 0 };
+    settled = false;
+    wake();
+  }, { passive: true });
+  foot.addEventListener("pointerleave", function () { if (ptr) { ptr = null; settled = false; wake(); } });
+
+  // For testing: replay the growth.
+  api.replay = function () { shown = 0; started = true; settled = false; lastGrass = -1; plants.forEach(function (p) { p.lastOpen = -1; p.restDrawn = false; }); check(); };
+})();
+</script>
 <!-- FLOATING NAV -->
 <div class="fab" role="group" aria-label="Page navigation">
   <span class="fab-slot" style="--i:3;"><button type="button" class="fab-act" data-go="top" aria-label="To Top" style="--from:#4f46e5;--to:#6366f1;"><span class="fill"></span><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg></span><span class="lbl">To Top</span></button></span>
@@ -2938,10 +3630,12 @@ html.ksch-lock .fab{display:none;}
 <div class="scrim" data-close-side></div>
 <aside class="sidebar" id="sidebar" aria-label="Contents">
   <div class="side-head">
+    <a class="side-brand" href="#home" aria-label="Prestudy Pamphlet Guide, home"><span class="side-brand-mark" aria-hidden="true"></span><span class="side-brand-txt"><span class="side-brand-t">Prestudy Pamphlet Guide</span><span class="side-brand-s">KCM &middot; Focus Family Leaders</span></span></a>
     <span class="part-label">Contents</span>
     <button type="button" class="btn btn-icon" data-close-side aria-label="Close contents"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
   </div>
   <nav class="toc toc-side"></nav>
+  <span class="side-prog none" aria-hidden="true"></span>
 </aside>
 <script>
 // qrcode-generator 2.0.4 by Kazuhiko Arase, MIT licence, from npm (integrity checked).
@@ -5299,17 +5993,66 @@ function fallbackCopy(text, done) {
 }
 
 // Theme wiring. The class goes on <html> so the pre-paint script and this agree
-// on one place. The crossfade class comes and goes the way Blueberry's
-// animated-theme-toggler does it.
+// on one place. The swap: both bodies ride one circle centred below the
+// button, like a sky dome; the outgoing one sets with an ease-in, the incoming
+// one rises with a slight overshoot, and the skies cross-fade. Pressing again
+// mid-swap plays the running swap backwards from where it is.
+var THEME_SWAP_MS = 1740;
 var themeSwapTimer = null;
+var themeFlight = [];
+var SM = { moon: { side: -1, spin: 25 }, sun: { side: 1, spin: 120 } };
+function smPoint(side, angle) { return { x: side * 115 * Math.sin(angle), y: 115 * (1 - Math.cos(angle)) }; }
+function smFrames(body, rising) {
+  var out = [];
+  for (var i = 0; i <= 30; i++) {
+    var t = i / 30, k, pt, f;
+    if (rising) {
+      var e = 1 + 2.4 * Math.pow(t - 1, 3) + 1.4 * Math.pow(t - 1, 2);
+      k = 1 - e; pt = smPoint(body.side, k * Math.PI / 2);
+      f = { offset: t, opacity: Math.min(1, t / 0.3),
+        transform: "translate(" + pt.x + "%," + pt.y + "%) rotate(" + body.side * body.spin * k + "deg) scale(" + (1 - 0.28 * k) + ")" };
+    } else {
+      k = t * t * t; pt = smPoint(body.side, k * Math.PI / 2);
+      f = { offset: t, opacity: t < 0.55 ? 1 : (1 - t) / 0.45,
+        transform: "translate(" + pt.x + "%," + pt.y + "%) rotate(" + body.side * body.spin * k + "deg)" };
+    }
+    out.push(f);
+  }
+  return out;
+}
+function playThemeSwap(toDark) {
+  var btn = document.querySelector(".themebtn");
+  if (themeFlight.length) { themeFlight.forEach(function (a) { a.reverse(); }); return; }
+  var moon = btn.querySelector(".sm-moon"), sun = btn.querySelector(".sm-sun");
+  if (!moon.animate || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var d = THEME_SWAP_MS;
+  var setting = (toDark ? sun : moon).animate(smFrames(toDark ? SM.sun : SM.moon, false), { duration: d * 0.65, fill: "both" });
+  var rising = (toDark ? moon : sun).animate(smFrames(toDark ? SM.moon : SM.sun, true), { duration: d * 0.64, delay: d * 0.36, fill: "both" });
+  var sky = { duration: d, easing: "cubic-bezier(.65,0,.35,1)", fill: "both" };
+  var pair = [setting, rising,
+    btn.querySelector(".sm-night").animate([{ opacity: toDark ? 0 : 1 }, { opacity: toDark ? 1 : 0 }], sky),
+    btn.querySelector(".sm-day").animate([{ opacity: toDark ? 1 : 0 }, { opacity: toDark ? 0 : 1 }], sky)];
+  themeFlight = pair;
+  Promise.all(pair.map(function (a) { return a.finished; })).then(function () {
+    if (themeFlight !== pair) return;
+    themeFlight = [];
+    pair.forEach(function (a) { a.cancel(); });
+  }, function () {});
+}
 function setTheme(theme) {
   var root = document.documentElement;
-  root.classList.add("theme-transition");
-  clearTimeout(themeSwapTimer);
-  themeSwapTimer = setTimeout(function () {
-    root.classList.remove("theme-transition");
-  }, 260);
-  root.classList.toggle("dark", theme === "dark");
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var change = theme === "dark" !== root.classList.contains("dark");
+  if (change) playThemeSwap(theme === "dark");
+  function apply() { root.classList.toggle("dark", theme === "dark"); }
+  if (change && !reduce && document.startViewTransition) {
+    document.startViewTransition(apply);
+  } else if (change && !reduce) {
+    root.classList.add("theme-transition");
+    clearTimeout(themeSwapTimer);
+    themeSwapTimer = setTimeout(function () { root.classList.remove("theme-transition"); }, 300);
+    apply();
+  } else apply();
   try {
     localStorage.setItem("theme", theme);
   } catch (e) {
@@ -5370,14 +6113,93 @@ function initSidebar() {
   var burger = document.querySelector(".burger");
   var body = document.querySelector("#contents .toc-body");
   side.querySelector(".toc-side").appendChild(body.cloneNode(true));
+  // The brand row reuses the header's flower mark rather than a second copy.
+  var mark = document.querySelector(".docbar .brand-mark");
+  var slot = side.querySelector(".side-brand-mark");
+  if (mark && slot) slot.appendChild(mark.cloneNode(true));
+  // Wrap each row's name so the rail can fade it, and mark the numbered steps
+  // so the collapsed rail shows their number instead of the icon.
+  side.querySelectorAll(".toc-side li a").forEach(function (a) {
+    var n = a.querySelector(".toc-n");
+    if (n && n.textContent.trim()) a.classList.add("is-step");
+    Array.prototype.slice.call(a.childNodes).forEach(function (node) {
+      if (node.nodeType === 3 && node.nodeValue.trim()) {
+        var span = document.createElement("span");
+        span.className = "toc-lbl";
+        a.replaceChild(span, node);
+        span.appendChild(node);
+      }
+    });
+  });
+  var closeBtn = side.querySelector(".side-head [data-close-side]");
+  var rail = window.matchMedia("(min-width:1024px)");
 
   function setOpen(open, returnFocus) {
+    var was = side.classList.contains("open");
     side.classList.toggle("open", open);
     scrim.classList.toggle("open", open);
+    document.documentElement.classList.toggle("side-lock", open);
     burger.setAttribute("aria-expanded", open ? "true" : "false");
-    if (open) side.querySelector("a").focus({ preventScroll: true });
-    else if (returnFocus) burger.focus({ preventScroll: true });
+    if (open) closeBtn.focus({ preventScroll: true });
+    else if (returnFocus && was) burger.focus({ preventScroll: true });
   }
+  // Moving up to the rail width closes the panel and frees the page scroll.
+  function onRail() { if (rail.matches) setOpen(false, false); }
+  if (rail.addEventListener) rail.addEventListener("change", onRail);
+  else if (rail.addListener) rail.addListener(onRail);
+  // The rail stops at the footer's top edge. The footer is revealed from under
+  // .shell, so its visible top is wherever the shell's bottom is.
+  var shell = document.querySelector(".shell");
+  var list = side.querySelector(".toc-side");
+  var prog = side.querySelector(".side-prog");
+  var fitQueued = false;
+  function fitRail() {
+    fitQueued = false;
+    var b = 0;
+    if (rail.matches && shell) b = Math.max(0, Math.round(window.innerHeight - shell.getBoundingClientRect().bottom));
+    side.style.bottom = b ? b + "px" : "";
+    setProgTarget();
+  }
+  function queueFit() { if (!fitQueued) { fitQueued = true; requestAnimationFrame(fitRail); } }
+  window.addEventListener("scroll", queueFit, { passive: true });
+  window.addEventListener("resize", queueFit);
+
+  // Scroll progress, sprung like motion's useSpring (stiffness 200, damping 50,
+  // mass 1, restDelta .001). The loop runs only while the bar is moving.
+  var still = window.matchMedia("(prefers-reduced-motion: reduce)");
+  var pos = 0, vel = 0, target = 0, last = 0, ticking = false;
+  function draw() { prog.style.transform = "scaleX(" + pos.toFixed(4) + ")"; }
+  function step(t) {
+    var dt = Math.min((t - (last || t)) / 1000, 1 / 30) || 1 / 60;
+    last = t;
+    vel += (-200 * (pos - target) - 50 * vel) / 1 * dt;
+    pos += vel * dt;
+    if (Math.abs(pos - target) < 0.001 && Math.abs(vel) < 0.001) { pos = target; vel = 0; ticking = false; draw(); return; }
+    draw();
+    requestAnimationFrame(step);
+  }
+  function setProgTarget() {
+    var max = list.scrollHeight - list.clientHeight;
+    prog.classList.toggle("none", max <= 1);
+    target = max > 1 ? Math.min(1, Math.max(0, list.scrollTop / max)) : 0;
+    if (still.matches) { pos = target; vel = 0; draw(); return; }
+    if (!ticking) { ticking = true; last = 0; requestAnimationFrame(step); }
+  }
+  list.addEventListener("scroll", setProgTarget, { passive: true });
+  if (window.ResizeObserver) new ResizeObserver(setProgTarget).observe(list);
+  fitRail();
+
+  // Keep Tab inside the open panel.
+  side.addEventListener("keydown", function (e) {
+    if (e.key !== "Tab" || !side.classList.contains("open")) return;
+    var f = Array.prototype.filter.call(side.querySelectorAll("a[href],button"), function (el) {
+      return el.offsetParent !== null;
+    });
+    if (!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
 
   burger.addEventListener("click", function () { setOpen(true); });
   document.querySelectorAll("[data-close-side]").forEach(function (el) {

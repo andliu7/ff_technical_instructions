@@ -624,18 +624,15 @@ body{background:#ffffff;}
   .sidebar a.is-step .toc-ico,.sidebar a:not(.is-step) .toc-n{display:none;}
   /* Step 10's icon sits inside the flame effect's wrapper: hide the wrapper too, or it leaves a gap. */
   .sidebar a.is-step .flame-host{display:none;}
-  .sidebar:not(:hover):not(:has(:focus-visible)) a.is-step .flame-host{display:revert;}
   .sidebar a.is-step .toc-n{flex:0 0 26px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
     text-align:center;font-size:12px;background:color-mix(in srgb,var(--sc) 14%,var(--sheet));color:var(--sc);
     transition:background-color .15s ease,color .15s ease;}
   .sidebar a.is-step:is(:hover,:focus-visible,[aria-current="page"]) .toc-n{background:var(--sc);color:var(--sheet);}
-  /* Collapsed: just a column of coloured icons, no stripes or section bars.
-     The frames, headings and step numbers come back when it opens. */
-  .sidebar:not(:hover):not(:has(:focus-visible)) .toc-sec{border-color:transparent;margin-bottom:0;}
-  .sidebar:not(:hover):not(:has(:focus-visible)) .toc-sec .toc-ph{display:none;}
-  .sidebar:not(:hover):not(:has(:focus-visible)) a.is-step .toc-ico{display:grid;}
-  .sidebar:not(:hover):not(:has(:focus-visible)) a.is-step .toc-n{display:none;}
-  .sidebar:not(:hover):not(:has(:focus-visible)) .toc-sec li a{padding:3px 9px;}
+  /* Collapsed: the same layout as open, so every icon and number badge sits
+     exactly where it will be when the rail opens, and the scroll position
+     carries over. Only the paint goes: no stripes, frames or heading bars. */
+  .sidebar:not(:hover):not(:has(:focus-visible)) .toc-sec{border-color:transparent;}
+  .sidebar:not(:hover):not(:has(:focus-visible)) .toc-sec .toc-ph::before{opacity:0;}
 }
 @supports not selector(:has(a)){
   @media screen and (min-width:1024px){

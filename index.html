@@ -1573,6 +1573,18 @@ html.ksch-lock .fab{display:none;}
 .ksch-g-mi svg{width:15px;height:15px;color:var(--sub);}
 
 /* Name gate */
+.ksch-g-who{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;}
+.ksch-g-whobtn{display:flex;align-items:center;gap:10px;min-height:52px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--line);
+  background:var(--btn-bg);color:var(--ink);font:inherit;font-weight:600;text-align:left;cursor:pointer;box-shadow:0 2px 0 var(--line);
+  transition:border-color .15s,transform .1s,box-shadow .1s;}
+.ksch-g-whobtn:hover{border-color:var(--acc);box-shadow:0 2px 0 var(--acc);}
+.ksch-g-whobtn:active{transform:translateY(2px);box-shadow:none;}
+.ksch-g-whobtn:focus-visible{outline:2px solid var(--acc);outline-offset:2px;}
+.ksch-g-whobtn[aria-pressed="true"]{border-color:var(--acc);background:var(--acc-soft);}
+.ksch-g-whoini{display:grid;place-items:center;flex:none;width:30px;height:30px;border-radius:50%;background:var(--acc);color:var(--btn-bg);font-size:14px;}
+.ksch-g-whobtn{font-size:15px;}
+@media (max-width:600px){.ksch-g-mi{min-height:44px;}}
+.ksch-g-gate .ksch-lbl.ksch-g-whoelse{margin-top:10px;font-weight:500;}
 .ksch-g-gate{display:flex;flex-direction:column;gap:10px;max-width:460px;padding:6px 0;}
 .ksch-g-gate .ksch-lbl{margin-top:4px;}
 
@@ -2724,14 +2736,14 @@ html.ksch-lock .fab{display:none;}
 
   <!-- PDF TOOL. PdfCraft's web build (pdfcraft/, Apache-2.0 or MIT, see
        pdfcraft/NOTICE), a full PDF app compiled from Rust to WebAssembly.
-       It is about 15 MB to download, so the iframe is only made when someone
+       It is about 42 MB to download, so the iframe is only made when someone
        presses the button; the guide does fetch the file in the background a
        few seconds after opening (see the preload below) so it is usually
        cached by then. Screen only. -->
   <div class="tip pdftool" id="pdf-tool"><span class="tl">The PDF editor</span>
     <p>Open it here or as a full page. Besides the booklet, it can add text and images, highlight, draw, and rotate or reorder pages.</p>
     <p class="pdftool-acts">
-      <button type="button" class="btn btn-primary" data-pdftool><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>Load the PDF editor here (about 15 MB, once)</button>
+      <button type="button" class="btn btn-primary" data-pdftool><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>Load the PDF editor here (about 42 MB, once)</button>
       <a class="btn" href="pdf-editor.html" target="_blank" rel="noopener"><svg class="bi" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3"/></svg>Open it as a full page</a>
     </p>
     <p class="pdftool-wait" hidden>A loading screen counts up to 100% while the editor downloads; after the first time it opens much faster.</p>
@@ -5545,7 +5557,7 @@ document.addEventListener("click", function (e) {
 });
 
 // The PDF tool appears on request: the button swaps itself for the app in an
-// iframe. The 15 MB download itself is usually already cached by the preload.
+// iframe. The 42 MB download itself is usually already cached by the preload.
 document.addEventListener("click", function (e) {
   var b = e.target.closest("[data-pdftool]");
   if (!b) return;
@@ -5557,7 +5569,7 @@ document.addEventListener("click", function (e) {
 });
 
 // Preload the PDF editor. A few seconds in, once the browser is idle, fetch the
-// editor's 15 MB app in the background so the browser keeps it, and
+// editor's 42 MB app in the background so the browser keeps it, and
 // pdf-editor.html then opens from the cache. Not tied to the page's load event:
 // the embedded PDFs further down hold that back for a long time. Skipped for
 // guests on a scheduler link and when the device asks to save data. Same file
@@ -7177,8 +7189,9 @@ var KSCH = (function () {
   // The pill beside the title: the zone the times are in, and how far that is
   // from the reader when it is not their own. On the new-poll form it is also
   // the way to change the zone: an invisible dropdown covers it, so a click
-  // opens the browser's own list.
-  function setTzPill(tz, poll, editable) {
+  // opens the browser's own list. After the poll exists only the organizer
+  // gets the dropdown, and onPick saves the new zone to the poll.
+  function setTzPill(tz, poll, editable, onPick) {
     activeTz = tz || "";
     var pill = root.querySelector(".ksch-tz");
     if (!pill) return;
@@ -7191,7 +7204,12 @@ var KSCH = (function () {
     pill.title = editable ? "Change the time zone" : tz.replace(/_/g, " ");
     if (editable) {
       pill.insertAdjacentHTML("beforeend", '<svg class="ksch-tz-chev" ' + P + '><path d="m6 9 6 6 6-6"/></svg>');
-      var sel = tzSelect(tz, function (v) { pickedTz = v; setTzPill(v, null, true); });
+      var sel = tzSelect(tz, function (v) {
+        if (onPick) onPick(v); else pickedTz = v;
+        setTzPill(v, poll, true, onPick);
+        var again = pill.querySelector(".ksch-tz-sel");
+        if (again) again.focus({ preventScroll: true });
+      });
       sel.className = "ksch-tz-sel";
       sel.setAttribute("aria-label", "Time zone: " + tzLabel(tz) + ". Change it");
       pill.appendChild(sel);
@@ -7210,6 +7228,7 @@ var KSCH = (function () {
       setTzPill((data.poll.config && data.poll.config.tz) || "", data.poll);
       modes[name].open(data);
     }, function (err) {
+      setTzPill("");
       render(h("div", { class: "ksch-empty" },
         h("p", { text: err.code === "not_found" ? "That poll doesn't exist, or it was made in another browser before sharing was switched on." : "Couldn't open the poll: " + err.message }),
         button("Start a new one", { primary: true, onClick: function () { start(); } })));
@@ -7251,6 +7270,7 @@ var KSCH = (function () {
   return {
     root: root, h: h, esc: esc, icon: icon, button: button, render: render, toast: toast, dialog: dialog,
     tzEdit: function () { pickedTz = pickedTz || deviceTz(); setTzPill(pickedTz, null, true); },
+    tzPill: setTzPill, deviceTz: deviceTz,
     store: store, modes: modes, start: start, openPoll: openPoll, setFull: setFull, deletePoll: deletePoll, validEmail: validEmail,
     isAdmin: isAdmin, me: me, setMe: setMe, tok: tok, keepTokens: keepTokens, remember: remember, forget: forget,
     shareUrl: shareUrl, copy: copy, recent: recent, nativeShare: nativeShare, gcalUrl: gcalUrl, downloadIcs: downloadIcs,
@@ -8440,6 +8460,10 @@ var KSCH = (function () {
       actions(button("View results", { icon: "grid", onClick: function () { nextView = "group"; K.openPoll(id); } }),
         button("Add my availability", { primary: true, icon: "brush", onClick: function () { nextView = "mine"; K.openPoll(id); } }))), "Find a time");
     var p = K.root.querySelector(".ksch-g .ksch-actions .btn-primary"); if (p) p.focus({ preventScroll: true });
+    if (cfg) K.tzPill(cfg.tz || K.deviceTz(), null, true, function (v) {
+      var nc = Object.assign({}, live.cfg, { tz: v });
+      K.store.update(id, { config: nc }).then(function () { live.cfg = nc; K.toast("Time zone saved"); }, function (err) { K.toast("Couldn't save: " + err.message); });
+    });
   }
 
   function shareDialog() {
@@ -8503,6 +8527,13 @@ var KSCH = (function () {
     var el = screen(prog, finalBanner(), isClosed() ? closedBanner() : null, toolbar(poll.title, sub, right, "ksch-g-polltop"));
     if (P.view === "mine") mineView(el); else groupView(el);
     P.root = el;
+    if (admin && !isClosed()) K.tzPill(c.tz || K.deviceTz(), poll, true, function (v) {
+      P.tzFocus = true;
+      var nc = Object.assign({}, cfg(), { tz: v });
+      patch({ config: nc }, "Time zone saved. Everyone now sees times in " + v.replace(/_/g, " ").split("/").pop() + ".");
+    });
+    else K.tzPill(c.tz || "", poll);
+    if (P.tzFocus) { P.tzFocus = false; var tzs = K.root.querySelector(".ksch-tz-sel"); if (tzs) tzs.focus({ preventScroll: true }); }
     K.render(el, "Find a time");
     if (keepScroll) body.scrollTop = top;
   }
@@ -8560,6 +8591,13 @@ var KSCH = (function () {
     btn.addEventListener("click", function () {
       if (!menu.hidden) return hide();
       menu.hidden = false; btn.setAttribute("aria-expanded", "true");
+      menu.style.right = "";
+      // Keep it inside the scrolling panel, which clips anything past its edges.
+      var box = (wrap.closest(".ksch-body") || document.documentElement).getBoundingClientRect();
+      var lo = Math.max(box.left, 0) + 4, hi = Math.min(box.right, document.documentElement.clientWidth) - 4;
+      var mr = menu.getBoundingClientRect();
+      if (mr.left < lo) menu.style.right = (mr.left - lo) + "px";
+      else if (mr.right > hi) menu.style.right = (mr.right - hi) + "px";
       document.addEventListener("pointerdown", outside, true);
       var first = menu.querySelector("button:not([disabled])"); if (first) first.focus();
     });
@@ -8648,19 +8686,21 @@ var KSCH = (function () {
 
   function nameGate(el, errMsg, prefill) {
     var free = notAnswered(), picked = null;
-    var input = h("input", { class: "ksch-input big", maxlength: "60", autocomplete: "name", placeholder: "Your name", value: free.length ? "" : prefill,
-      autofocus: true, oninput: function () { picked = null; mark(); check(); } });
+    // With a guest list, the names come first as big buttons and typing is
+    // the fallback, so the input does not grab focus (or the phone keyboard).
+    var input = h("input", { class: "ksch-input big", maxlength: "60", autocomplete: "name", placeholder: free.length ? "Type your name" : "Your name", value: free.length ? "" : prefill,
+      autofocus: !free.length, oninput: function () { picked = null; mark(); check(); } });
     var err = h("p", { class: "ksch-err", role: "alert", text: errMsg || "" });
     var chips = null;
     if (free.length) {
-      chips = h("div", { class: "ksch-chips", role: "group", "aria-label": "Invited people who haven't answered" });
+      chips = h("div", { class: "ksch-g-who", role: "group", "aria-label": "Invited people who haven't answered" });
       free.forEach(function (n) {
-        chips.appendChild(h("button", { type: "button", class: "ksch-chip", "aria-pressed": "false", text: n, onclick: function () {
+        chips.appendChild(h("button", { type: "button", class: "ksch-g-whobtn", "aria-pressed": "false", "data-name": n, onclick: function () {
           picked = n; input.value = ""; mark(); check(); go();
-        } }));
+        } }, h("span", { class: "ksch-g-whoini", "aria-hidden": "true", text: n.trim().charAt(0).toUpperCase() }), h("span", { text: n })));
       });
     }
-    function mark() { if (chips) chips.querySelectorAll(".ksch-chip").forEach(function (c) { c.setAttribute("aria-pressed", c.textContent === picked ? "true" : "false"); }); }
+    function mark() { if (chips) chips.querySelectorAll(".ksch-g-whobtn").forEach(function (c) { c.setAttribute("aria-pressed", c.getAttribute("data-name") === picked ? "true" : "false"); }); }
     var next = button("Continue", { primary: true, icon: "next", onClick: function () { go(); } });
     function val() { return (picked || input.value).trim(); }
     function check() { next.disabled = !val(); if (val()) err.textContent = ""; }
@@ -8672,9 +8712,9 @@ var KSCH = (function () {
     }
     input.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); go(); } });
     el.appendChild(h("div", { class: "ksch-g-gate" },
-      h("h4", { class: "ksch-h", text: "Who are you?" }),
-      h("p", { class: "ksch-sub", text: "Your name shows next to your times. No account needed." }),
-      chips ? [h("span", { class: "ksch-lbl", text: "Tap your name" }), chips, h("span", { class: "ksch-lbl", text: "Someone else" })] : null,
+      h("h4", { class: "ksch-h", text: chips ? "Which one is you?" : "Who are you?" }),
+      h("p", { class: "ksch-sub", text: chips ? "Tap your name to start marking your times. No account needed." : "Your name shows next to your times. No account needed." }),
+      chips, chips ? h("span", { class: "ksch-lbl ksch-g-whoelse", text: "Not on the list? Type your name" }) : null,
       input, err));
     el.appendChild(actions(button("Cancel", { icon: "back", onClick: function () { P.gate = false; P.gateErr = P.gateName = null; P.pending = null; P.view = "group"; draw(); } }), next));
     check();

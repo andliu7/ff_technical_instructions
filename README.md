@@ -25,7 +25,16 @@ Kharis Campus Ministry
 
 ## Read it
 
-Open `index.html` in a browser, or download `guide.pdf`.
+Open `index.html` in a browser. It reads one page at a time: the tabs at the top go to the
+Memo, the Editor and the Calendar, and the contents sit in a sidebar on the left on wide
+screens (the menu button opens them on smaller ones). `guide.pdf` is the printable version,
+last made on 2026-09-09, so it lags the web guide: regenerate it after content changes.
+
+Step 1 opens with the **simplified pamphlet** for new leaders: a plain layout with nothing
+locked. Its "Save as a Google Doc" button is the Doc's `/copy` link, which gives the reader
+their own copy in Drive. That only works while the Doc stays shared as "Anyone with the
+link"; the link check cannot tell if it stops being shared, so check by opening the link
+signed out.
 
 ## Run locally
 
@@ -47,15 +56,17 @@ Then visit `http://localhost:8000`. A server is needed because the browser block
     apps-script/          the scheduler's shared store (Code.gs) and its test
     pdfcraft/             PdfCraft 0.13.0's web build, the PDF editor (see below)
 
-The styles, the background effect, the copy buttons, the fonts (Libre Baskerville,
-Instrument Sans, JetBrains Mono, Allura) and the annotated screenshots are all
-inlined into `index.html`, so the guide itself is one self-contained file. Two parts reach
-outside it: the scheduler talks to a Google Apps Script, and the PDF editor lives in
-`pdfcraft/` beside it (the guide fetches it in the background, about 15 MB compressed).
+The styles, the background effect, the copy cards, the fonts (Libre Baskerville,
+Instrument Sans, JetBrains Mono, Allura) and the screenshots are all inlined into
+`index.html`, so the guide itself is one self-contained file. Two parts reach outside it:
+the scheduler talks to a Google Apps Script, and the PDF editor lives in `pdfcraft/` beside
+it. The guide fetches the editor in the background a few seconds after each visit (not on
+scheduler links or with data saver on): the `.wasm` file is 42.5 MB (less over the wire if
+the host compresses it).
 
 ## The calendar
 
-The first page carries the 26-27 KCM Master Calendar (Fall 2026 and Spring 2027
+The Calendar tab carries the 26-27 KCM Master Calendar (Fall 2026 and Spring 2027
 tabs) as a month, week and list view with the sheet's own colour code behind the
 key icon. The events are a snapshot taken 2026-09-27, baked into `index.html`.
 On load the page tries to read the sheet again, but the sheet is shared only with
@@ -65,21 +76,48 @@ the sheet and rebuild the JSON in the `kcal-data` block.
 
 ## The scheduler
 
-Under the calendar sits "Find a time", a when2meet replacement. It starts by asking who the
-meeting is with (one person or a group) and how to find the time:
+At the top of the Calendar page, the "Find a time that works for everyone" card opens "Find a time", a
+when2meet replacement, as a popup over the page (close it with the cross, a click outside
+it or Escape). Making a poll takes two pages, with a setup tracker beside them (Set a name,
+Who's coming?, When is it?, Send the link!, Wait for responses, Pick a time!). The bar is
+weighted so the first three steps fill 90% of it:
 
-- **They share when they're free, I pick:** each person types their name and drags over
-  the grid (green available, yellow maybe). Results show as a heat grid, a ranked list
-  of best times and a per-person view. The organiser picks the final time.
-- **I have a time in mind:** for one person, they accept it or suggest another; for a
-  group, a poll of just that time, so everyone marks whether they can come.
-- **I offer times, they book one:** one person only. They book one of your free slots.
+1. **Give it a name** (optional; left blank it becomes "Meeting with Sam and Ana"), **your
+   name** (required, red asterisk) and **who's it with** (optional): names or emails typed
+   like email recipients, Enter or a comma after each, × to take one out. Pasting
+   `Marc, Ana and Sam.` works too. Once your name is filled in, Enter on an empty box goes
+   to page 2. An email in the list is only a name: nobody is emailed. When a guest opens
+   the link, the list comes first: "Which one is you?" with a big button per name, and
+   typing a name is the fallback below it. If they type a different name instead, their
+   entry still counts as not answered.
+2. **How long it is** (30 min to 2 hours) and **the dates** (required). People mark their
+   free times between 9 AM and 11 PM in 30 minute slots.
 
-Invitees can be pasted as `Marc, Ana and Sam.`. The organiser can delete a poll from its
-menu or from "Your polls" (the clock icon), where polls this browser made are highlighted.
-An optional email gets a short digest each morning someone new answered. Each poll
-deletes itself 5 days after its confirmed time, else after its last day (weekday-only
-polls: 30 days after their last change).
+The time zone is the chip beside the title: it starts as the device's zone, and a click
+opens a list to change it. The zone is saved with the poll (`config.tz`). After creating,
+only the organiser can still change it (on the share screen and on the poll itself, while
+it is open), and the change saves to the poll for everyone; guests see it as a plain
+label. Anyone who opens it from another zone sees the gap ("3 hours ahead of you") in amber. Times are labelled,
+not converted. "Add to Google Calendar" passes the zone; the `.ics` download does not yet,
+so it lands at the wrong hour for someone in another zone.
+
+After creating, the share screen gives the link, a "Copy invite message" that includes the
+length and, once added, the location, and an optional "Add details" box for location and a
+note. Guests type their name and drag over the grid (green available, yellow maybe);
+results show as a heat grid, a ranked list of best times and a per-person view, and the
+organiser picks the final time. Polls made before this form (one-on-ones, a time in mind,
+offered slots) still open from their links.
+
+The organiser can delete a poll from its menu or from "Your polls" (the clock icon), where
+polls this browser made are highlighted. Polls made with the new form send no email
+digest: the form has no organiser email box, and the script only takes an email when a
+poll is created. Each poll deletes itself 5 days after its confirmed time, else after its
+last day (weekday-only polls: 30 days after their last change).
+
+Delete, the digest and the automatic clean-up need the current `Code.gs` deployed: as of
+2026-11-03 the live script is an older version (the link check says "older version"), so
+they fail until it is redeployed as a New version (see "When something breaks"). Saving
+a poll's details does not need the redeploy.
 
 The expand icon (top right) turns it full screen. Links look like `?meet=<id>`; the
 organiser's own link adds `&admin=<token>` and is the only way to edit from another
@@ -94,8 +132,8 @@ the scheduler alone, with the guide hidden.
 
 ## The QR maker
 
-On the example pamphlet page: paste a link and a QR code draws as you type, to copy into the Doc
-or save as a PNG. It uses qrcode-generator 2.0.4 (Kazuhiko Arase, MIT), inlined in `index.html`
+On the Editor page, right under the editor: paste a link and a QR code draws as you type, to
+copy into the Doc or save as a PNG. The cover's QR tile links there. It uses qrcode-generator 2.0.4 (Kazuhiko Arase, MIT), inlined in `index.html`
 so the guide stays one file.
 
 ## The PDF editor
@@ -105,11 +143,18 @@ so the guide stays one file.
 under MIT or Apache-2.0; its `NOTICE` and licences sit beside it. It is a Rust app compiled
 to WebAssembly: open, edit (text, images, highlights, drawing), organise pages, and print as a
 booklet, all in the browser. `pdf-editor.html` is its page: a curtain counts 10 to 100% from
-the real download while the app compiles, then lifts. The cover links to that page, Step 10
-loads it in place on request, and the guide preloads the app once idle (not on scheduler
-links or with data saver on) so the editor opens from the cache. To update it, replace the
-folder with a newer release's files and change the two file names in `pdf-editor.html` and
-in the preload in `index.html`.
+the real download while the app compiles, then lifts.
+
+The Editor tab opens it in a window on the page the first time that page is shown, with the
+QR maker under it and four short steps with screenshots of the running editor (step 3's
+picture shows the All tools list, not the rotate screen). Above the window, four ready-made
+PDFs (blank template, example pamphlet, print-ready booklet, simplified pamphlet) fly into
+it on click and reopen the editor on that file through `pdf-editor.html?file=<name>`. That
+`?file=` loading is PdfCraft's own behaviour, not code in this repo, so check it by hand
+after any PdfCraft update. Step 10 loads the editor in place on request, and the guide
+preloads the app once idle (not on scheduler links or with data saver on) so the editor
+opens from the cache. To update it, replace the folder with a newer release's files and
+change the two file names in `pdf-editor.html` and in the preload in `index.html`.
 
 ## When something breaks
 

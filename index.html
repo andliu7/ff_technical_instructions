@@ -561,6 +561,13 @@ body{background:#ffffff;}
 .side-head{display:flex;align-items:center;justify-content:space-between;gap:12px;}
 .side-head .part-label{margin:0;white-space:nowrap;}
 .toc-side{border:0;padding:0;flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;}
+/* The contents fade out at the top and bottom edges while there is more to
+   scroll that way (the script sets --ft and --fb). */
+@property --ft{syntax:"<length>";inherits:false;initial-value:0px;}
+@property --fb{syntax:"<length>";inherits:false;initial-value:0px;}
+.toc-side{-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 var(--ft),#000 calc(100% - var(--fb)),transparent 100%);
+  mask-image:linear-gradient(to bottom,transparent 0,#000 var(--ft),#000 calc(100% - var(--fb)),transparent 100%);
+  transition:--ft .25s ease,--fb .25s ease;}
 .toc-side::-webkit-scrollbar{display:none;}
 /* Scroll progress for the contents list, in place of its hidden scrollbar. */
 .side-prog{position:absolute;top:0;left:0;right:0;z-index:2;height:3px;background:var(--acc);
@@ -6177,6 +6184,8 @@ function initSidebar() {
   }
   function setProgTarget() {
     var max = list.scrollHeight - list.clientHeight;
+    list.style.setProperty("--ft", list.scrollTop > 2 ? "36px" : "0px");
+    list.style.setProperty("--fb", max - list.scrollTop > 2 ? "36px" : "0px");
     prog.classList.toggle("none", max <= 1);
     target = max > 1 ? Math.min(1, Math.max(0, list.scrollTop / max)) : 0;
     if (still.matches) { pos = target; vel = 0; draw(); return; }
@@ -6185,6 +6194,42 @@ function initSidebar() {
   list.addEventListener("scroll", setProgTarget, { passive: true });
   if (window.ResizeObserver) new ResizeObserver(setProgTarget).observe(list);
   fitRail();
+
+  // Left alone, the list keeps the page you are on second from the top: the
+  // row before it sits at the top edge. It moves there on every page change,
+  // and if you scroll the list yourself it drifts back a moment after the
+  // pointer leaves the sidebar.
+  var userMoved = false, backTimer = 0;
+  function followCurrent(smooth) {
+    var cur = list.querySelector('a[aria-current="page"]');
+    if (!cur) return;
+    var links = Array.prototype.slice.call(list.querySelectorAll("a"));
+    var prev = links[links.indexOf(cur) - 1] || cur;
+    var lr = list.getBoundingClientRect();
+    var top = prev.getBoundingClientRect().top - lr.top + list.scrollTop - 6;
+    var max = list.scrollHeight - list.clientHeight;
+    if (links.indexOf(prev) === 0) top = 0;
+    top = Math.max(0, Math.min(max, Math.round(top)));
+    userMoved = false;
+    if (Math.abs(top - list.scrollTop) < 2) return;
+    list.scrollTo({ top: top, behavior: smooth && !still.matches ? "smooth" : "auto" });
+  }
+  ["wheel", "touchmove"].forEach(function (ev) {
+    list.addEventListener(ev, function () { userMoved = true; clearTimeout(backTimer); }, { passive: true });
+  });
+  list.addEventListener("keydown", function (e) {
+    if (/^(Arrow|Page|Home|End| )/.test(e.key)) { userMoved = true; clearTimeout(backTimer); }
+  });
+  side.addEventListener("pointerleave", function () {
+    if (!userMoved) return;
+    clearTimeout(backTimer);
+    backTimer = setTimeout(function () {
+      if (!side.matches(":hover") && !side.contains(document.activeElement)) followCurrent(true);
+    }, 1200);
+  });
+  side.addEventListener("pointerenter", function () { clearTimeout(backTimer); });
+  window.addEventListener("ff:page", function (e) { followCurrent(!!e.detail); });
+  followCurrent(false);
 
   // Keep Tab inside the open panel.
   side.addEventListener("keydown", function (e) {
@@ -6277,6 +6322,7 @@ function setPagerLink(a, page, word) {
   a.setAttribute("aria-label", word + ": " + page.title);
 }
 
+var pageShownOnce = false;
 function showPage() {
   currentPage = pageForHash();
   var i = indexOfPage(currentPage);
@@ -6294,6 +6340,8 @@ function showPage() {
     if (a.getAttribute("href") === "#/" + currentPage) a.setAttribute("aria-current", "page");
     else a.removeAttribute("aria-current");
   });
+  window.dispatchEvent(new CustomEvent("ff:page", { detail: pageShownOnce }));
+  pageShownOnce = true;
   var cur = document.querySelector('[data-page="' + currentPage + '"]');
   document.title = currentPage !== PAGES[0].name ? cur.getAttribute("data-title") + " · " + BASE_TITLE : BASE_TITLE;
   window.scrollTo(0, 0);
